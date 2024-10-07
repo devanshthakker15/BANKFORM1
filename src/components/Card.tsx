@@ -1,6 +1,11 @@
 import React from "react";
 
-const Card = ({ title, children }) => {
+interface CardProps {
+  title: string;
+  children: React.ReactNode; 
+}
+
+const Card: React.FC<CardProps> = ({ title, children }) => {
   return (
     <div className="card mb-4">
       <div className="card-header">

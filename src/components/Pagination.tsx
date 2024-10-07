@@ -1,6 +1,16 @@
 import React from "react";
 
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+interface PaginationProps {
+  currentPage: number; 
+  totalPages: number; 
+  onPageChange: (page: number) => void; 
+}
+
+const Pagination: React.FC<PaginationProps> = ({
+  currentPage,
+  totalPages,
+  onPageChange,
+}) => {
   const handlePrev = () => {
     if (currentPage > 1) {
       onPageChange(currentPage - 1);
@@ -23,7 +33,9 @@ const Pagination = ({ currentPage, totalPages, onPageChange }) => {
         Previous
       </button>
 
-      <span>Page {currentPage} of {totalPages}</span>
+      <span>
+        Page {currentPage} of {totalPages}
+      </span>
 
       <button
         className="btn btn-secondary"

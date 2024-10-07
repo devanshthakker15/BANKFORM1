@@ -2,54 +2,63 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../components/Pagination";
 
-const BankDetailsList = () => {
-  const [bankData, setBankData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+
+interface BankData {
+  id: number; 
+  bankName: string;
+  accountHolderName: string;
+  accountNumber: string;
+}
+
+const BankDetailsList: React.FC = () => {
+  const [bankData, setBankData] = useState<BankData[]>([]);
+  const [filteredData, setFilteredData] = useState<BankData[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const navigate = useNavigate();
   const itemsPerPage = 3;
 
   useEffect(() => {
-    const storedData = JSON.parse(localStorage.getItem("bankFormData")) || [];
+    const storedData = JSON.parse(localStorage.getItem("bankFormData") || "[]") as BankData[];
     setBankData(storedData);
     setFilteredData(storedData);
   }, []);
 
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value);
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
     const filtered = bankData.filter((item) =>
-      item.bankName.toLowerCase().includes(e.target.value.toLowerCase()) ||
-      item.accountHolderName.toLowerCase().includes(e.target.value.toLowerCase())
+      item.bankName.toLowerCase().includes(value.toLowerCase()) ||
+      item.accountHolderName.toLowerCase().includes(value.toLowerCase())
     );
     setFilteredData(filtered);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
 
-  const handleEdit = (id) => {
+  const handleEdit = (id: number) => {
     navigate("/", { state: { id } });
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: number) => {
     const updatedData = bankData.filter((item) => item.id !== id);
     setBankData(updatedData);
     localStorage.setItem("bankFormData", JSON.stringify(updatedData));
   };
 
   const handleBackToForm = () => {
-    navigate("/"); 
+    navigate("/");
   };
 
-  //Pagination part constants/functions and calculations
+  // Pagination part constants/functions and calculations
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  
-  const handlePageChange = (page) => {
+
+  const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
   // Calculate the entries to display on the current page
-  const startIndex = (currentPage -1) * itemsPerPage;
+  const startIndex = (currentPage - 1) * itemsPerPage;
   const currentEntries = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
   return (
@@ -80,8 +89,8 @@ const BankDetailsList = () => {
         </thead>
         <tbody>
           {currentEntries.length > 0 ? (
-            currentEntries.map((item, index) => (
-              <tr key={index}>
+            currentEntries.map((item) => (
+              <tr key={item.id}>
                 <td>{item.id}</td>
                 <td>{item.bankName}</td>
                 <td>{item.accountHolderName}</td>
@@ -104,7 +113,7 @@ const BankDetailsList = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="5" className="text-center">
+              <td colSpan={5} className="text-center">
                 No data found
               </td>
             </tr>
@@ -112,16 +121,12 @@ const BankDetailsList = () => {
         </tbody>
       </table>
 
-
-
       {/* Pagination Controls */}
       <Pagination
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={handlePageChange}
       />
-
-
 
       {/* Back to Form Button */}
       <div className="text-center mt-4 d-flex justify-content-start">

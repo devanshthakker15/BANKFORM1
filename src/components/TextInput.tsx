@@ -1,7 +1,14 @@
 import React from 'react';
 import { Field, ErrorMessage } from 'formik';
 
-const TextInput = ({ label, name, type = "text", placeholder }) => {
+interface TextInputProps {
+  label: string; 
+  name: string; 
+  type?: string; 
+  placeholder?: string; 
+}
+
+const TextInput: React.FC<TextInputProps> = ({ label, name, type = "text", placeholder }) => {
   return (
     <div className="mb-1 mt-2">
       <label htmlFor={name} className="form-label">{label}</label>
