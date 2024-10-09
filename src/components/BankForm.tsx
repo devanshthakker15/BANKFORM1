@@ -7,7 +7,8 @@ import { saveFormDataAsync } from "../redux/formSlice";
 import { basicSchema } from "../schema/basicSchema";
 import Card from "./Card";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AppDispatch } from "../redux/store"; // Import RootState and AppDispatch
+// import { AppDispatch } from "../redux/store";
+import { AppDispatch } from "../redux/store";
 import { Link } from "react-router-dom";
 
 interface Address {
@@ -27,7 +28,7 @@ interface BankFormValues {
   accountNumber: string;
   email: string;
   addresses: Address[];
-  id?: number; // Optional id for editing purposes
+  id?: number;
 }
 
 interface Option {
@@ -36,10 +37,9 @@ interface Option {
 }
 
 const BankForm: React.FC = () => {
-  const dispatch: AppDispatch = useDispatch(); 
-  const location = useLocation(); 
+  const dispatch: AppDispatch = useDispatch();
+  const location = useLocation();
   const navigate = useNavigate();
-  // const formStatus = useSelector((state: RootState) => state.form.status); 
 
   const bankOptions: Option[] = [
     { value: "Bank of Baroda", label: "Bank of Baroda" },
@@ -76,7 +76,6 @@ const BankForm: React.FC = () => {
       const storedData = JSON.parse(
         localStorage.getItem("bankFormData") || "[]"
       ) as BankFormValues[];
-      console.log("Stored Data for editing:", storedData); // Log stored data
       const dataToEdit: BankFormValues =
         storedData.find((item) => item.id === location.state.id) || {
           bankName: "",
@@ -96,7 +95,6 @@ const BankForm: React.FC = () => {
             },
           ],
         };
-      console.log("Data to Edit:", dataToEdit); // Log data that will be edited
       return dataToEdit;
     }
     return {
@@ -119,38 +117,34 @@ const BankForm: React.FC = () => {
     };
   }, [location.state]);
 
-  const onSubmit = (
+  const onSubmit = async (
     values: BankFormValues,
     { resetForm }: FormikHelpers<BankFormValues>
   ) => {
-    console.log("Submit button clicked")
-    console.log("Form Values on Submit:", values); // Log form values on submit
-
     const existingData = JSON.parse(
       localStorage.getItem("bankFormData") || "[]"
     ) as BankFormValues[];
-    console.log("Existing Data in localStorage:", existingData); // Log existing data
 
     if (values.id !== undefined) {
       const updatedData = existingData.map((item) =>
         item.id === values.id ? values : item
       );
-      console.log("Updated Data for Editing:", updatedData); // Log updated data after editing
       localStorage.setItem("bankFormData", JSON.stringify(updatedData));
     } else {
       const newId = existingData.length
         ? Math.max(...existingData.map((item) => item.id || 0)) + 1
         : 0;
       const updatedData = [...existingData, { ...values, id: newId }];
-      console.log("New Data with ID:", updatedData); // Log new data with the generated id
       localStorage.setItem("bankFormData", JSON.stringify(updatedData));
     }
 
-    dispatch(saveFormDataAsync(values)).then(() => {
-      console.log("Form data saved to Redux successfully"); // Log after successful Redux dispatch
+    try {
+      await dispatch(saveFormDataAsync(values));
       resetForm();
-      navigate("/bank-details-list"); // Redirect to bank details page
-    });
+      navigate("/bank-details-list");
+    } catch (error) {
+      console.error("Error during form submission:", error);
+    }
   };
 
   return (
@@ -163,7 +157,6 @@ const BankForm: React.FC = () => {
       >
         {({ values }) => (
           <Form>
-            {/* General Information Card */}
             <Card title="General Information">
               <div className="row">
                 <div className="col-md-6">
@@ -190,7 +183,6 @@ const BankForm: React.FC = () => {
               </div>
             </Card>
 
-            {/* Multiple Addresses using FieldArray */}
             <FieldArray name="addresses">
               {({ remove, push }) => (
                 <Card title="Address Information">
@@ -209,7 +201,7 @@ const BankForm: React.FC = () => {
                             <TextInput
                               label="Address Line 2"
                               placeholder="Enter Address"
-                              name={`addresses.${index}.addressLine2`} 
+                              name={`addresses.${index}.addressLine2`}
                             />
                           </div>
                         </div>
@@ -217,21 +209,21 @@ const BankForm: React.FC = () => {
                           <div className="col-md-3">
                             <SelectInput
                               label="City*"
-                              name={`addresses.${index}.city`} 
+                              name={`addresses.${index}.city`}
                               options={cityOptions}
                             />
                           </div>
                           <div className="col-md-3">
                             <SelectInput
                               label="State*"
-                              name={`addresses.${index}.state`} 
+                              name={`addresses.${index}.state`}
                               options={stateOptions}
                             />
                           </div>
                           <div className="col-md-3">
                             <SelectInput
                               label="Country*"
-                              name={`addresses.${index}.country`} 
+                              name={`addresses.${index}.country`}
                               options={countryOptions}
                             />
                           </div>
@@ -239,7 +231,7 @@ const BankForm: React.FC = () => {
                             <TextInput
                               label="Pincode*"
                               placeholder="Enter Pincode"
-                              name={`addresses.${index}.pincode`} 
+                              name={`addresses.${index}.pincode`}
                             />
                           </div>
                         </div>
@@ -261,7 +253,7 @@ const BankForm: React.FC = () => {
                           >
                             Add Another Address
                           </button>
-                          {index > 0 && (
+                          {values.addresses.length > 1 && (
                             <button
                               type="button"
                               className="btn btn-danger mt-2"
@@ -298,7 +290,7 @@ const BankForm: React.FC = () => {
                     label="Email*"
                     placeholder="Enter Email"
                     name="email"
-                    type="email" 
+                    type="email"
                   />
                 </div>
               </div>
@@ -308,16 +300,9 @@ const BankForm: React.FC = () => {
               <button type="submit" className="btn btn-success mt-2">
                 Submit
               </button>
-              {/* <button
-                type="button"
-                className="btn btn-secondary mt-2"
-                onClick={() => navigate("/bank-details-page")} 
-              >
-                View Bank Details
-              </button> */}
               <Link to="/bank-details-list">
-            <button className="btn btn-primary">View Submissions</button>
-          </Link>
+                <button className="btn btn-warning mt-2">View Details</button>
+              </Link>
             </div>
           </Form>
         )}

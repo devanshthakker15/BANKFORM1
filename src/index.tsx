@@ -45,7 +45,8 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App'; // Ensure App.tsx is in the same directory
 import { Provider } from 'react-redux';
-import { store } from './redux/store'; // Ensure store.ts is in the redux folder
+// import { store } from './redux/store'; // Ensure store.ts is in the redux folder
+import { store } from './redux/store';
 
 
 const rootElement = document.getElementById('root') as HTMLElement;
@@ -59,6 +60,3 @@ root.render(
    <App />
  </Provider>
 );
-
-
-

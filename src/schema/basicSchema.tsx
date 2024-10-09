@@ -5,6 +5,9 @@ export const basicSchema = Yup.object({
     .matches(/^[A-Za-z\s]+$/, 'Bank name must contain only letters and spaces')
     .max(50, 'Bank name must be at most 50 characters long')
     .required('Bank name is required'),
+  ifscCode: Yup.string()
+  .matches(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code format")
+  .required("IFSC Code is required"),
   accountHolderName: Yup.string()
     .matches(/^[A-Za-z\s]+$/, 'Account holder name must contain only letters and spaces')
     .max(50, 'Account holder name must be at most 50 characters long')
@@ -16,7 +19,7 @@ export const basicSchema = Yup.object({
     .of(
       Yup.object({
         addressLine1: Yup.string()
-          .min(10, 'Address Line 1 must be at least 10 characters long')
+          .min(1, 'Address Line 1 must be at least 10 characters long')
           .max(100, 'Address Line 1 must be at most 100 characters long')
           .required('Address Line 1 is required'),
         addressLine2: Yup.string().max(100, 'Address Line 2 must be at most 100 characters long'),
@@ -39,9 +42,4 @@ export const basicSchema = Yup.object({
     )
     .required('At least one address is required')
     .min(1, 'At least one address is required'),
-
-    categoryName: Yup.string().required('Category Name is required'),
-    categoryCode: Yup.string().required('Category Code is required'),
-    categoryDescription: Yup.string().required('Category Description is required'),
-    subCategory: Yup.string().required('Subcategory is required'),
 });
