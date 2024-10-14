@@ -11,6 +11,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import LoginPage from "./pages/LoginPage";
 import "admin-lte/dist/css/adminlte.min.css";
 import "admin-lte/dist/js/adminlte.min.js";
+import PageNotFound from "./pages/PageNotFound";
 
 const App: React.FC = () => {
   return (
@@ -18,10 +19,10 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<LoginPage />} />
-          {/* Update this route to include id parameter */}
           <Route path="/bank-form/:id?" element={<BankFormPage />} />
           <Route path="/bank-details-list" element={<BankDetailsList />} />
           <Route path="/home" element={<HomePage />} />
+          <Route path="*" element={<PageNotFound />} />
         </Route>
       </Routes>
     </BrowserRouter>

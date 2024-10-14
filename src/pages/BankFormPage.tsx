@@ -42,11 +42,11 @@ const BankFormPage: React.FC = () => {
         <BankForm initialValues={initialValues} /> {/* Render form with initial values or empty form */}
 
         {/* Back to Form Button */}
-        <div className="text-left mt-4">
+        {/* <div className="text-left mt-4">
           <button className="btn btn-secondary" onClick={handleBackToForm}>
             Back to Form
           </button>
-        </div>
+        </div> */}
       </div>
 
       <footer className="mt-5 d-flex justify-content-center">

@@ -26,9 +26,10 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="pagination d-flex justify-content-between align-items-center mt-4">
+    <div className="pagination d-flex justify-content-center align-items-center mt-4">
       <button
-        className="btn btn-secondary"
+        className="btn btn-primary"
+        style={{ width: '40px', marginRight: '10px'}}
         disabled={currentPage === 1}
         onClick={handlePrev}
       >
@@ -40,7 +41,8 @@ const Pagination: React.FC<PaginationProps> = ({
       </span>
 
       <button
-        className="btn btn-secondary"
+        className="btn btn-primary"
+        style={{ width: '40px', marginLeft: '10px' }}
         disabled={currentPage === totalPages}
         onClick={handleNext}
       >
