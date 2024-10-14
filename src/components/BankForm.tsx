@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Formik, Form, FieldArray, FormikHelpers } from "formik";
 import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
@@ -9,7 +9,7 @@ import Card from "./Card";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AppDispatch } from "../redux/store";
 import { Link } from "react-router-dom";
-import { bankOptions, cityOptions, stateOptions, countryOptions } from "../utils/constants";  // Import from constants
+import { bankOptions, countryOptions, stateCityMapping } from "../utils/constants";  // Import updated constants
 
 interface Address {
   addressLine1: string;
@@ -44,6 +44,9 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
   const dispatch: AppDispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [selectedCountry, setSelectedCountry] = useState<string>("");
+  const [selectedState, setSelectedState] = useState<string>("");
 
   const defaultValues = useMemo(() => {
     return initialValues || {
@@ -94,6 +97,14 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
     } catch (error) {
       console.error("Error during form submission:", error);
     }
+  };
+
+  const getStateOptions = () => {
+    return selectedCountry ? stateCityMapping[selectedCountry].states : [];
+  };
+
+  const getCityOptions = () => {
+    return selectedState ? stateCityMapping[selectedCountry].cities[selectedState] : [];
   };
 
   return (
@@ -165,21 +176,26 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                               name={`addresses.${index}.country`}
                               options={countryOptions}  // Use imported options
                               required={true}
+                              onChange={(e) => {
+                                setSelectedCountry(e.target.value);
+                                setSelectedState("");
+                              }}
                             />
                           </div>
                           <div className="col-md-3">
                             <SelectInput
                               label="State"
                               name={`addresses.${index}.state`}
-                              options={stateOptions}    // Use imported options
+                              options={getStateOptions()}    // Dynamically filtered states
                               required={true}
+                              onChange={(e) => setSelectedState(e.target.value)}
                             />
                           </div>
                           <div className="col-md-3">
                             <SelectInput
                               label="City"
                               name={`addresses.${index}.city`}
-                              options={cityOptions}     // Use imported options
+                              options={getCityOptions()}     // Dynamically filtered cities
                               required={true}
                             />
                           </div>

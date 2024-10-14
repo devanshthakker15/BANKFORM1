@@ -26,7 +26,7 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="pagination d-flex justify-content-around align-items-center mt-4">
+    <div className="pagination d-flex justify-content-between align-items-center mt-4">
       <button
         className="btn btn-secondary"
         disabled={currentPage === 1}

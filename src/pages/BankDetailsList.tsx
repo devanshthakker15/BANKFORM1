@@ -144,7 +144,7 @@ const BankDetailsList: React.FC = () => {
       />
 
       {/* Back to Form Button */}
-      <div className="text-center mt-4 d-flex justify-content-around">
+      <div className="text-center mt-4 d-flex justify-content-between">
         <button className="btn btn-primary" onClick={handleBackToForm}>
           Back to Form
         </button>
