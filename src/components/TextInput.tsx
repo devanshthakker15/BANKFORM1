@@ -6,18 +6,21 @@ interface TextInputProps {
   name: string; 
   type?: string; 
   placeholder?: string; 
+  required?: boolean; 
 }
 
-const TextInput: React.FC<TextInputProps> = ({ label, name, type = "text", placeholder }) => {
+const TextInput: React.FC<TextInputProps> = ({ label, name, type = "text", placeholder, required = false }) => {
   return (
-    <div className="mb-1 mt-2">
-      <label htmlFor={name} className="form-label">{label}</label>
+    <div className="form-group">
+      <label htmlFor={name} className="form-label">
+        {label} {required && <span className="text-danger">*</span>} 
+      </label>
       <Field
         id={name}
         name={name}
         type={type}
         placeholder={placeholder}
-        className="form-control"
+        className="form-control input-size"
       />
       <ErrorMessage name={name} component="div" className="text-danger" />
     </div>

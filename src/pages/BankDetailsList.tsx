@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Pagination from "../components/Pagination";
-
+import "../styles/bankStyles.css";
 
 interface BankData {
-  id: number; 
+  id: number;
   bankName: string;
   accountHolderName: string;
   accountNumber: string;
@@ -37,32 +37,47 @@ const BankDetailsList: React.FC = () => {
   };
 
   const handleEdit = (id: number) => {
-    navigate("/", { state: { id } });
+    navigate(`/bank-form/${id}`);
   };
 
   const handleDelete = (id: number) => {
     const updatedData = bankData.filter((item) => item.id !== id);
     setBankData(updatedData);
+    setFilteredData(updatedData); // Update filtered data as well
     localStorage.setItem("bankFormData", JSON.stringify(updatedData));
+
+    // Check if current page entries are empty
+    const totalPages = Math.ceil(updatedData.length / itemsPerPage);
+    if (currentPage > totalPages) {
+      setCurrentPage(totalPages); // Set current page to the last available page
+    }
+    // Check if the current page is now empty
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const currentEntries = updatedData.slice(startIndex, startIndex + itemsPerPage);
+    if (currentEntries.length === 0 && totalPages > 0) {
+      setCurrentPage(1); // Reset to the first page
+    }
   };
 
   const handleBackToForm = () => {
-    navigate("/");
+    navigate("/bank-form");
   };
 
-  // Pagination part constants/functions and calculations
+  const handleBackToHome = () => {
+    navigate("/home");
+  };
+
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
 
-  // Calculate the entries to display on the current page
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentEntries = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div className="container mt-5">
+    <div className="container">
       <h2>Bank Details Submissions</h2>
 
       {/* Search Input */}
@@ -80,30 +95,30 @@ const BankDetailsList: React.FC = () => {
       <table className="table table-bordered">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Bank Name</th>
-            <th>Account Holder Name</th>
-            <th>Account Number</th>
+            <th>Serial No.</th>
+            <th className="bank-name">Bank Name</th>
+            <th className="account-holder">Account Holder Name</th>
+            <th className="account-number">Account Number</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {currentEntries.length > 0 ? (
-            currentEntries.map((item) => (
+            currentEntries.map((item, index) => (
               <tr key={item.id}>
-                <td>{item.id}</td>
-                <td>{item.bankName}</td>
-                <td>{item.accountHolderName}</td>
-                <td>{item.accountNumber}</td>
+                <td>{startIndex + index + 1}</td> {/* Serial number calculation */}
+                <td className="bank-name">{item.bankName}</td>
+                <td className="account-holder">{item.accountHolderName}</td>
+                <td className="account-number">{item.accountNumber}</td>
                 <td>
                   <button
-                    className="btn btn-primary me-2"
+                    className="button btn btn-primary"
                     onClick={() => handleEdit(item.id)}
                   >
                     Edit
                   </button>
                   <button
-                    className="btn btn-danger"
+                    className="button btn btn-danger"
                     onClick={() => handleDelete(item.id)}
                   >
                     <strong>X</strong>
@@ -129,9 +144,12 @@ const BankDetailsList: React.FC = () => {
       />
 
       {/* Back to Form Button */}
-      <div className="text-center mt-4 d-flex justify-content-start">
-        <button className="btn btn-secondary" onClick={handleBackToForm}>
+      <div className="text-center mt-4 d-flex justify-content-around">
+        <button className="btn btn-primary" onClick={handleBackToForm}>
           Back to Form
+        </button>
+        <button className="btn btn-primary" onClick={handleBackToHome}>
+          Back to Home
         </button>
       </div>
     </div>

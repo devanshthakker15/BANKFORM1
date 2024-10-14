@@ -1,16 +1,33 @@
-import React from "react";
-// import BankForm from "../components/BankForm.tsx";
+import React, { useEffect, useState } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import BankForm from "../components/BankForm";
-import { Link } from "react-router-dom";
 import "../App.css";
 
 const BankFormPage: React.FC = () => {
+  const { id } = useParams<{ id?: string }>(); // Make id optional
+  const [initialValues, setInitialValues] = useState<any>(null); // Replace `any` with your actual type if needed
+  const navigate = useNavigate(); // Hook for navigation
+
+  useEffect(() => {
+    if (id) {
+      const storedData = JSON.parse(localStorage.getItem("bankFormData") || "[]");
+      const bankData = storedData.find((item: { id: number }) => item.id === Number(id));
+      if (bankData) {
+        setInitialValues(bankData);
+      } else {
+        // If ID is not found, redirect to the empty form
+        navigate("/bank-form");
+      }
+    }
+  }, [id, navigate]);
+
+  const handleBackToForm = () => {
+    navigate("/bank-form"); // Navigate to BankForm without an ID
+  };
+
   return (
     <div className="body">
       <div className="container mt-5">
-        <div className="text-right mb-4 d-flex justify-content-start">
-            {/* Enter Offcanvas here */}
-        </div>
         {/* View Submissions Button */}
         <div className="text-right mb-4 d-flex justify-content-end">
           <Link to="/bank-details-list">
@@ -22,9 +39,16 @@ const BankFormPage: React.FC = () => {
         <div className="header">
           <h2>Bank Details Form</h2>
         </div>
-        <BankForm />
+        <BankForm initialValues={initialValues} /> {/* Render form with initial values or empty form */}
+
+        {/* Back to Form Button */}
+        <div className="text-left mt-4">
+          <button className="btn btn-secondary" onClick={handleBackToForm}>
+            Back to Form
+          </button>
+        </div>
       </div>
-      
+
       <footer className="mt-5 d-flex justify-content-center">
         <p>&copy; 2024 Our Company. All Rights Reserved.</p>
       </footer>

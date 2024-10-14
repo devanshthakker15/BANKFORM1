@@ -10,18 +10,34 @@ interface Option {
 interface SelectInputProps {
   label: string; 
   name: string; 
-  options: Option[]; 
+  options: Option[];
+  required?: boolean; 
+  onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void; // Add optional onChange prop
 }
 
-const SelectInput: React.FC<SelectInputProps> = ({ label, name, options }) => {
-  const [field, meta] = useField(name);
+const SelectInput: React.FC<SelectInputProps> = ({ label, name, options, required = false, onChange }) => {
+  const [field, meta, helpers] = useField(name);
+
+  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = event.target;
+    helpers.setValue(value); // Set value in Formik
+    if (onChange) {
+      onChange(event); // Call custom onChange if provided
+    }
+  };
 
   return (
     <div className="form-group">
-      <div className='select-style'>
-        <label htmlFor={name}>{label}</label>
-      </div>
-      <select {...field} className="form-control" id={name}>
+      <label htmlFor={name} className="form-label">
+        {label} {required && <span className="text-danger">*</span>}
+      </label>
+      <select
+        {...field}
+        className={`form-control input-size ${meta.touched && meta.error ? 'is-invalid' : ''}`} // Add invalid class on error
+        id={name}
+        required={required} // Add required attribute to select
+        onChange={handleChange} // Use custom handleChange
+      >
         <option value="">Select an option</option>
         {options.map(option => (
           <option key={option.value} value={option.value}>

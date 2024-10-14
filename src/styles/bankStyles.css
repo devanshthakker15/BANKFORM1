@@ -1,0 +1,33 @@
+.button{
+    width: 70px;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+/* Ensure table columns maintain a fixed width and handle text overflow */
+.table th, .table td {
+    width: 150px; /* You can adjust the width as per your design */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Optionally, give more width to specific columns */
+  .table .bank-name {
+    width: 200px;
+  }
+  
+  .table .account-holder {
+    width: 180px;
+  }
+  
+  .table .account-number {
+    width: 150px;
+  }
+  
+  /* Adjust column widths for different screen sizes (responsive design) */
+  @media (max-width: 768px) {
+    .table th, .table td {
+      width: 100px;
+    }
+  }
+  

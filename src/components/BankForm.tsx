@@ -7,9 +7,9 @@ import { saveFormDataAsync } from "../redux/formSlice";
 import { basicSchema } from "../schema/basicSchema";
 import Card from "./Card";
 import { useLocation, useNavigate } from "react-router-dom";
-// import { AppDispatch } from "../redux/store";
 import { AppDispatch } from "../redux/store";
 import { Link } from "react-router-dom";
+import { bankOptions, cityOptions, stateOptions, countryOptions } from "../utils/constants";  // Import from constants
 
 interface Address {
   addressLine1: string;
@@ -36,68 +36,17 @@ interface Option {
   label: string;
 }
 
-const BankForm: React.FC = () => {
+interface BankFormProps {
+  initialValues?: BankFormValues; 
+}
+
+const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
   const dispatch: AppDispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
 
-  const bankOptions: Option[] = [
-    { value: "Bank of Baroda", label: "Bank of Baroda" },
-    { value: "HDFC Bank", label: "HDFC Bank" },
-    { value: "ICICI Bank", label: "ICICI Bank" },
-    { value: "IDFC First Bank", label: "IDFC First Bank" },
-    { value: "Kotak Bank", label: "Kotak Bank" },
-    { value: "SBI", label: "SBI" },
-    { value: "Bank of Maharashtra", label: "Bank of Maharashtra" },
-  ];
-
-  const cityOptions: Option[] = [
-    { value: "Thane", label: "Thane" },
-    { value: "Mulund", label: "Mulund" },
-    { value: "Bhandup", label: "Bhandup" },
-    { value: "Ghatkopar", label: "Ghatkopar" },
-  ];
-
-  const stateOptions: Option[] = [
-    { value: "Maharashtra", label: "Maharashtra" },
-    { value: "Delhi", label: "Delhi" },
-    { value: "Karnataka", label: "Karnataka" },
-    { value: "Kashmir", label: "Kashmir" },
-  ];
-
-  const countryOptions: Option[] = [
-    { value: "India", label: "India" },
-    { value: "Dubai", label: "Dubai" },
-    { value: "USA", label: "USA" },
-  ];
-
-  const initialValues: BankFormValues = useMemo(() => {
-    if (location.state && location.state.id !== undefined) {
-      const storedData = JSON.parse(
-        localStorage.getItem("bankFormData") || "[]"
-      ) as BankFormValues[];
-      const dataToEdit: BankFormValues =
-        storedData.find((item) => item.id === location.state.id) || {
-          bankName: "",
-          ifscCode: "",
-          branchName: "",
-          accountHolderName: "",
-          accountNumber: "",
-          email: "",
-          addresses: [
-            {
-              addressLine1: "",
-              addressLine2: "",
-              city: "",
-              state: "",
-              country: "",
-              pincode: "",
-            },
-          ],
-        };
-      return dataToEdit;
-    }
-    return {
+  const defaultValues = useMemo(() => {
+    return initialValues || {
       bankName: "",
       ifscCode: "",
       branchName: "",
@@ -115,7 +64,7 @@ const BankForm: React.FC = () => {
         },
       ],
     };
-  }, [location.state]);
+  }, [initialValues]);
 
   const onSubmit = async (
     values: BankFormValues,
@@ -150,7 +99,7 @@ const BankForm: React.FC = () => {
   return (
     <div>
       <Formik
-        initialValues={initialValues}
+        initialValues={defaultValues}
         validationSchema={basicSchema}
         onSubmit={onSubmit}
         enableReinitialize={true}
@@ -161,23 +110,26 @@ const BankForm: React.FC = () => {
               <div className="row">
                 <div className="col-md-6">
                   <SelectInput
-                    label="Bank Name*"
+                    label="Bank Name"
                     name="bankName"
-                    options={bankOptions}
+                    options={bankOptions}   // Use imported options
+                    required={true}
                   />
                 </div>
                 <div className="col-md-6">
                   <TextInput
-                    label="IFSC Code*"
+                    label="IFSC Code"
                     placeholder="Enter IFSC code"
                     name="ifscCode"
+                    required={true}
                   />
                 </div>
                 <div className="col-md-6">
                   <TextInput
-                    label="Branch Name*"
+                    label="Branch Name"
                     placeholder="Enter Branch name"
                     name="branchName"
+                    required={true}
                   />
                 </div>
               </div>
@@ -192,9 +144,10 @@ const BankForm: React.FC = () => {
                         <div className="row mt-3">
                           <div className="col-md-6">
                             <TextInput
-                              label="Address Line 1*"
+                              label="Address Line 1"
                               placeholder="Enter Address"
                               name={`addresses.${index}.addressLine1`}
+                              required={true}
                             />
                           </div>
                           <div className="col-md-6">
@@ -208,30 +161,34 @@ const BankForm: React.FC = () => {
                         <div className="row">
                           <div className="col-md-3">
                             <SelectInput
-                              label="City*"
-                              name={`addresses.${index}.city`}
-                              options={cityOptions}
-                            />
-                          </div>
-                          <div className="col-md-3">
-                            <SelectInput
-                              label="State*"
-                              name={`addresses.${index}.state`}
-                              options={stateOptions}
-                            />
-                          </div>
-                          <div className="col-md-3">
-                            <SelectInput
-                              label="Country*"
+                              label="Country"
                               name={`addresses.${index}.country`}
-                              options={countryOptions}
+                              options={countryOptions}  // Use imported options
+                              required={true}
                             />
                           </div>
-                          <div className="col-md-3 mt-2">
+                          <div className="col-md-3">
+                            <SelectInput
+                              label="State"
+                              name={`addresses.${index}.state`}
+                              options={stateOptions}    // Use imported options
+                              required={true}
+                            />
+                          </div>
+                          <div className="col-md-3">
+                            <SelectInput
+                              label="City"
+                              name={`addresses.${index}.city`}
+                              options={cityOptions}     // Use imported options
+                              required={true}
+                            />
+                          </div>
+                          <div className="col-md-3">
                             <TextInput
-                              label="Pincode*"
+                              label="Pincode"
                               placeholder="Enter Pincode"
                               name={`addresses.${index}.pincode`}
+                              required={true}
                             />
                           </div>
                         </div>
@@ -273,24 +230,27 @@ const BankForm: React.FC = () => {
               <div className="row">
                 <div className="col-md-6">
                   <TextInput
-                    label="Account Holder Name*"
+                    label="Account Holder Name"
                     placeholder="Enter Account Holder Name"
                     name="accountHolderName"
+                    required={true}
                   />
                 </div>
                 <div className="col-md-6">
                   <TextInput
-                    label="Account Number*"
+                    label="Account Number"
                     placeholder="Enter Account Number"
                     name="accountNumber"
+                    required={true}
                   />
                 </div>
                 <div className="col-md-6">
                   <TextInput
-                    label="Email*"
+                    label="Email"
                     placeholder="Enter Email"
                     name="email"
                     type="email"
+                    required={true}
                   />
                 </div>
               </div>
@@ -301,7 +261,9 @@ const BankForm: React.FC = () => {
                 Submit
               </button>
               <Link to="/bank-details-list">
-                <button className="btn btn-warning mt-2">View Details</button>
+                <button type="button" className="btn btn-primary mt-2">
+                  Go to Bank Details List
+                </button>
               </Link>
             </div>
           </Form>

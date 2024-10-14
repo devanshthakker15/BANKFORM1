@@ -1,9 +1,11 @@
 import React from "react";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
 interface PaginationProps {
-  currentPage: number; 
-  totalPages: number; 
-  onPageChange: (page: number) => void; 
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
 }
 
 const Pagination: React.FC<PaginationProps> = ({
@@ -30,7 +32,7 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === 1}
         onClick={handlePrev}
       >
-        Previous
+        <FontAwesomeIcon icon={faChevronLeft} />
       </button>
 
       <span>
@@ -42,7 +44,7 @@ const Pagination: React.FC<PaginationProps> = ({
         disabled={currentPage === totalPages}
         onClick={handleNext}
       >
-        Next
+        <FontAwesomeIcon icon={faChevronRight} />
       </button>
     </div>
   );
