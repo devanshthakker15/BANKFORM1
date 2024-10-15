@@ -3,6 +3,7 @@
   background-color: #343a40; 
   transition: width 0.3s ease; 
   width: 250px; 
+
 }
 
 .main-sidebar.collapsed {
@@ -10,7 +11,7 @@
 }
 
 .sidebar {
-  transition: background-color 0.3s ease; 
+  /* transition: background-color 0.3s ease;  */
 }
 
 .sidebar.collapsed {
@@ -20,9 +21,8 @@
 .nav-link {
   white-space: nowrap; 
   color: white; 
-  text-overflow: ellipsis; 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2); 
   padding: 10px; 
+  
 }
 
 .main-sidebar.collapsed .nav-link p {
@@ -58,6 +58,7 @@
   align-items: center;
   display: flex;
   width: 100%;
+  border-bottom: 1px solid rgb(185, 180, 180); 
 }
 
 .nav-link p {

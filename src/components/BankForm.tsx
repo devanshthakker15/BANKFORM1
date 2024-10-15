@@ -2,13 +2,13 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Formik, Form, FieldArray, FormikHelpers } from "formik";
 import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
-import { useAppDispatch } from "../redux/hooks";  // Import the new hook
+import { useAppDispatch } from "../redux/hooks";
 import { saveFormDataAsync } from "../redux/formSlice";
 import { basicSchema } from "../schema/basicSchema";
 import Card from "./Card";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { bankOptions, countryOptions, stateCityMapping } from "../utils/constants";  // Import updated constants
+import { bankOptions, countryOptions, stateCityMapping } from "../utils/constants";  
 
 interface Address {
   addressLine1: string;
@@ -36,18 +36,18 @@ interface Option {
 }
 
 interface BankFormProps {
-  initialValues?: BankFormValues; 
+  initialValues?: BankFormValues;
 }
 
 const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
-  const dispatch = useAppDispatch(); // Now using useAppDispatch instead of AppDispatch
+  const dispatch = useAppDispatch();
   const location = useLocation();
   const navigate = useNavigate();
 
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [selectedState, setSelectedState] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
-  // Set selectedCountry and selectedState from initialValues when form is in edit mode
   useEffect(() => {
     if (initialValues && initialValues.addresses.length > 0) {
       setSelectedCountry(initialValues.addresses[0].country);
@@ -56,6 +56,20 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
   }, [initialValues]);
 
   const defaultValues = useMemo(() => {
+    // Safely fetch and parse data from localStorage, handle any errors
+    let existingData: BankFormValues[] = [];
+
+    try {
+      const storedData = localStorage.getItem("bankFormData");
+      if (storedData) {
+        existingData = JSON.parse(storedData);
+        // Optionally, you can add a deeper check here to validate the structure of `existingData`
+      }
+    } catch (error) {
+      setErrorMessage("Failed to load saved data. Resetting to defaults.");
+      console.error("Error parsing data from localStorage:", error);
+    }
+
     return initialValues || {
       bankName: "",
       ifscCode: "",
@@ -80,9 +94,16 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
     values: BankFormValues,
     { resetForm }: FormikHelpers<BankFormValues>
   ) => {
-    const existingData = JSON.parse(
-      localStorage.getItem("bankFormData") || "[]"
-    ) as BankFormValues[];
+    let existingData: BankFormValues[] = [];
+
+    try {
+      const storedData = localStorage.getItem("bankFormData");
+      if (storedData) {
+        existingData = JSON.parse(storedData);
+      }
+    } catch (error) {
+      console.error("Error parsing data during submission:", error);
+    }
 
     if (values.id !== undefined) {
       const updatedData = existingData.map((item) =>
@@ -116,6 +137,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
 
   return (
     <div>
+      {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
       <Formik
         initialValues={defaultValues}
         validationSchema={basicSchema}
@@ -130,7 +152,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                   <SelectInput
                     label="Bank Name"
                     name="bankName"
-                    options={bankOptions}   // Use imported options
+                    options={bankOptions}
                     required={true}
                   />
                 </div>
@@ -181,32 +203,32 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                             <SelectInput
                               label="Country"
                               name={`addresses.${index}.country`}
-                              options={countryOptions}  // Use imported options
+                              options={countryOptions}
                               required={true}
                               onChange={(e) => {
                                 setSelectedCountry(e.target.value);
                                 setSelectedState("");
                               }}
-                              value={address.country}  // Set the selected country
+                              value={address.country}
                             />
                           </div>
                           <div className="col-md-3">
                             <SelectInput
                               label="State"
                               name={`addresses.${index}.state`}
-                              options={getStateOptions()}    // Dynamically filtered states
+                              options={getStateOptions()}
                               required={true}
                               onChange={(e) => setSelectedState(e.target.value)}
-                              value={address.state}  // Set the selected state
+                              value={address.state}
                             />
                           </div>
                           <div className="col-md-3">
                             <SelectInput
                               label="City"
                               name={`addresses.${index}.city`}
-                              options={getCityOptions()}     // Dynamically filtered cities
+                              options={getCityOptions()}
                               required={true}
-                              value={address.city}  // Set the selected city
+                              value={address.city}
                             />
                           </div>
                           <div className="col-md-3">
@@ -215,7 +237,6 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                               placeholder="Enter Pincode"
                               name={`addresses.${index}.pincode`}
                               required={true}
-                              // value={address.pincode}  // Set the pincode
                             />
                           </div>
                         </div>

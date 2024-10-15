@@ -1,17 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faTachometerAlt,
-  faTh,
   faChevronLeft,
-  faChevronRight,
+  faBars,
+  faHome,
+  faClipboardList,
+  faList,
+  faSignOutAlt
 } from "@fortawesome/free-solid-svg-icons";
 import "../styles/sidebar.css"; 
 
 const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const location = useLocation(); 
+  const [permissions, setPermissions] = useState<string[]>([]); // Store user permissions
+  const location = useLocation();
+
+  useEffect(() => {
+    // Retrieve the current user's permissions from local storage
+    const storedUser = localStorage.getItem("currentUser");
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      setPermissions(user.permissions || []);
+    }
+  }, []);
 
   const toggleSidebar = () => {
     setIsCollapsed((prev) => !prev);
@@ -21,7 +33,7 @@ const Sidebar: React.FC = () => {
 
   // If on the login page, don't render the sidebar at all
   if (hideContent) {
-    return null; // or return <div></div> if you prefer an empty div
+    return null;
   }
 
   return (
@@ -32,7 +44,7 @@ const Sidebar: React.FC = () => {
     >
       {/* Toggle Button */}
       <div className="sidebar-toggle" onClick={toggleSidebar}>
-        <FontAwesomeIcon icon={isCollapsed ? faChevronRight : faChevronLeft} />
+        <FontAwesomeIcon icon={isCollapsed ? faBars : faChevronLeft} />
       </div>
 
       {/* Sidebar */}
@@ -45,43 +57,49 @@ const Sidebar: React.FC = () => {
             role="menu"
             data-accordion="false"
           >
-            <li className="nav-item">
-              <Link to="/home" className="nav-link">
-                <div className="nav-content">
-                  <FontAwesomeIcon
-                    icon={faTachometerAlt}
-                    className="nav-icon"
-                  />
-                  <p>Home</p>
-                </div>
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/bank-form" className="nav-link">
-                <div className="nav-content">
-                  <FontAwesomeIcon icon={faTh} className="nav-icon" />
-                  <p>
-                    Bank Form
-                    <span className="right badge badge-danger"></span>
-                  </p>
-                </div>
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/bank-details-list" className="nav-link">
-                <div className="nav-content">
-                  <FontAwesomeIcon icon={faTachometerAlt} className="nav-icon" />
-                  <p>
-                    Bank Details List
-                    <span className="right badge badge-danger"></span>
-                  </p>
-                </div>
-              </Link>
-            </li>
+            {permissions.includes("home") && (
+              <li className="nav-item">
+                <Link to="/home" className="nav-link">
+                  <div className="nav-content">
+                    <FontAwesomeIcon
+                      icon={faHome}
+                      className="nav-icon"
+                    />
+                    <p>Home</p>
+                  </div>
+                </Link>
+              </li>
+            )}
+            {permissions.includes("form") && (
+              <li className="nav-item">
+                <Link to="/bank-form" className="nav-link">
+                  <div className="nav-content">
+                    <FontAwesomeIcon icon={faClipboardList} className="nav-icon" />
+                    <p>
+                      Bank Form
+                      <span className="right badge badge-danger"></span>
+                    </p>
+                  </div>
+                </Link>
+              </li>
+            )}
+            {permissions.includes("viewDetails") && (
+              <li className="nav-item">
+                <Link to="/bank-details-list" className="nav-link">
+                  <div className="nav-content">
+                    <FontAwesomeIcon icon={faList} className="nav-icon" />
+                    <p>
+                      Bank Details List
+                      <span className="right badge badge-danger"></span>
+                    </p>
+                  </div>
+                </Link>
+              </li>
+            )}
             <li className="nav-item">
               <Link to="/" className="nav-link">
                 <div className="nav-content">
-                  <FontAwesomeIcon icon={faTh} className="nav-icon" />
+                  <FontAwesomeIcon icon={faSignOutAlt} className="nav-icon" />
                   <p>Logout</p>
                 </div>
               </Link>

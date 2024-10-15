@@ -1,6 +1,26 @@
 body {
     font-family: Arial, Helvetica, sans-serif;
   }
+  .row {
+    display: flex;
+    justify-content: space-between; /* Adjusts space between the items */
+    align-items: center; /* Aligns items vertically */
+    margin-bottom: 16px; /* Optional: space below the row */
+  }
+
+  h2 {
+    flex: 1; /* Heading will take up remaining space */
+  }
+  .container{
+    margin: 20px;
+    padding: 30px;
+    height: 110vh;
+    /* width: 70%; */
+  }
+  
+  button {
+    width: auto; /* Keep the button size consistent */
+  }
   
   /* Full-width input fields */
   input[type="text"],
@@ -29,10 +49,11 @@ body {
   }
   
   /* Extra styles for the cancel button */
-  .cancelbtn {
-    width: auto;
+  .can{
+    width: 10%;
     padding: 10px 18px;
     background-color: #170370;
+
   }
   
   /* Center the image and position the close button */
@@ -43,7 +64,8 @@ body {
   }
   
   img.avatar {
-    width: 40%;
+    width:150px;
+    height: auto;
     border-radius: 50%;
   }
   

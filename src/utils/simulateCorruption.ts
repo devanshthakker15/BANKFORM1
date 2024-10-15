@@ -1,17 +1,16 @@
-export const simulateCorruption = (data: any) => {
-    // Create a shallow copy of the data
-    const corruptedData = { ...data };
-    
-    // Get keys of the data
-    const keys = Object.keys(corruptedData);
-  
-    // Randomly remove up to 2 keys from the data to simulate corruption
-    const numKeysToRemove = Math.floor(Math.random() * Math.min(2, keys.length)) + 1;
-    for (let i = 0; i < numKeysToRemove; i++) {
-      const randomKey = keys[Math.floor(Math.random() * keys.length)];
-      delete corruptedData[randomKey];
-    }
-    
-    return corruptedData;
-  };
-  
+// simulateCorruption.ts
+export const simulateCorruption = (data: any[]) => {
+  if (data.length === 0) return data;
+
+  const corruptedData = [...data];
+  const randomIndex = Math.floor(Math.random() * corruptedData.length);
+
+  // Corrupt random fields or remove an entire entry
+  if (Math.random() > 0.5) {
+    delete corruptedData[randomIndex].accountHolderName;
+  } else {
+    corruptedData.splice(randomIndex, 1);
+  }
+
+  return corruptedData;
+};

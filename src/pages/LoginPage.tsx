@@ -2,10 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/LoginPage.css"; 
 import avatar from "../assets/avatar.jpg";
+// import perms from "../utils/perms"; // Import the permissions
+import perms from "../utils/perms";
 
 interface User {
   username: string;
   password: string;
+  userType: string;
+  permissions: string[];
 }
 
 const LoginPage: React.FC = () => {
@@ -24,55 +28,24 @@ const LoginPage: React.FC = () => {
     }
   };
 
-  const getStoredUsers = (): User[] => {
-    const users = localStorage.getItem("users");
-    try {
-      return users ? JSON.parse(users) : [];
-    } catch (error) {
-      console.error("Failed to parse users from localStorage:", error);
-      return []; // Return empty array if parsing fails
-    }
-  };
+  const handleLogin = () => {
+    const user = perms.find(
+      (u) => u.username === username && u.password === password
+    );
 
-  const setStoredUsers = (users: User[]) => {
-    localStorage.setItem("users", JSON.stringify(users));
+    if (!user) {
+      alert("Invalid username or password!");
+      return;
+    }
+
+    // Store user details in localStorage upon successful login
+    localStorage.setItem("currentUser", JSON.stringify(user));
+    navigate("/home");
   };
 
   const handleRegister = () => {
-    const users = getStoredUsers();
-
-    const userExists = users.some((user) => user.username === username);
-    if (userExists) {
-      alert("User already exists! Please choose a different username.");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
-
-    const newUser: User = { username, password };
-    const updatedUsers = [...users, newUser];
-    setStoredUsers(updatedUsers);
-    alert("Registration successful!");
-    setIsLoginMode(true);
-  };
-
-  const handleLogin = () => {
-    const users = getStoredUsers();
-
-    const user = users.find((user) => user.username === username);
-    if (!user) {
-      alert("User not found! Please register.");
-      return;
-    }
-
-    if (user.password === password) {
-      navigate("/home");
-    } else {
-      alert("Incorrect password");
-    }
+    // Registration logic is not being updated here since perms.ts is used for user management
+    alert("Registration is disabled in this version");
   };
 
   const toggleMode = () => {
@@ -83,14 +56,20 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div>
-      <h2>{isLoginMode ? "Login" : "Register"} Page</h2>
+    <div className="container">
+      <div className="row">
+        <h2>{isLoginMode ? "Login" : "Register"} Page</h2>
+        <button type="button" onClick={toggleMode} className="can rounded">
+          {isLoginMode ? "Switch to Register" : "Switch to Login"}
+        </button>
+      </div>
+
       <form className="modal-content animate p-2" onSubmit={handleSubmit}>
         <div className="imgcontainer">
           <img src={avatar} alt="Avatar" className="avatar" />
         </div>
 
-        <div className="container">
+        <div>
           <label htmlFor="uname">
             <b>Username</b>
           </label>
@@ -140,12 +119,6 @@ const LoginPage: React.FC = () => {
           <label>
             <input type="checkbox" name="remember" defaultChecked /> Remember me
           </label>
-        </div>
-
-        <div className="container" style={{ backgroundColor: "#f1f1f1" }}>
-          <button type="button" onClick={toggleMode} className="cancelbtn rounded">
-            {isLoginMode ? "Switch to Register" : "Switch to Login"}
-          </button>
         </div>
       </form>
     </div>

@@ -16,7 +16,7 @@ const BankDetailsList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const itemsPerPage = 3;
+  const itemsPerPage = 2;
 
   // Get the current page from the URL or default to 1
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
@@ -72,7 +72,7 @@ const BankDetailsList: React.FC = () => {
   const currentEntries = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
   return (
-    <div className="container">
+    <div className="container mt-5">
       <h2>Bank Details Submissions</h2>
 
       {/* Search Input */}

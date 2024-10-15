@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 
 import HomePage from "./pages/HomePage";
 import BankFormPage from "./pages/BankFormPage";
@@ -15,18 +15,44 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "admin-lte/dist/css/adminlte.min.css";
 import "admin-lte/dist/js/adminlte.min.js";
 
+// Route protection based on user permissions
+const ProtectedRoute: React.FC<{ permission: string, children: React.ReactNode }> = ({ permission, children }) => {
+  const currentUser = localStorage.getItem("currentUser");
+  if (!currentUser) {
+    return <Navigate to="/" />;
+  }
+
+  const user = JSON.parse(currentUser);
+  if (user.permissions.includes(permission)) {
+    return <>{children}</>;
+  }
+
+  return <Navigate to="*" />;
+};
 
 const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<LoginPage />} />
         <Route path="/" element={<Layout />}>
-          <Route index element={<LoginPage />} />
-          <Route path="/bank-form/:id?" element={<BankFormPage />} />
-          <Route path="/bank-details-list" element={<BankDetailsList />} />
           <Route path="/home" element={<HomePage />} />
-          <Route path="*" element={<PageNotFound />} />
+          
+          {/* Protected Routes */}
+          <Route path="/bank-form" element={
+            <ProtectedRoute permission="form">
+              <BankFormPage />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/bank-details-list" element={
+            <ProtectedRoute permission="viewDetails">
+              <BankDetailsList />
+            </ProtectedRoute>
+          } />
         </Route>
+
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
     </BrowserRouter>
   );
