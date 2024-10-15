@@ -116,9 +116,10 @@ const LoginPage: React.FC = () => {
           <button className="submit rounded" type="submit">
             {isLoginMode ? "Login" : "Register"}
           </button>
-          <label>
+          {/* <label>
             <input type="checkbox" name="remember" defaultChecked /> Remember me
-          </label>
+          </label> */}
+          
         </div>
       </form>
     </div>

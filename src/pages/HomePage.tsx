@@ -10,41 +10,70 @@ const HomePage: React.FC = () => {
   return (
     <div className="body">
       <div className="container mt-5">
-
-                {/* Header */}
-                <div className="header text-center mt-4">
+        {/* Header */}
+        <div className="header text-center mt-4 mb-3">
           <h2>Welcome to Our Bank Application</h2>
           <p>Please use the button below to access the bank details form.</p>
         </div>
         {/* Carousel Section */}
-        <div id="bankingCarousel" className="carousel slide mt-2" data-bs-ride="carousel">
+        <div
+          id="bankingCarousel"
+          className="carousel slide mt-2"
+          data-bs-ride="carousel"
+        >
           <div className="carousel-inner">
             <div className="carousel-item active">
-              <img src={bankingImg1} className="d-block w-100" alt="Banking Activity 1" />
+              <img
+                src={bankingImg2}
+                className="d-block w-100"
+                alt="Banking Activity 1"
+              />
             </div>
             <div className="carousel-item">
-              <img src={bankingImg2} className="d-block w-100" alt="Banking Activity 2" />
+              <img
+                src={bankingImg2}
+                className="d-block w-100"
+                alt="Banking Activity 2"
+              />
             </div>
             <div className="carousel-item">
-              <img src={bankingImg3} className="d-block w-100" alt="Banking Activity 3" />
+              <img
+                src={bankingImg3}
+                className="d-block w-100"
+                alt="Banking Activity 3"
+              />
             </div>
           </div>
-          <button className="carousel-control-prev" type="button" data-bs-target="#bankingCarousel" data-bs-slide="prev">
-            <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+          <button
+            className="carousel-control-prev"
+            type="button"
+            data-bs-target="#bankingCarousel"
+            data-bs-slide="prev"
+          >
+            <span
+              className="carousel-control-prev-icon"
+              aria-hidden="true"
+            ></span>
             <span className="visually-hidden">Previous</span>
           </button>
-          <button className="carousel-control-next" type="button" data-bs-target="#bankingCarousel" data-bs-slide="next">
-            <span className="carousel-control-next-icon" aria-hidden="true"></span>
+          <button
+            className="carousel-control-next"
+            type="button"
+            data-bs-target="#bankingCarousel"
+            data-bs-slide="next"
+          >
+            <span
+              className="carousel-control-next-icon"
+              aria-hidden="true"
+            ></span>
             <span className="visually-hidden">Next</span>
           </button>
         </div>
 
-
-
         {/* Go to Form Button */}
         <div className="d-flex justify-content-center mt-4">
           <Link to="/bank-form">
-            <button className="btn btn-primary">Go to Form</button>
+            <button className="btn btn-primary mb-5">Go to Form</button>
           </Link>
         </div>
       </div>

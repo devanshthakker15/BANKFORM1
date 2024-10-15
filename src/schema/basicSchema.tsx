@@ -21,7 +21,7 @@ export const basicSchema = Yup.object({
     .max(50, 'Account holder name must be at most 50 characters long')
     .required('Account holder name is required'),
 
-  accountNumber: Yup.string()
+  accountNumber: Yup.number()
     .min(9, 'Account number must be at least 9 digits')
     .max(18, 'Account number cannot exceed 18 digits')
     .required('Account number is required'),

@@ -12,7 +12,7 @@ import {
 import "../styles/sidebar.css"; 
 
 const Sidebar: React.FC = () => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [permissions, setPermissions] = useState<string[]>([]); // Store user permissions
   const location = useLocation();
 

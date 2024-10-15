@@ -7,7 +7,7 @@ import LoginPage from "./pages/LoginPage";
 import BankDetailsList from "./pages/BankDetailsList";
 import PageNotFound from "./pages/PageNotFound";
 
-import Layout from "./components/Layout"; 
+import Layout from "./components/Layout";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
@@ -15,8 +15,10 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "admin-lte/dist/css/adminlte.min.css";
 import "admin-lte/dist/js/adminlte.min.js";
 
-// Route protection based on user permissions
-const ProtectedRoute: React.FC<{ permission: string, children: React.ReactNode }> = ({ permission, children }) => {
+const ProtectedRoute: React.FC<{
+  permission: string;
+  children: React.ReactNode;
+}> = ({ permission, children }) => {
   const currentUser = localStorage.getItem("currentUser");
   if (!currentUser) {
     return <Navigate to="/" />;
@@ -37,19 +39,25 @@ const App: React.FC = () => {
         <Route path="/" element={<LoginPage />} />
         <Route path="/" element={<Layout />}>
           <Route path="/home" element={<HomePage />} />
-          
+
           {/* Protected Routes */}
-          <Route path="/bank-form" element={
-            <ProtectedRoute permission="form">
-              <BankFormPage />
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/bank-details-list" element={
-            <ProtectedRoute permission="viewDetails">
-              <BankDetailsList />
-            </ProtectedRoute>
-          } />
+          <Route
+            path="/bank-form/:id?"
+            element={
+              <ProtectedRoute permission="form">
+                <BankFormPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/bank-details-list"
+            element={
+              <ProtectedRoute permission="viewDetails">
+                <BankDetailsList />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         <Route path="*" element={<PageNotFound />} />

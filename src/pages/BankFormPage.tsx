@@ -36,7 +36,7 @@ const BankFormPage: React.FC = () => {
         </div>
 
         {/* Bank Details Form */}
-        <div className="header">
+        <div className="header mb-2">
           <h2>Bank Details Form</h2>
         </div>
         <BankForm initialValues={initialValues} /> {/* Render form with initial values or empty form */}
