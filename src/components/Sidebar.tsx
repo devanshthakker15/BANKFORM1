@@ -17,8 +17,12 @@ const Sidebar: React.FC = () => {
     setIsCollapsed((prev) => !prev);
   };
 
- 
   const hideContent = location.pathname === "/login";
+
+  // If on the login page, don't render the sidebar at all
+  if (hideContent) {
+    return null; // or return <div></div> if you prefer an empty div
+  }
 
   return (
     <aside
@@ -33,61 +37,57 @@ const Sidebar: React.FC = () => {
 
       {/* Sidebar */}
       <div className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
-        
-
         {/* Sidebar Menu */}
-        {!hideContent && (
-          <nav className="mt-2">
-            <ul
-              className="nav nav-pills nav-sidebar flex-column"
-              data-widget="treeview"
-              role="menu"
-              data-accordion="false"
-            >
-              <li className="nav-item">
-                <Link to="/home" className="nav-link">
-                  <div className="nav-content">
-                    <FontAwesomeIcon
-                      icon={faTachometerAlt}
-                      className="nav-icon"
-                    />
-                    <p>Home</p>
-                  </div>
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link to="/bank-form" className="nav-link">
-                  <div className="nav-content">
-                    <FontAwesomeIcon icon={faTh} className="nav-icon" />
-                    <p>
-                      Bank Form
-                      <span className="right badge badge-danger"></span>
-                    </p>
-                  </div>
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link to="/bank-details-list" className="nav-link">
-                  <div className="nav-content">
-                    <FontAwesomeIcon icon={faTachometerAlt} className="nav-icon" />
-                    <p>
-                      Bank Details List
-                      <span className="right badge badge-danger"></span>
-                    </p>
-                  </div>
-                </Link>
-              </li>
-              <li className="nav-item">
-                <Link to="/" className="nav-link">
-                  <div className="nav-content">
-                    <FontAwesomeIcon icon={faTh} className="nav-icon" />
-                    <p>Logout</p>
-                  </div>
-                </Link>
-              </li>
-            </ul>
-          </nav>
-        )}
+        <nav className="mt-2">
+          <ul
+            className="nav nav-pills nav-sidebar flex-column"
+            data-widget="treeview"
+            role="menu"
+            data-accordion="false"
+          >
+            <li className="nav-item">
+              <Link to="/home" className="nav-link">
+                <div className="nav-content">
+                  <FontAwesomeIcon
+                    icon={faTachometerAlt}
+                    className="nav-icon"
+                  />
+                  <p>Home</p>
+                </div>
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/bank-form" className="nav-link">
+                <div className="nav-content">
+                  <FontAwesomeIcon icon={faTh} className="nav-icon" />
+                  <p>
+                    Bank Form
+                    <span className="right badge badge-danger"></span>
+                  </p>
+                </div>
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/bank-details-list" className="nav-link">
+                <div className="nav-content">
+                  <FontAwesomeIcon icon={faTachometerAlt} className="nav-icon" />
+                  <p>
+                    Bank Details List
+                    <span className="right badge badge-danger"></span>
+                  </p>
+                </div>
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/" className="nav-link">
+                <div className="nav-content">
+                  <FontAwesomeIcon icon={faTh} className="nav-icon" />
+                  <p>Logout</p>
+                </div>
+              </Link>
+            </li>
+          </ul>
+        </nav>
       </div>
     </aside>
   );

@@ -1,4 +1,4 @@
-/* sidebar.css */
+
 .main-sidebar {
   background-color: #343a40; 
   transition: width 0.3s ease; 
@@ -42,26 +42,26 @@
 }
 
 .nav-content {
-  display: flex; /* Use flexbox for alignment */
-  align-items: center; /* Center items vertically */
-  justify-content: flex-start; /* Align items to the start */
-  padding: 10px; /* Add padding for spacing */
-  flex-grow: 1; /* Allow flex items to grow equally */
+  display: flex; 
+  align-items: center; 
+  justify-content: flex-start; 
+  /* padding: 10px;  */
+  flex-grow: 1; 
 }
 
 .nav-icon {
-  margin-right: 10px; /* Space between icon and text */
-  flex-shrink: 0; /* Prevent icon from shrinking */
+  margin-right: 10px; 
+  flex-shrink: 0; 
 }
 
 .nav-item {
   align-items: center;
   display: flex;
-  width: 100%; /* Make nav items take full width */
+  width: 100%;
 }
 
 .nav-link p {
-  margin: 0; /* Remove default margins from paragraphs */
-  flex-grow: 1; /* Allow text to take remaining space */
-  text-align: left; /* Align text to the left */
+  margin: 0; 
+  flex-grow: 1; 
+  text-align: left; 
 }

@@ -13,9 +13,10 @@ interface SelectInputProps {
   options: Option[];
   required?: boolean; 
   onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void; // Add optional onChange prop
+  value?: string; // Add optional value prop
 }
 
-const SelectInput: React.FC<SelectInputProps> = ({ label, name, options, required = false, onChange }) => {
+const SelectInput: React.FC<SelectInputProps> = ({ label, name, options, required = false, onChange, value }) => {
   const [field, meta, helpers] = useField(name);
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -37,6 +38,7 @@ const SelectInput: React.FC<SelectInputProps> = ({ label, name, options, require
         id={name}
         required={required} // Add required attribute to select
         onChange={handleChange} // Use custom handleChange
+        value={value || field.value} // Use provided value or the Formik field value
       >
         <option value="">Select an option</option>
         {options.map(option => (

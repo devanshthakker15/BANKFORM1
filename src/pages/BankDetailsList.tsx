@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Pagination from "../components/Pagination";
 import "../styles/bankStyles.css";
 
@@ -14,10 +14,12 @@ const BankDetailsList: React.FC = () => {
   const [bankData, setBankData] = useState<BankData[]>([]);
   const [filteredData, setFilteredData] = useState<BankData[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState<number>(1);
-
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const itemsPerPage = 3;
+
+  // Get the current page from the URL or default to 1
+  const currentPage = parseInt(searchParams.get("page") || "1", 10);
 
   useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem("bankFormData") || "[]") as BankData[];
@@ -33,7 +35,7 @@ const BankDetailsList: React.FC = () => {
       item.accountHolderName.toLowerCase().includes(value.toLowerCase())
     );
     setFilteredData(filtered);
-    setCurrentPage(1);
+    setSearchParams({ page: "1" }); 
   };
 
   const handleEdit = (id: number) => {
@@ -43,19 +45,12 @@ const BankDetailsList: React.FC = () => {
   const handleDelete = (id: number) => {
     const updatedData = bankData.filter((item) => item.id !== id);
     setBankData(updatedData);
-    setFilteredData(updatedData); // Update filtered data as well
+    setFilteredData(updatedData);
     localStorage.setItem("bankFormData", JSON.stringify(updatedData));
 
-    // Check if current page entries are empty
     const totalPages = Math.ceil(updatedData.length / itemsPerPage);
     if (currentPage > totalPages) {
-      setCurrentPage(totalPages); // Set current page to the last available page
-    }
-    // Check if the current page is now empty
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentEntries = updatedData.slice(startIndex, startIndex + itemsPerPage);
-    if (currentEntries.length === 0 && totalPages > 0) {
-      setCurrentPage(1); // Reset to the first page
+      setSearchParams({ page: totalPages.toString() });
     }
   };
 
@@ -70,7 +65,7 @@ const BankDetailsList: React.FC = () => {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    setSearchParams({ page: page.toString() });
   };
 
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -106,7 +101,7 @@ const BankDetailsList: React.FC = () => {
           {currentEntries.length > 0 ? (
             currentEntries.map((item, index) => (
               <tr key={item.id}>
-                <td>{startIndex + index + 1}</td> {/* Serial number calculation */}
+                <td>{startIndex + index + 1}</td> 
                 <td className="bank-name">{item.bankName}</td>
                 <td className="account-holder">{item.accountHolderName}</td>
                 <td className="account-number">{item.accountNumber}</td>
@@ -143,7 +138,7 @@ const BankDetailsList: React.FC = () => {
         onPageChange={handlePageChange}
       />
 
-      {/* Back to Form Button */}
+      {/* Back to Form and Home Buttons */}
       <div className="text-center mt-4 d-flex justify-content-between">
         <button className="btn btn-primary" onClick={handleBackToForm}>
           Back to Form

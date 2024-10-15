@@ -16,7 +16,7 @@ const BankFormPage: React.FC = () => {
         setInitialValues(bankData);
       } else {
         // If ID is not found, redirect to the empty form
-        navigate("/bank-form");
+        navigate("*");
       }
     }
   }, [id, navigate]);

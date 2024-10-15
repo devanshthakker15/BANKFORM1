@@ -7,7 +7,15 @@ export const bankOptions = [
     { value: "SBI", label: "SBI" },
     { value: "Bank of Maharashtra", label: "Bank of Maharashtra" },
   ];
+
+//   export const stateOptions =[
+//     {value: "Maharashtra" , label: "Maharashtra"}
+//   ];
   
+// export const cityOptions =[
+//     {value: "Thane", label:"Thane"}
+// ]
+
   export const countryOptions = [
     { value: "India", label: "India" },
     { value: "USA", label: "USA" },
@@ -24,10 +32,14 @@ export const bankOptions = [
         Maharashtra: [
           { value: "Mumbai", label: "Mumbai" },
           { value: "Pune", label: "Pune" },
+          { value: "Mulund", label: "Mulund" },
+          { value: "Bhandup", label: "Bhandup" },
+          { value: "Thane", label: "Thane" },
         ],
         Gujarat: [
           { value: "Ahmedabad", label: "Ahmedabad" },
           { value: "Surat", label: "Surat" },
+          { value: "Vadodra", label: "Vadodra" },
         ],
       },
     },

@@ -5,9 +5,11 @@ export const basicSchema = Yup.object({
     .max(50, 'Bank name must be at most 50 characters long')
     .required('Bank name is required'),
 
-  ifscCode: Yup.string()
-    .matches(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code format - 0 expected on 4th place")
+    ifscCode: Yup.string()
+    .length(11, "IFSC Code must be exactly 11 characters long")
+    .matches(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code format. It must start with four uppercase letters followed by a '0', and then six alphanumeric characters.")
     .required("IFSC Code is required"),
+
 
   branchName: Yup.string()
     .max(50, 'Branch name must be at most 50 characters long')

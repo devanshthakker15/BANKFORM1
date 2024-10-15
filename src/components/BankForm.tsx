@@ -1,13 +1,12 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Formik, Form, FieldArray, FormikHelpers } from "formik";
 import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "../redux/hooks";  // Import the new hook
 import { saveFormDataAsync } from "../redux/formSlice";
 import { basicSchema } from "../schema/basicSchema";
 import Card from "./Card";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AppDispatch } from "../redux/store";
 import { Link } from "react-router-dom";
 import { bankOptions, countryOptions, stateCityMapping } from "../utils/constants";  // Import updated constants
 
@@ -41,12 +40,20 @@ interface BankFormProps {
 }
 
 const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
-  const dispatch: AppDispatch = useDispatch();
+  const dispatch = useAppDispatch(); // Now using useAppDispatch instead of AppDispatch
   const location = useLocation();
   const navigate = useNavigate();
 
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [selectedState, setSelectedState] = useState<string>("");
+
+  // Set selectedCountry and selectedState from initialValues when form is in edit mode
+  useEffect(() => {
+    if (initialValues && initialValues.addresses.length > 0) {
+      setSelectedCountry(initialValues.addresses[0].country);
+      setSelectedState(initialValues.addresses[0].state);
+    }
+  }, [initialValues]);
 
   const defaultValues = useMemo(() => {
     return initialValues || {
@@ -180,6 +187,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                                 setSelectedCountry(e.target.value);
                                 setSelectedState("");
                               }}
+                              value={address.country}  // Set the selected country
                             />
                           </div>
                           <div className="col-md-3">
@@ -189,6 +197,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                               options={getStateOptions()}    // Dynamically filtered states
                               required={true}
                               onChange={(e) => setSelectedState(e.target.value)}
+                              value={address.state}  // Set the selected state
                             />
                           </div>
                           <div className="col-md-3">
@@ -197,6 +206,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                               name={`addresses.${index}.city`}
                               options={getCityOptions()}     // Dynamically filtered cities
                               required={true}
+                              value={address.city}  // Set the selected city
                             />
                           </div>
                           <div className="col-md-3">
@@ -205,6 +215,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                               placeholder="Enter Pincode"
                               name={`addresses.${index}.pincode`}
                               required={true}
+                              // value={address.pincode}  // Set the pincode
                             />
                           </div>
                         </div>
@@ -263,10 +274,10 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                 <div className="col-md-6">
                   <TextInput
                     label="Email"
-                    placeholder="Enter Email"
+                    placeholder="Enter Email Address"
                     name="email"
-                    type="email"
                     required={true}
+                    type="email"
                   />
                 </div>
               </div>
