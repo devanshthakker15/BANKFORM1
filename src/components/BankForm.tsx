@@ -2,13 +2,13 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Formik, Form, FieldArray, FormikHelpers } from "formik";
 import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
-import { useAppDispatch } from "../redux/hooks";
+import { useAppDispatch } from "../redux/hooks"; 
 import { saveFormDataAsync } from "../redux/formSlice";
 import { basicSchema } from "../schema/basicSchema";
 import Card from "./Card";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { bankOptions, countryOptions, stateCityMapping } from "../utils/constants";  
+import { bankOptions, countries, states, cities } from "../utils/constants";  
 
 interface Address {
   addressLine1: string;
@@ -36,17 +36,16 @@ interface Option {
 }
 
 interface BankFormProps {
-  initialValues?: BankFormValues;
+  initialValues?: BankFormValues; 
 }
 
 const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch(); 
   const location = useLocation();
   const navigate = useNavigate();
 
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [selectedState, setSelectedState] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
 
   useEffect(() => {
     if (initialValues && initialValues.addresses.length > 0) {
@@ -56,20 +55,6 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
   }, [initialValues]);
 
   const defaultValues = useMemo(() => {
-    // Safely fetch and parse data from localStorage, handle any errors
-    let existingData: BankFormValues[] = [];
-
-    try {
-      const storedData = localStorage.getItem("bankFormData");
-      if (storedData) {
-        existingData = JSON.parse(storedData);
-        // Optionally, you can add a deeper check here to validate the structure of `existingData`
-      }
-    } catch (error) {
-      setErrorMessage("Failed to load saved data. Resetting to defaults.");
-      console.error("Error parsing data from localStorage:", error);
-    }
-
     return initialValues || {
       bankName: "",
       ifscCode: "",
@@ -94,16 +79,9 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
     values: BankFormValues,
     { resetForm }: FormikHelpers<BankFormValues>
   ) => {
-    let existingData: BankFormValues[] = [];
-
-    try {
-      const storedData = localStorage.getItem("bankFormData");
-      if (storedData) {
-        existingData = JSON.parse(storedData);
-      }
-    } catch (error) {
-      console.error("Error parsing data during submission:", error);
-    }
+    const existingData = JSON.parse(
+      localStorage.getItem("bankFormData") || "[]"
+    ) as BankFormValues[];
 
     if (values.id !== undefined) {
       const updatedData = existingData.map((item) =>
@@ -127,17 +105,17 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
     }
   };
 
+  // Helper functions to get filtered state and city options based on selections
   const getStateOptions = () => {
-    return selectedCountry ? stateCityMapping[selectedCountry].states : [];
+    return states.filter(state => state.countryId === countries.find(country => country.value === selectedCountry)?.id);
   };
 
   const getCityOptions = () => {
-    return selectedState ? stateCityMapping[selectedCountry].cities[selectedState] : [];
+    return cities.filter(city => city.stateId === states.find(state => state.value === selectedState)?.id);
   };
 
   return (
     <div>
-      {errorMessage && <div className="alert alert-danger">{errorMessage}</div>}
       <Formik
         initialValues={defaultValues}
         validationSchema={basicSchema}
@@ -152,7 +130,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                   <SelectInput
                     label="Bank Name"
                     name="bankName"
-                    options={bankOptions}
+                    options={bankOptions}   
                     required={true}
                   />
                 </div>
@@ -203,32 +181,32 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                             <SelectInput
                               label="Country"
                               name={`addresses.${index}.country`}
-                              options={countryOptions}
+                              options={countries}  
                               required={true}
                               onChange={(e) => {
                                 setSelectedCountry(e.target.value);
                                 setSelectedState("");
                               }}
-                              value={address.country}
+                              value={address.country} 
                             />
                           </div>
                           <div className="col-md-3">
                             <SelectInput
                               label="State"
                               name={`addresses.${index}.state`}
-                              options={getStateOptions()}
+                              options={getStateOptions()}    
                               required={true}
                               onChange={(e) => setSelectedState(e.target.value)}
-                              value={address.state}
+                              value={address.state} 
                             />
                           </div>
                           <div className="col-md-3">
                             <SelectInput
                               label="City"
                               name={`addresses.${index}.city`}
-                              options={getCityOptions()}
+                              options={getCityOptions()}    
                               required={true}
-                              value={address.city}
+                              value={address.city}  
                             />
                           </div>
                           <div className="col-md-3">
@@ -237,6 +215,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                               placeholder="Enter Pincode"
                               name={`addresses.${index}.pincode`}
                               required={true}
+                              
                             />
                           </div>
                         </div>
