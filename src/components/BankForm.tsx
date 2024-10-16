@@ -47,6 +47,8 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [selectedState, setSelectedState] = useState<string>("");
 
+  const [isCorrupted, setIsCorrupted] = useState<boolean>(false);
+
   useEffect(() => {
     if (initialValues && initialValues.addresses.length > 0) {
       setSelectedCountry(initialValues.addresses[0].country);
@@ -113,6 +115,43 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
   const getCityOptions = () => {
     return cities.filter(city => city.stateId === states.find(state => state.value === selectedState)?.id);
   };
+
+  // Check for corrupted data
+  const checkForCorruptedData = (data: BankFormValues) => {
+    const requiredFields = [
+      data.bankName,
+      data.ifscCode,
+      data.branchName,
+      data.accountHolderName,
+      data.accountNumber,
+      data.email,
+    ];
+
+    const addressFields = data.addresses.every(address => 
+      address.addressLine1 &&
+      address.city &&
+      address.state &&
+      address.country &&
+      address.pincode
+    );
+
+    return requiredFields.every(field => field) && addressFields;
+  };
+
+  useEffect(() => {
+    if (initialValues && !checkForCorruptedData(initialValues)) {
+      setIsCorrupted(true);  // Mark as corrupted if data is incomplete
+    }
+  }, [initialValues]);
+
+  if (isCorrupted) {
+    return (
+      <div className="alert alert-danger">
+        <h4>Data Corrupted</h4>
+        <p>Sorry for the inconvenience. The data you are trying to edit is corrupted or missing. Please contact support or try again.</p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -274,23 +313,20 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                 <div className="col-md-6">
                   <TextInput
                     label="Email"
-                    placeholder="Enter Email Address"
+                    placeholder="Enter Email"
                     name="email"
                     required={true}
-                    type="email"
                   />
                 </div>
               </div>
             </Card>
 
-            <div className="d-flex justify-content-between">
-              <button type="submit" className="btn btn-success mt-2">
+            <div className="d-flex justify-content-between mt-4">
+              <button type="submit" className="btn btn-success">
                 Submit
               </button>
-              <Link to="/bank-details-list">
-                <button type="button" className="btn btn-primary mt-2">
-                  Go to Bank Details List
-                </button>
+              <Link to="/bank-details-list" className="btn btn-secondary">
+                Back to List
               </Link>
             </div>
           </Form>

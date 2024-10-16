@@ -5,6 +5,7 @@ import "../App.css";
 import bankingImg1 from "../assets/banking1.jpg";
 import bankingImg2 from "../assets/banking2.jpg";
 import bankingImg3 from "../assets/banking3.jpg";
+import bankingImg4 from "../assets/banking4.jpg";
 
 const HomePage: React.FC = () => {
   return (
@@ -24,7 +25,7 @@ const HomePage: React.FC = () => {
           <div className="carousel-inner">
             <div className="carousel-item active">
               <img
-                src={bankingImg2}
+                src={bankingImg4}
                 className="d-block w-100"
                 alt="Banking Activity 1"
               />

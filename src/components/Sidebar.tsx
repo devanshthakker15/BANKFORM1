@@ -38,7 +38,7 @@ const Sidebar: React.FC = () => {
 
   return (
     <aside
-      className={`main-sidebar sidebar-dark-primary elevation-4 ${
+      className={`main-sidebar sidebar-dark-secondary elevation-4 ${
         isCollapsed ? "collapsed" : ""
       }`}
     >
@@ -77,7 +77,7 @@ const Sidebar: React.FC = () => {
                     <FontAwesomeIcon icon={faClipboardList} className="nav-icon" />
                     <p>
                       Bank Form
-                      <span className="right badge badge-danger"></span>
+                      <span className="right badge badge-danger">LO</span>
                     </p>
                   </div>
                 </Link>

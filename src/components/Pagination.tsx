@@ -26,7 +26,7 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="pagination d-flex justify-content-center align-items-center mt-4">
+    <div className="pagination d-flex justify-content-end align-items-center mt-4">
       <button
         className="btn btn-primary"
         style={{ width: '40px', marginRight: '10px'}}

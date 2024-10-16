@@ -29,7 +29,7 @@ const SelectInput: React.FC<SelectInputProps> = ({ label, name, options, require
 
   return (
     <div className="form-group">
-      <label htmlFor={name} className="form-label">
+      <label htmlFor={name} className="select-form-label">
         {label} {required && <span className="text-danger">*</span>}
       </label>
       <select

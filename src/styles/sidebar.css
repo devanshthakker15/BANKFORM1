@@ -3,6 +3,7 @@
   background-color: #343a40; 
   transition: width 0.3s ease; 
   width: 250px; 
+  /* height: 100%; */
 
 }
 
@@ -66,4 +67,28 @@
   margin: 0; 
   flex-grow: 1; 
   text-align: left; 
+}
+
+@media (max-width: 768px) {
+  .main-sidebar {
+    width: 100%;
+    height: auto; 
+  }
+
+  .main-sidebar.collapsed {
+    width: 100%; 
+    
+  }
+
+  .sidebar-toggle {
+    padding: 8px; 
+  }
+
+  .nav-item {
+    padding: 8px; 
+  }
+
+  .nav-link {
+    padding: 8px; 
+  }
 }

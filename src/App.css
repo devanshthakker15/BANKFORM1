@@ -1,5 +1,40 @@
-*{
-  /* background-color: ; */
+/* Centering the carousel images both horizontally and vertically */
+.carousel-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px; /* Set the height for the carousel */
+}
+
+.carousel-item img {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: cover; /* Ensures the images cover the container while maintaining aspect ratio */
+}
+
+.carousel {
+  width: 80%;
+  margin: 0 auto; 
+  padding-top: 20px;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: rgb(94, 93, 93); 
+  border-radius: 50%;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  width: 5%; 
+}
+
+.header {
+  background-color: rgb(9, 9, 97);
+  color: white;
+  padding: 20px;
+  text-align: center;
+  border-radius: 20px;
 }
 
 .container {
@@ -12,49 +47,66 @@
 }
 
 .form-group {
-  margin-top: 15px;
   display: flex;
   flex-direction: column;
 }
 
-.form-label {
+.text-form-label {
   font-weight: bold;
-  /* margin-bottom: 5px; */
-  /* margin-top: 2px
-  ; */
+  margin-top: 7px;
+}
+
+.select-form-label {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.form-control {
+  height: 45px;
+  font-size: 16px;
+}
+
+.text-danger {
+  font-size: 14px;
 }
 
 .input-size {
-  width: 100%; /* Ensure inputs are the same width */
+  width: 100%;
   max-width: 100%;
   padding: 10px; 
   box-sizing: border-box; 
 }
 
 .select-style {
-  margin-bottom: 9px;
+  margin-bottom: 5px;
 }
 
-h2 {
-  margin: 0;
-}
+@media (max-width: 768px) {
+  .carousel-item {
+    height: 250px; 
+  }
 
-.header {
-  background-color: rgb(9, 9, 97);
-  color: white;
-  padding: 20px;
-  text-align: center;
-  border-radius: 20px;
-}
+  .carousel {
+    width: 100%; 
+    padding-top: 10px; 
+  }
 
-/* Add spacing to the select and text input elements to ensure they align properly */
-.form-control {
-  padding: 10px;
-  height: 45px;
-  font-size: 16px;
-  margin-top: 8px;
-}
+  .header {
+    font-size: 16px; 
+    padding: 15px; 
+  }
 
-.text-danger {
-  font-size: 14px;
+  .container {
+    padding: 10px; 
+    max-width: 100%; 
+  }
+
+  .form-group {
+    flex-direction: column; 
+  }
+
+  .form-control {
+    font-size: 14px; 
+    height: 40px; 
+  }
 }

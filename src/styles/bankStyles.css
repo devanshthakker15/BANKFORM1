@@ -1,33 +1,64 @@
-.button{
-    width: 70px;
+.button {
+    width: 70px; 
     margin-right: 5px;
     margin-left: 5px;
 }
-/* Ensure table columns maintain a fixed width and handle text overflow */
-.table th, .table td {
-    width: 150px; /* You can adjust the width as per your design */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  
-  /* Optionally, give more width to specific columns */
-  .table .bank-name {
-    width: 200px;
-  }
-  
-  .table .account-holder {
-    width: 180px;
-  }
-  
-  .table .account-number {
-    width: 150px;
-  }
-  
-  /* Adjust column widths for different screen sizes (responsive design) */
-  @media (max-width: 768px) {
-    .table th, .table td {
-      width: 100px;
+
+
+.table {
+    width: 100%; 
+    table-layout: auto; 
+}
+
+.table th,
+.table td {
+    width: auto; 
+    min-width: 100px; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    vertical-align: middle; 
+}
+
+
+.table .bank-name {
+    width: auto; 
+}
+
+.table .account-holder {
+    width: auto; 
+}
+
+.table .account-number {
+    width: auto; 
+}
+
+
+@media (max-width: 768px) {
+    .button {
+        width: 100%; 
+        margin: 5px 0; 
     }
-  }
-  
+
+   
+    .table th, .table td {
+        width: auto; 
+        min-width: 80px; 
+    }
+
+    .table .bank-name, .table .account-holder, .table .account-number {
+        min-width: 100px; 
+    }
+}
+
+
+.table-responsive {
+    overflow-x: auto; 
+}
+
+.table td .button-container {
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center; 
+    width: 100%; 
+}

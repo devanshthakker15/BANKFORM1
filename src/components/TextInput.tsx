@@ -12,7 +12,7 @@ interface TextInputProps {
 const TextInput: React.FC<TextInputProps> = ({ label, name, type = "text", placeholder, required = false }) => {
   return (
     <div className="form-group">
-      <label htmlFor={name} className="form-label">
+      <label htmlFor={name} className="text-form-label">
         {label} {required && <span className="text-danger">*</span>} 
       </label>
       <Field
