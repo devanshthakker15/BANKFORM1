@@ -13,29 +13,28 @@ interface BankData {
 const BankDetailsList: React.FC = () => {
   const [bankData, setBankData] = useState<BankData[]>([]);
   const [filteredData, setFilteredData] = useState<BankData[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const itemsPerPage = 2;
 
-  // Get the current page from the URL or default to 1
+  // Get the current page and query from the URL or default to 1 and empty string
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
+  const query = searchParams.get("q") || "";
 
   useEffect(() => {
     const storedData = JSON.parse(localStorage.getItem("bankFormData") || "[]") as BankData[];
     setBankData(storedData);
-    setFilteredData(storedData);
-  }, []);
+    setFilteredData(
+      storedData.filter((item) =>
+        item.bankName.toLowerCase().includes(query.toLowerCase()) ||
+        item.accountHolderName.toLowerCase().includes(query.toLowerCase())
+      )
+    );
+  }, [query]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSearchTerm(value);
-    const filtered = bankData.filter((item) =>
-      item.bankName.toLowerCase().includes(value.toLowerCase()) ||
-      item.accountHolderName.toLowerCase().includes(value.toLowerCase())
-    );
-    setFilteredData(filtered);
-    setSearchParams({ page: "1" }); 
+    setSearchParams({ page: "1", q: value });
   };
 
   const handleEdit = (id: number) => {
@@ -50,7 +49,7 @@ const BankDetailsList: React.FC = () => {
 
     const totalPages = Math.ceil(updatedData.length / itemsPerPage);
     if (currentPage > totalPages) {
-      setSearchParams({ page: totalPages.toString() });
+      setSearchParams({ page: totalPages.toString(), q: query });
     }
   };
 
@@ -65,7 +64,7 @@ const BankDetailsList: React.FC = () => {
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   const handlePageChange = (page: number) => {
-    setSearchParams({ page: page.toString() });
+    setSearchParams({ page: page.toString(), q: query });
   };
 
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -81,7 +80,7 @@ const BankDetailsList: React.FC = () => {
           type="text"
           placeholder="Search by Bank Name or Account Holder Name"
           className="form-control"
-          value={searchTerm}
+          value={query}
           onChange={handleSearch}
         />
       </div>
