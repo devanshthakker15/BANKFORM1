@@ -2,13 +2,14 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Formik, Form, FieldArray, FormikHelpers } from "formik";
 import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
-import { useAppDispatch } from "../redux/hooks"; 
+import { useAppDispatch } from "../redux/hooks";
 import { saveFormDataAsync } from "../redux/formSlice";
 import { basicSchema } from "../schema/basicSchema";
 import Card from "./Card";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { bankOptions, countries, states, cities } from "../utils/constants";  
+import { bankOptions, countries, states, cities } from "../utils/constants";
+import "../styles/bankStyles.css";
 
 interface Address {
   addressLine1: string;
@@ -36,17 +37,17 @@ interface Option {
 }
 
 interface BankFormProps {
-  initialValues?: BankFormValues; 
+  initialValues?: BankFormValues;
 }
 
 const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
-  const dispatch = useAppDispatch(); 
+  const dispatch = useAppDispatch();
   const location = useLocation();
   const navigate = useNavigate();
 
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [selectedState, setSelectedState] = useState<string>("");
-
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false); // New state for submission loading
   const [isCorrupted, setIsCorrupted] = useState<boolean>(false);
 
   useEffect(() => {
@@ -57,30 +58,33 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
   }, [initialValues]);
 
   const defaultValues = useMemo(() => {
-    return initialValues || {
-      bankName: "",
-      ifscCode: "",
-      branchName: "",
-      accountHolderName: "",
-      accountNumber: "",
-      email: "",
-      addresses: [
-        {
-          addressLine1: "",
-          addressLine2: "",
-          city: "",
-          state: "",
-          country: "",
-          pincode: "",
-        },
-      ],
-    };
+    return (
+      initialValues || {
+        bankName: "",
+        ifscCode: "",
+        branchName: "",
+        accountHolderName: "",
+        accountNumber: "",
+        email: "",
+        addresses: [
+          {
+            addressLine1: "",
+            addressLine2: "",
+            city: "",
+            state: "",
+            country: "",
+            pincode: "",
+          },
+        ],
+      }
+    );
   }, [initialValues]);
 
   const onSubmit = async (
     values: BankFormValues,
     { resetForm }: FormikHelpers<BankFormValues>
   ) => {
+    setIsSubmitting(true); // Start loader
     const existingData = JSON.parse(
       localStorage.getItem("bankFormData") || "[]"
     ) as BankFormValues[];
@@ -104,16 +108,26 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
       navigate("/bank-details-list");
     } catch (error) {
       console.error("Error during form submission:", error);
+    } finally {
+      setIsSubmitting(false); // End loader
     }
   };
 
   // Helper functions to get filtered state and city options based on selections
   const getStateOptions = () => {
-    return states.filter(state => state.countryId === countries.find(country => country.value === selectedCountry)?.id);
+    return states.filter(
+      (state) =>
+        state.countryId ===
+        countries.find((country) => country.value === selectedCountry)?.id
+    );
   };
 
   const getCityOptions = () => {
-    return cities.filter(city => city.stateId === states.find(state => state.value === selectedState)?.id);
+    return cities.filter(
+      (city) =>
+        city.stateId ===
+        states.find((state) => state.value === selectedState)?.id
+    );
   };
 
   // Check for corrupted data
@@ -127,20 +141,21 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
       data.email,
     ];
 
-    const addressFields = data.addresses.every(address => 
-      address.addressLine1 &&
-      address.city &&
-      address.state &&
-      address.country &&
-      address.pincode
+    const addressFields = data.addresses.every(
+      (address) =>
+        address.addressLine1 &&
+        address.city &&
+        address.state &&
+        address.country &&
+        address.pincode
     );
 
-    return requiredFields.every(field => field) && addressFields;
+    return requiredFields.every((field) => field) && addressFields;
   };
 
   useEffect(() => {
     if (initialValues && !checkForCorruptedData(initialValues)) {
-      setIsCorrupted(true);  // Mark as corrupted if data is incomplete
+      setIsCorrupted(true); // Mark as corrupted if data is incomplete
     }
   }, [initialValues]);
 
@@ -148,7 +163,10 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
     return (
       <div className="alert alert-danger">
         <h4>Data Corrupted</h4>
-        <p>Sorry for the inconvenience. The data you are trying to edit is corrupted or missing. Please contact support or try again.</p>
+        <p>
+          Sorry for the inconvenience. The data you are trying to edit is
+          corrupted or missing. Please contact support or try again.
+        </p>
       </div>
     );
   }
@@ -169,7 +187,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                   <SelectInput
                     label="Bank Name"
                     name="bankName"
-                    options={bankOptions}   
+                    options={bankOptions}
                     required={true}
                   />
                 </div>
@@ -220,32 +238,32 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                             <SelectInput
                               label="Country"
                               name={`addresses.${index}.country`}
-                              options={countries}  
+                              options={countries}
                               required={true}
                               onChange={(e) => {
                                 setSelectedCountry(e.target.value);
                                 setSelectedState("");
                               }}
-                              value={address.country} 
+                              value={address.country}
                             />
                           </div>
                           <div className="col-md-3">
                             <SelectInput
                               label="State"
                               name={`addresses.${index}.state`}
-                              options={getStateOptions()}    
+                              options={getStateOptions()}
                               required={true}
                               onChange={(e) => setSelectedState(e.target.value)}
-                              value={address.state} 
+                              value={address.state}
                             />
                           </div>
                           <div className="col-md-3">
                             <SelectInput
                               label="City"
                               name={`addresses.${index}.city`}
-                              options={getCityOptions()}    
+                              options={getCityOptions()}
                               required={true}
-                              value={address.city}  
+                              value={address.city}
                             />
                           </div>
                           <div className="col-md-3">
@@ -254,7 +272,6 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                               placeholder="Enter Pincode"
                               name={`addresses.${index}.pincode`}
                               required={true}
-                              
                             />
                           </div>
                         </div>
@@ -322,10 +339,17 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
             </Card>
 
             <div className="d-flex justify-content-between mt-4">
-              <button type="submit" className="btn btn-success">
-                Submit
+              <button
+                type="submit"
+                className="btn btn-primary custom-button"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Submitting..." : "Submit"}
               </button>
-              <Link to="/bank-details-list" className="btn btn-secondary">
+              <Link
+                to="/bank-details-list"
+                className="btn btn-primary custom-button"
+              >
                 Back to List
               </Link>
             </div>

@@ -22,12 +22,15 @@ const BankDetailsList: React.FC = () => {
   const query = searchParams.get("q") || "";
 
   useEffect(() => {
-    const storedData = JSON.parse(localStorage.getItem("bankFormData") || "[]") as BankData[];
+    const storedData = JSON.parse(
+      localStorage.getItem("bankFormData") || "[]"
+    ) as BankData[];
     setBankData(storedData);
     setFilteredData(
-      storedData.filter((item) =>
-        item.bankName.toLowerCase().includes(query.toLowerCase()) ||
-        item.accountHolderName.toLowerCase().includes(query.toLowerCase())
+      storedData.filter(
+        (item) =>
+          item.bankName.toLowerCase().includes(query.toLowerCase()) ||
+          item.accountHolderName.toLowerCase().includes(query.toLowerCase())
       )
     );
   }, [query]);
@@ -68,7 +71,10 @@ const BankDetailsList: React.FC = () => {
   };
 
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentEntries = filteredData.slice(startIndex, startIndex + itemsPerPage);
+  const currentEntries = filteredData.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   return (
     <div className="container mt-5">
@@ -100,7 +106,7 @@ const BankDetailsList: React.FC = () => {
           {currentEntries.length > 0 ? (
             currentEntries.map((item, index) => (
               <tr key={item.id}>
-                <td>{startIndex + index + 1}</td> 
+                <td>{startIndex + index + 1}</td>
                 <td className="bank-name">{item.bankName}</td>
                 <td className="account-holder">{item.accountHolderName}</td>
                 <td className="account-number">{item.accountNumber}</td>
@@ -139,10 +145,16 @@ const BankDetailsList: React.FC = () => {
 
       {/* Back to Form and Home Buttons */}
       <div className="text-center mt-4 d-flex justify-content-between">
-        <button className="btn btn-primary" onClick={handleBackToForm}>
+        <button
+          className="btn btn-primary custom-button"
+          onClick={handleBackToForm}
+        >
           Back to Form
         </button>
-        <button className="btn btn-primary" onClick={handleBackToHome}>
+        <button
+          className="btn btn-primary custom-button"
+          onClick={handleBackToHome}
+        >
           Back to Home
         </button>
       </div>

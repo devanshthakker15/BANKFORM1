@@ -3,6 +3,11 @@
     margin-right: 5px;
     margin-left: 5px;
 }
+.custom-button {
+    width: 200px; 
+    margin: 0 5px; 
+}
+
 
 
 .table {
@@ -61,4 +66,30 @@
     justify-content: flex-start; 
     align-items: center; 
     width: 100%; 
+}
+
+.container {
+    overflow-x: auto; /* Allow horizontal scrolling */
+}
+
+.table {
+    width: 100%; /* Full width */
+    table-layout: fixed; /* Prevent overflow */
+}
+
+.table th, .table td {
+    /* word-wrap: break-word; Break long words */
+    white-space: normal; /* Allow wrapping */
+}
+
+/* Optional adjustments for smaller screens */
+@media (max-width: 768px) {
+    .table th, .table td {
+        padding: 8px; /* Padding for better touch targets */
+    }
+    
+    .button {
+        width: 100%; /* Make buttons full width */
+        margin: 5px 0; /* Adjust margins for mobile */
+    }
 }
