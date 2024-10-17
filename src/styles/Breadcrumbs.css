@@ -1,0 +1,31 @@
+.breadcrumb {
+    background-color: #f8f9fa; /* Light background color */
+    border-radius: 5px;        /* Rounded corners */
+    padding: 10px 15px;        /* Padding around the breadcrumbs */
+    margin-bottom: 20px;       /* Margin below the breadcrumb */
+  }
+  
+  .breadcrumb-item {
+    font-size: 16px;           /* Font size for breadcrumb items */
+  }
+  
+  .breadcrumb-item + .breadcrumb-item::before {
+    content: ">";
+    padding: 0 8px;           /* Padding around the separator */
+    color: #6c757d;           /* Color of the separator */
+  }
+  
+  .breadcrumb-item a {
+    text-decoration: none;      /* No underline on links */
+    color: #007bff;            /* Primary link color */
+  }
+  
+  .breadcrumb-item a:hover {
+    text-decoration: underline; /* Underline on hover */
+  }
+  
+  .breadcrumb-item.active {
+    color: #343a40;            /* Color for the active breadcrumb */
+    font-weight: bold;         /* Bold for the active breadcrumb */
+  }
+  

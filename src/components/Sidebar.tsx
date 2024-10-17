@@ -7,17 +7,19 @@ import {
   faHome,
   faClipboardList,
   faList,
-  faSignOutAlt
+  faSignOutAlt,
+  faWrench,
+  faScrewdriverWrench
 } from "@fortawesome/free-solid-svg-icons";
-import "../styles/sidebar.css"; 
+import "../styles/sidebar.css";
 
 const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [permissions, setPermissions] = useState<string[]>([]); // Store user permissions
+  const [permissions, setPermissions] = useState<string[]>([]); 
   const location = useLocation();
 
   useEffect(() => {
-    // Retrieve the current user's permissions from local storage
+
     const storedUser = localStorage.getItem("currentUser");
     if (storedUser) {
       const user = JSON.parse(storedUser);
@@ -58,33 +60,41 @@ const Sidebar: React.FC = () => {
             data-accordion="false"
           >
             {permissions.includes("home") && (
-              <li className="nav-item">
+              <li className="nav-item d-flex justify-content-center">
                 <Link to="/home" className="nav-link">
                   <div className="nav-content">
-                    <FontAwesomeIcon
-                      icon={faHome}
-                      className="nav-icon"
-                    />
+                    <FontAwesomeIcon icon={faHome} className="nav-icon" />
                     <p>Home</p>
                   </div>
                 </Link>
               </li>
             )}
+            <li className="nav-item d-flex justify-content-center">
+              <Link to="/home/test" className="nav-link">
+                <div className="nav-content">
+                  <FontAwesomeIcon icon={faScrewdriverWrench} className="nav-icon" />
+                  <p>Test</p>
+                </div>
+              </Link>
+            </li>
             {permissions.includes("form") && (
-              <li className="nav-item">
+              <li className="nav-item d-flex justify-content-center">
                 <Link to="/bank-form" className="nav-link">
                   <div className="nav-content">
-                    <FontAwesomeIcon icon={faClipboardList} className="nav-icon" />
+                    <FontAwesomeIcon
+                      icon={faClipboardList}
+                      className="nav-icon"
+                    />
                     <p>
                       Bank Form
-                      <span className="right badge badge-danger">LO</span>
+                      <span className="right badge badge-danger"></span>
                     </p>
                   </div>
                 </Link>
               </li>
             )}
             {permissions.includes("viewDetails") && (
-              <li className="nav-item">
+              <li className="nav-item d-flex justify-content-center">
                 <Link to="/bank-details-list" className="nav-link">
                   <div className="nav-content">
                     <FontAwesomeIcon icon={faList} className="nav-icon" />
@@ -96,7 +106,7 @@ const Sidebar: React.FC = () => {
                 </Link>
               </li>
             )}
-            <li className="nav-item">
+            <li className="nav-item d-flex justify-content-center">
               <Link to="/" className="nav-link">
                 <div className="nav-content">
                   <FontAwesomeIcon icon={faSignOutAlt} className="nav-icon" />

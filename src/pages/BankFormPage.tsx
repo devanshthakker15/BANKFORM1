@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import BankForm from "../components/BankForm";
+import Breadcrumbs from "../components/Breadcrumb";
 import "../App.css";
 
 const BankFormPage: React.FC = () => {
@@ -22,12 +23,20 @@ const BankFormPage: React.FC = () => {
   }, [id, navigate]);
 
   const handleBackToForm = () => {
-    navigate("/bank-form"); // Navigate to BankForm without an ID
+    navigate("/bank-form"); 
   };
 
   return (
     <div className="body">
-      <div className="container mt-5">
+            <Breadcrumbs
+        items={[
+          { label: "Logout", path: "/" }, 
+          { label: "Home", path: "/home"},
+          { label: "Bank Form", path: "/bank-form" }, 
+        ]}
+      />
+      <div className="container mt-2">
+
         {/* View Submissions Button */}
         <div className="text-right mb-4 d-flex justify-content-end">
           <Link to="/bank-details-list">

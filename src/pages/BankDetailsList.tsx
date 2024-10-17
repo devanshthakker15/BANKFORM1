@@ -1,7 +1,9 @@
+// src/pages/BankDetailsList.tsx
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Pagination from "../components/Pagination";
 import "../styles/bankStyles.css";
+import Breadcrumbs from "../components/Breadcrumb";
 
 interface BankData {
   id: number;
@@ -17,7 +19,6 @@ const BankDetailsList: React.FC = () => {
   const navigate = useNavigate();
   const itemsPerPage = 2;
 
-  // Get the current page and query from the URL or default to 1 and empty string
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
   const query = searchParams.get("q") || "";
 
@@ -77,88 +78,94 @@ const BankDetailsList: React.FC = () => {
   );
 
   return (
-    <div className="container mt-5">
-      <h2>Bank Details Submissions</h2>
+    <>
+      <Breadcrumbs
+        items={[
+          { label: "Logout", path: "/" },
+          { label: "Home", path: "/home" },
+          { label: "Bank Form", path: "/bank-form" },
+          { label: "Details", path: "/bank-details-list" },
+        ]}
+      />
+      <div className="container mt-2">
+        <h2>Bank Details Submissions</h2>
 
-      {/* Search Input */}
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Search by Bank Name or Account Holder Name"
-          className="form-control"
-          value={query}
-          onChange={handleSearch}
-        />
-      </div>
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search by Bank Name or Account Holder Name"
+            className="form-control"
+            value={query}
+            onChange={handleSearch}
+          />
+        </div>
 
-      {/* Submission List */}
-      <table className="table table-bordered">
-        <thead>
-          <tr>
-            <th>Serial No.</th>
-            <th className="bank-name">Bank Name</th>
-            <th className="account-holder">Account Holder Name</th>
-            <th className="account-number">Account Number</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentEntries.length > 0 ? (
-            currentEntries.map((item, index) => (
-              <tr key={item.id}>
-                <td>{startIndex + index + 1}</td>
-                <td className="bank-name">{item.bankName}</td>
-                <td className="account-holder">{item.accountHolderName}</td>
-                <td className="account-number">{item.accountNumber}</td>
-                <td>
-                  <button
-                    className="button btn btn-primary"
-                    onClick={() => handleEdit(item.id)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="button btn btn-danger"
-                    onClick={() => handleDelete(item.id)}
-                  >
-                    <strong>X</strong>
-                  </button>
+        <table className="table table-bordered">
+          <thead>
+            <tr>
+              <th>Serial No.</th>
+              <th className="bank-name">Bank Name</th>
+              <th className="account-holder">Account Holder Name</th>
+              <th className="account-number">Account Number</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentEntries.length > 0 ? (
+              currentEntries.map((item, index) => (
+                <tr key={item.id}>
+                  <td>{startIndex + index + 1}</td>
+                  <td className="bank-name">{item.bankName}</td>
+                  <td className="account-holder">{item.accountHolderName}</td>
+                  <td className="account-number">{item.accountNumber}</td>
+                  <td>
+                    <button
+                      className="button btn btn-primary"
+                      onClick={() => handleEdit(item.id)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="button btn btn-danger"
+                      onClick={() => handleDelete(item.id)}
+                    >
+                      <strong>X</strong>
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="text-center">
+                  No data found
                 </td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={5} className="text-center">
-                No data found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            )}
+          </tbody>
+        </table>
 
-      {/* Pagination Controls */}
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
 
-      {/* Back to Form and Home Buttons */}
-      <div className="text-center mt-4 d-flex justify-content-between">
-        <button
-          className="btn btn-primary custom-button"
-          onClick={handleBackToForm}
-        >
-          Back to Form
-        </button>
-        <button
-          className="btn btn-primary custom-button"
-          onClick={handleBackToHome}
-        >
-          Back to Home
-        </button>
+        <div className="text-center mt-4 d-flex justify-content-between">
+          <button
+            className="btn btn-primary custom-button"
+            onClick={handleBackToForm}
+          >
+            Back to Form
+          </button>
+          <button
+            className="btn btn-primary custom-button"
+            onClick={handleBackToHome}
+          >
+            Back to Home
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

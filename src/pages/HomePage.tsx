@@ -6,12 +6,21 @@ import bankingImg1 from "../assets/banking1.jpg";
 import bankingImg2 from "../assets/banking2.jpg";
 import bankingImg3 from "../assets/banking3.jpg";
 import bankingImg4 from "../assets/banking4.jpg";
+import Breadcrumbs from "../components/Breadcrumb";
 
 const HomePage: React.FC = () => {
   return (
     <div className="body">
-      <div className="container mt-5">
+      <Breadcrumbs
+        items={[
+          { label: "Logout", path: "/" },
+          { label: "Home", path: "/home" },
+          // { label: "Test Page", path: "/home/test" },
+        ]}
+      />
+      <div className="container mt-2">
         {/* Header */}
+
         <div className="header text-center mt-4 mb-3">
           <h2>Welcome to Our Bank Application</h2>
           <p>Please use the button below to access the bank details form.</p>
@@ -74,7 +83,12 @@ const HomePage: React.FC = () => {
         {/* Go to Form Button */}
         <div className="d-flex justify-content-center mt-4">
           <Link to="/bank-form">
-            <button className="btn btn-primary mb-5">Go to Form</button>
+            <button className="btn btn-primary btn-sm mb-5 me-2">
+              Go to Form
+            </button>
+          </Link>
+          <Link to="/home/test">
+            <button className="btn btn-primary btn-sm mb-5">Go to test</button>
           </Link>
         </div>
       </div>

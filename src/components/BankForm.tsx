@@ -350,7 +350,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                 to="/bank-details-list"
                 className="btn btn-primary custom-button"
               >
-                Back to List
+                View Details List
               </Link>
             </div>
           </Form>

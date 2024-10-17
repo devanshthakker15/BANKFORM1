@@ -6,6 +6,7 @@ import BankFormPage from "./pages/BankFormPage";
 import LoginPage from "./pages/LoginPage";
 import BankDetailsList from "./pages/BankDetailsList";
 import PageNotFound from "./pages/PageNotFound";
+import TestPage from "./pages/TestPage";
 
 import Layout from "./components/Layout";
 
@@ -39,6 +40,7 @@ const App: React.FC = () => {
         <Route path="/" element={<LoginPage />} />
         <Route path="/" element={<Layout />}>
           <Route path="/home" element={<HomePage />} />
+          <Route path="/home/test" element={<TestPage />} />
 
           {/* Protected Routes */}
           <Route
@@ -55,6 +57,7 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute permission="viewDetails">
                 <BankDetailsList />
+                {/* <BreadcrumbPage/> */}
               </ProtectedRoute>
             }
           />
