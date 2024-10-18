@@ -1,4 +1,3 @@
-// src/pages/BankDetailsList.tsx
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Pagination from "../components/Pagination";
@@ -19,9 +18,11 @@ const BankDetailsList: React.FC = () => {
   const navigate = useNavigate();
   const itemsPerPage = 2;
 
+  // Fetch current page and query from URL parameters
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
   const query = searchParams.get("q") || "";
 
+  // Fetch and filter bank data based on search query
   useEffect(() => {
     const storedData = JSON.parse(
       localStorage.getItem("bankFormData") || "[]"
@@ -36,15 +37,20 @@ const BankDetailsList: React.FC = () => {
     );
   }, [query]);
 
+  // Handle search input and update query params
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchParams({ page: "1", q: value });
   };
 
+  // Navigate to bank form for editing with dynamic id
   const handleEdit = (id: number) => {
-    navigate(`/bank-form/${id}`);
+    // Get the current path and navigate to /edit/:id
+    const currentPath = window.location.pathname;
+    navigate(`${currentPath}/edit/${id}`);
   };
 
+  // Handle deletion of a bank entry and update the data
   const handleDelete = (id: number) => {
     const updatedData = bankData.filter((item) => item.id !== id);
     setBankData(updatedData);
@@ -57,16 +63,20 @@ const BankDetailsList: React.FC = () => {
     }
   };
 
+  // Navigate back to the empty bank form for new entry
   const handleBackToForm = () => {
-    navigate("/bank-form");
+    // Get the current path and navigate to /add
+    const currentPath = window.location.pathname;
+    navigate(`${currentPath}/add`);
   };
 
+  // Navigate back to the home page
   const handleBackToHome = () => {
-    navigate("/home");
+    navigate("/");
   };
 
+  // Pagination handling
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
   const handlePageChange = (page: number) => {
     setSearchParams({ page: page.toString(), q: query });
   };
@@ -79,14 +89,7 @@ const BankDetailsList: React.FC = () => {
 
   return (
     <>
-      <Breadcrumbs
-        items={[
-          { label: "Logout", path: "/" },
-          { label: "Home", path: "/home" },
-          { label: "Bank Form", path: "/bank-form" },
-          { label: "Details", path: "/bank-details-list" },
-        ]}
-      />
+      <Breadcrumbs />
       <div className="container mt-2">
         <h2>Bank Details Submissions</h2>
 
@@ -155,7 +158,7 @@ const BankDetailsList: React.FC = () => {
             className="btn btn-primary custom-button"
             onClick={handleBackToForm}
           >
-            Back to Form
+            Go to Form
           </button>
           <button
             className="btn btn-primary custom-button"

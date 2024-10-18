@@ -40,7 +40,7 @@ const LoginPage: React.FC = () => {
 
     // Store user details in localStorage upon successful login
     localStorage.setItem("currentUser", JSON.stringify(user));
-    navigate("/home");
+    navigate("/");
   };
 
   const handleRegister = () => {

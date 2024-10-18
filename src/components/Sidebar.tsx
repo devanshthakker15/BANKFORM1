@@ -15,11 +15,10 @@ import "../styles/sidebar.css";
 
 const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [permissions, setPermissions] = useState<string[]>([]); 
+  const [permissions, setPermissions] = useState<string[]>([]);
   const location = useLocation();
 
   useEffect(() => {
-
     const storedUser = localStorage.getItem("currentUser");
     if (storedUser) {
       const user = JSON.parse(storedUser);
@@ -31,12 +30,14 @@ const Sidebar: React.FC = () => {
     setIsCollapsed((prev) => !prev);
   };
 
-  const hideContent = location.pathname === "/login";
+  const hideContent = location.pathname === "/";
 
-  // If on the login page, don't render the sidebar at all
   if (hideContent) {
-    return null;
+    return null; // Don't render the sidebar on the login page
   }
+
+  // Construct base path dynamically
+  const basePath = location.pathname.split('/').slice(0, -1).join('/');
 
   return (
     <aside
@@ -61,7 +62,7 @@ const Sidebar: React.FC = () => {
           >
             {permissions.includes("home") && (
               <li className="nav-item d-flex justify-content-center">
-                <Link to="/home" className="nav-link">
+                <Link to={`/home`} className="nav-link">
                   <div className="nav-content">
                     <FontAwesomeIcon icon={faHome} className="nav-icon" />
                     <p>Home</p>
@@ -70,7 +71,7 @@ const Sidebar: React.FC = () => {
               </li>
             )}
             <li className="nav-item d-flex justify-content-center">
-              <Link to="/home/test" className="nav-link">
+              <Link to={`/home/test`} className="nav-link">
                 <div className="nav-content">
                   <FontAwesomeIcon icon={faScrewdriverWrench} className="nav-icon" />
                   <p>Test</p>
@@ -79,7 +80,7 @@ const Sidebar: React.FC = () => {
             </li>
             {permissions.includes("form") && (
               <li className="nav-item d-flex justify-content-center">
-                <Link to="/bank-form" className="nav-link">
+                <Link to={`/home/bank-form`} className="nav-link">
                   <div className="nav-content">
                     <FontAwesomeIcon
                       icon={faClipboardList}
@@ -95,7 +96,7 @@ const Sidebar: React.FC = () => {
             )}
             {permissions.includes("viewDetails") && (
               <li className="nav-item d-flex justify-content-center">
-                <Link to="/bank-details-list" className="nav-link">
+                <Link to={`/home/bank-form/bank-details-list`} className="nav-link">
                   <div className="nav-content">
                     <FontAwesomeIcon icon={faList} className="nav-icon" />
                     <p>

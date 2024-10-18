@@ -57,6 +57,20 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
     }
   }, [initialValues]);
 
+  const handleNavigation = (path: string) => {
+    // Get the last segment of the path
+    const pathSegments = location.pathname.split("/");
+    const lastSegment = pathSegments[pathSegments.length - 1];
+
+    if (!isNaN(Number(lastSegment))) {
+      const basePath = pathSegments.slice(0, -1).join("/");
+      const newPath = `${basePath}${path}`;
+      navigate(newPath);
+    } else {
+      navigate(path);
+    }
+  };
+
   const defaultValues = useMemo(() => {
     return (
       initialValues || {
@@ -84,7 +98,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
     values: BankFormValues,
     { resetForm }: FormikHelpers<BankFormValues>
   ) => {
-    setIsSubmitting(true); // Start loader
+    setIsSubmitting(true); 
     const existingData = JSON.parse(
       localStorage.getItem("bankFormData") || "[]"
     ) as BankFormValues[];
@@ -105,7 +119,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
     try {
       await dispatch(saveFormDataAsync(values));
       resetForm();
-      navigate("/bank-details-list");
+      navigate("/banks");
     } catch (error) {
       console.error("Error during form submission:", error);
     } finally {
@@ -291,7 +305,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                               })
                             }
                           >
-                            Add Another Address
+                            Add Address
                           </button>
                           {values.addresses.length > 1 && (
                             <button
@@ -343,15 +357,18 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                 type="submit"
                 className="btn btn-primary custom-button"
                 disabled={isSubmitting}
+                // onClick={() => handleNavigation("/bank-details-list")}
               >
                 {isSubmitting ? "Submitting..." : "Submit"}
               </button>
-              <Link
-                to="/bank-details-list"
-                className="btn btn-primary custom-button"
+
+
+              {/* <button
+                onClick={() => handleNavigation("/bank-details-list")}
+                className="btn btn-secondary"
               >
                 View Details List
-              </Link>
+              </button> */}
             </div>
           </Form>
         )}
