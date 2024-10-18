@@ -8,7 +8,6 @@ import {
   faClipboardList,
   faList,
   faSignOutAlt,
-  faWrench,
   faScrewdriverWrench
 } from "@fortawesome/free-solid-svg-icons";
 import "../styles/sidebar.css";
@@ -30,14 +29,11 @@ const Sidebar: React.FC = () => {
     setIsCollapsed((prev) => !prev);
   };
 
-  const hideContent = location.pathname === "/";
+  const hideContent = location.pathname === "/login";
 
   if (hideContent) {
-    return null; // Don't render the sidebar on the login page
+    return null; 
   }
-
-  // Construct base path dynamically
-  const basePath = location.pathname.split('/').slice(0, -1).join('/');
 
   return (
     <aside
@@ -60,43 +56,19 @@ const Sidebar: React.FC = () => {
             role="menu"
             data-accordion="false"
           >
-            {permissions.includes("home") && (
+            {/* {permissions.includes("home") && ( */}
               <li className="nav-item d-flex justify-content-center">
-                <Link to={`/home`} className="nav-link">
+                <Link to={`/`} className="nav-link">
                   <div className="nav-content">
                     <FontAwesomeIcon icon={faHome} className="nav-icon" />
                     <p>Home</p>
                   </div>
                 </Link>
               </li>
-            )}
-            <li className="nav-item d-flex justify-content-center">
-              <Link to={`/home/test`} className="nav-link">
-                <div className="nav-content">
-                  <FontAwesomeIcon icon={faScrewdriverWrench} className="nav-icon" />
-                  <p>Test</p>
-                </div>
-              </Link>
-            </li>
-            {permissions.includes("form") && (
+            {/* )} */}
+            {permissions.includes("viewBanks") && (
               <li className="nav-item d-flex justify-content-center">
-                <Link to={`/home/bank-form`} className="nav-link">
-                  <div className="nav-content">
-                    <FontAwesomeIcon
-                      icon={faClipboardList}
-                      className="nav-icon"
-                    />
-                    <p>
-                      Bank Form
-                      <span className="right badge badge-danger"></span>
-                    </p>
-                  </div>
-                </Link>
-              </li>
-            )}
-            {permissions.includes("viewDetails") && (
-              <li className="nav-item d-flex justify-content-center">
-                <Link to={`/home/bank-form/bank-details-list`} className="nav-link">
+                <Link to={`/banks`} className="nav-link">
                   <div className="nav-content">
                     <FontAwesomeIcon icon={faList} className="nav-icon" />
                     <p>
@@ -107,8 +79,22 @@ const Sidebar: React.FC = () => {
                 </Link>
               </li>
             )}
+            {permissions.includes("addBank") && (
+              <li className="nav-item d-flex justify-content-center">
+                <Link to={`/banks/add`} className="nav-link">
+                  <div className="nav-content">
+                    <FontAwesomeIcon
+                      icon={faClipboardList}
+                      className="nav-icon"
+                    />
+                    <p>Bank Form</p>
+                  </div>
+                </Link>
+              </li>
+            )}
+
             <li className="nav-item d-flex justify-content-center">
-              <Link to="/" className="nav-link">
+              <Link to="/login" className="nav-link">
                 <div className="nav-content">
                   <FontAwesomeIcon icon={faSignOutAlt} className="nav-icon" />
                   <p>Logout</p>

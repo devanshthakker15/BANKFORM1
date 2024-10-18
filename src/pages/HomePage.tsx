@@ -12,6 +12,10 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Fetch the current user from localStorage
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+  const hasViewBanksPermission = currentUser?.permissions?.includes("viewBanks");
+
   const handleNavigation = (path: string) => {
     navigate(path);
   };
@@ -81,15 +85,17 @@ const HomePage: React.FC = () => {
           </button>
         </div>
 
-        {/* Go to Form Button */}
-        <div className="d-flex justify-content-center mt-4">
-          <button
-            className="btn btn-primary mb-5 me-2"
-            onClick={() => handleNavigation("/banks")}
-          >
-            Go to Bank welcome
-          </button>
-        </div>
+        {/* Conditionally Render "Go to Bank Details" Button */}
+        {hasViewBanksPermission && (
+          <div className="d-flex justify-content-center mt-4">
+            <button
+              className="btn btn-primary mb-5 me-2"
+              onClick={() => handleNavigation("/banks")}
+            >
+              Go to Bank Details
+            </button>
+          </div>
+        )}
       </div>
 
       <footer className="mt-5 d-flex justify-content-center">

@@ -22,7 +22,7 @@ const perms: PermissionUser[] = [
     email: "jane.smith@example.com",
     password: "customer123",
     userType: "customer",
-    permissions: ["home", "form"],
+    permissions: ["home", "viewBanks" ,"addBank"],
   },
   {
     id: 3,
@@ -30,7 +30,7 @@ const perms: PermissionUser[] = [
     email: "admin.jones@example.com",
     password: "admin789",
     userType: "admin",
-    permissions: ["home", "form", "viewDetails"],
+    permissions: ["home", "addBank", "viewBanks", "editBank"],
   },
   {
     id: 4,
@@ -46,7 +46,7 @@ const perms: PermissionUser[] = [
     email: "karen.hall@example.com",
     password: "cust5678",
     userType: "customer",
-    permissions: ["home", "form"],
+    permissions: ["home", "addBank"],
   },
   {
     id: 6,
@@ -54,7 +54,7 @@ const perms: PermissionUser[] = [
     email: "admin.williams@example.com",
     password: "admin123",
     userType: "admin",
-    permissions: ["home", "form", "viewDetails"],
+    permissions: ["home", "addBank", "viewBanks", "editBank"],
   },
   {
     id: 7,
@@ -70,7 +70,7 @@ const perms: PermissionUser[] = [
     email: "customer.anderson@example.com",
     password: "cust7890",
     userType: "customer",
-    permissions: ["home", "form"],
+    permissions: ["home", "addBank"],
   },
   {
     id: 9,
@@ -78,7 +78,7 @@ const perms: PermissionUser[] = [
     email: "admin.taylor@example.com",
     password: "adminpass",
     userType: "admin",
-    permissions: ["home", "form", "viewDetails"],
+    permissions: ["home", "addBank", "viewBanks", "editBank"],
   },
   {
     id: 10,

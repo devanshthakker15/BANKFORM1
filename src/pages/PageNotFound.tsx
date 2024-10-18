@@ -7,7 +7,7 @@ const PageNotFound: React.FC = () => {
       <h1 className="display-1 text-danger">404</h1>
       <h2 className="mb-4">Oops! Page Not Found</h2>
       <p>The page you're looking for doesn't exist or has been moved.</p>
-      <Link to="/home" className="btn btn-primary mt-3">
+      <Link to="/" className="btn btn-primary mt-3">
         Go to Home
       </Link>
     </div>

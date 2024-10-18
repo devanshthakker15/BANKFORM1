@@ -18,11 +18,14 @@ const BankDetailsList: React.FC = () => {
   const navigate = useNavigate();
   const itemsPerPage = 2;
 
-  // Fetch current page and query from URL parameters
+ 
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
   const query = searchParams.get("q") || "";
 
-  // Fetch and filter bank data based on search query
+  
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+  const hasEditBankPermission = currentUser?.permissions?.includes("editBank");
+
   useEffect(() => {
     const storedData = JSON.parse(
       localStorage.getItem("bankFormData") || "[]"
@@ -37,20 +40,19 @@ const BankDetailsList: React.FC = () => {
     );
   }, [query]);
 
-  // Handle search input and update query params
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchParams({ page: "1", q: value });
   };
 
-  // Navigate to bank form for editing with dynamic id
   const handleEdit = (id: number) => {
-    // Get the current path and navigate to /edit/:id
-    const currentPath = window.location.pathname;
-    navigate(`${currentPath}/edit/${id}`);
+    navigate(`/banks/edit/${id}`);
   };
 
-  // Handle deletion of a bank entry and update the data
   const handleDelete = (id: number) => {
     const updatedData = bankData.filter((item) => item.id !== id);
     setBankData(updatedData);
@@ -63,19 +65,6 @@ const BankDetailsList: React.FC = () => {
     }
   };
 
-  // Navigate back to the empty bank form for new entry
-  const handleBackToForm = () => {
-    // Get the current path and navigate to /add
-    const currentPath = window.location.pathname;
-    navigate(`${currentPath}/add`);
-  };
-
-  // Navigate back to the home page
-  const handleBackToHome = () => {
-    navigate("/");
-  };
-
-  // Pagination handling
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const handlePageChange = (page: number) => {
     setSearchParams({ page: page.toString(), q: query });
@@ -110,7 +99,7 @@ const BankDetailsList: React.FC = () => {
               <th className="bank-name">Bank Name</th>
               <th className="account-holder">Account Holder Name</th>
               <th className="account-number">Account Number</th>
-              <th>Actions</th>
+              {hasEditBankPermission && <th>Actions</th>}
             </tr>
           </thead>
           <tbody>
@@ -121,25 +110,27 @@ const BankDetailsList: React.FC = () => {
                   <td className="bank-name">{item.bankName}</td>
                   <td className="account-holder">{item.accountHolderName}</td>
                   <td className="account-number">{item.accountNumber}</td>
-                  <td>
-                    <button
-                      className="button btn btn-primary"
-                      onClick={() => handleEdit(item.id)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="button btn btn-danger"
-                      onClick={() => handleDelete(item.id)}
-                    >
-                      <strong>X</strong>
-                    </button>
-                  </td>
+                  {hasEditBankPermission && (
+                    <td>
+                      <button
+                        className="button btn btn-sm m-1 btn-primary"
+                        onClick={() => handleEdit(item.id)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="button btn btn-sm m-1 btn-danger"
+                        onClick={() => handleDelete(item.id)}
+                      >
+                        <strong>X</strong>
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="text-center">
+                <td colSpan={hasEditBankPermission ? 5 : 4} className="text-center">
                   No data found
                 </td>
               </tr>
@@ -152,21 +143,12 @@ const BankDetailsList: React.FC = () => {
           totalPages={totalPages}
           onPageChange={handlePageChange}
         />
-
-        <div className="text-center mt-4 d-flex justify-content-between">
-          <button
-            className="btn btn-primary custom-button"
-            onClick={handleBackToForm}
-          >
-            Go to Form
-          </button>
-          <button
-            className="btn btn-primary custom-button"
-            onClick={handleBackToHome}
-          >
-            Back to Home
-          </button>
-        </div>
+                    <button
+              className="btn btn-primary mb-5 me-2"
+              onClick={() => handleNavigation("/banks/add")}
+            >
+              Go to Form
+            </button>
       </div>
     </>
   );
