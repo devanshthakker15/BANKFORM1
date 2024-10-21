@@ -3,6 +3,12 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import Pagination from "../components/Pagination";
 import "../styles/bankStyles.css";
 import Breadcrumbs from "../components/Breadcrumb";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faChevronLeft,
+  faTrashCan,
+  faPen,
+} from "@fortawesome/free-solid-svg-icons";
 
 interface BankData {
   id: number;
@@ -16,13 +22,11 @@ const BankDetailsList: React.FC = () => {
   const [filteredData, setFilteredData] = useState<BankData[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const itemsPerPage = 2;
+  const itemsPerPage = 5;
 
- 
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
   const query = searchParams.get("q") || "";
 
-  
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
   const hasEditBankPermission = currentUser?.permissions?.includes("editBank");
 
@@ -92,63 +96,67 @@ const BankDetailsList: React.FC = () => {
           />
         </div>
 
-        <table className="table table-bordered">
-          <thead>
-            <tr>
-              <th>Serial No.</th>
-              <th className="bank-name">Bank Name</th>
-              <th className="account-holder">Account Holder Name</th>
-              <th className="account-number">Account Number</th>
-              {hasEditBankPermission && <th>Actions</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {currentEntries.length > 0 ? (
-              currentEntries.map((item, index) => (
-                <tr key={item.id}>
-                  <td>{startIndex + index + 1}</td>
-                  <td className="bank-name">{item.bankName}</td>
-                  <td className="account-holder">{item.accountHolderName}</td>
-                  <td className="account-number">{item.accountNumber}</td>
-                  {hasEditBankPermission && (
-                    <td>
-                      <button
-                        className="button btn btn-sm m-1 btn-primary"
-                        onClick={() => handleEdit(item.id)}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="button btn btn-sm m-1 btn-danger"
-                        onClick={() => handleDelete(item.id)}
-                      >
-                        <strong>X</strong>
-                      </button>
-                    </td>
-                  )}
-                </tr>
-              ))
-            ) : (
+        {/* Make table responsive on mobile */}
+        <div className="table-responsive-mobile">
+          <table className="table table-bordered">
+            <thead>
               <tr>
-                <td colSpan={hasEditBankPermission ? 5 : 4} className="text-center">
-                  No data found
-                </td>
+                <th>Serial No.</th>
+                <th className="bank-name">Bank Name</th>
+                <th className="account-holder">Account Holder Name</th>
+                <th className="account-number">Account Number</th>
+                {hasEditBankPermission && <th>Actions</th>}
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {currentEntries.length > 0 ? (
+                currentEntries.map((item, index) => (
+                  <tr key={item.id}>
+                    <td>{startIndex + index + 1}</td>
+                    <td className="bank-name">{item.bankName}</td>
+                    <td className="account-holder">{item.accountHolderName}</td>
+                    <td className="account-number">{item.accountNumber}</td>
+                    {hasEditBankPermission && (
+                      <td>
+                        <button
+                          className="button btn btn-sm m-1 btn-primary"
+                          onClick={() => handleEdit(item.id)}
+                        >
+                          <FontAwesomeIcon icon={faPen} className="nav-icon ms-1" />
+                        </button>
+                        <button
+                          className="button btn btn-sm m-1 btn-danger"
+                          onClick={() => handleDelete(item.id)}
+                        >
+                          <FontAwesomeIcon icon={faTrashCan} className="nav-icon ms-1" />
+                        </button>
+                      </td>
+                    )}
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={hasEditBankPermission ? 5 : 4} className="text-center">
+                    No data found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={handlePageChange}
         />
-                    <button
-              className="btn btn-primary mb-5 me-2"
-              onClick={() => handleNavigation("/banks/add")}
-            >
-              Go to Form
-            </button>
+
+        <button
+          className="btn btn-primary mb-5 me-2"
+          onClick={() => handleNavigation("/banks/add")}
+        >
+          Go to Form
+        </button>
       </div>
     </>
   );

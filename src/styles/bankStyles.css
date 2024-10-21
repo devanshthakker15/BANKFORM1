@@ -1,5 +1,8 @@
 .button {
-    width: 70px; 
+    width: 40px; 
+    display: flex;
+    justify-content: center;
+    background-color: aqua;
     margin-right: 5px;
     margin-left: 5px;
 }
@@ -8,6 +11,9 @@
     margin: 0 5px; 
 }
 
+.form-control{
+    height: 39px;
+}
 
 
 .table {
@@ -57,9 +63,6 @@
 }
 
 
-.table-responsive {
-    overflow-x: auto; 
-}
 
 .table td .button-container {
     display: flex;
@@ -89,7 +92,21 @@
     }
     
     .button {
-        width: 100%; /* Make buttons full width */
-        margin: 5px 0; /* Adjust margins for mobile */
+        width: 40%; /* Make buttons full width */
+        margin: 2px 0; /* Adjust margins for mobile */
     }
 }
+
+@media (max-width: 768px) {
+    .table-responsive-mobile {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch; /* For smoother scrolling on iOS */
+    }
+  
+    .table-responsive-mobile table {
+      min-width: 600px; /* Set a minimum width for the table */
+    }
+  }
+  
+
+  

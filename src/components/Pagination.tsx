@@ -26,12 +26,13 @@ const Pagination: React.FC<PaginationProps> = ({
   };
 
   return (
-    <div className="pagination d-flex justify-content-end align-items-center mt-4">
+    <div className="pagination d-flex justify-content-end align-items-center mt-4 mb-3">
       <button
         className="btn btn-primary"
         style={{ width: '40px', marginRight: '10px'}}
         disabled={currentPage === 1}
         onClick={handlePrev}
+         aria-label="Previous page"
       >
         <FontAwesomeIcon icon={faChevronLeft} />
       </button>
@@ -45,6 +46,7 @@ const Pagination: React.FC<PaginationProps> = ({
         style={{ width: '40px', marginLeft: '10px' }}
         disabled={currentPage === totalPages}
         onClick={handleNext}
+        aria-label="Next page"
       >
         <FontAwesomeIcon icon={faChevronRight} />
       </button>

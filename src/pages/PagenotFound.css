@@ -1,0 +1,73 @@
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+.pagenotfound {
+  background: url("https://wallpapercave.com/wp/6SLzBEY.jpg") no-repeat left top;
+  background-size: cover;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.text {
+  margin-top: 300px;
+  margin-left: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pagenotfound .text h1 {
+  color: #ff0303;
+  margin-top: -200px;
+  font-size: 15em;
+  text-align: center;
+  text-shadow: -5px 5px 0px rgba(0, 0, 0, 0.7),
+               -10px 10px 0px rgba(0, 0, 0, 0.4),
+               -15px 15px 0px rgba(0, 0, 0, 0.2);
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.pagenotfound .text h2 {
+  color: rgb(255, 0, 0);
+  font-size: 5em;
+  text-shadow: -5px 5px 0px rgba(0, 0, 0, 0.7);
+  text-align: center;
+  margin-top: -150px;
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.pagenotfound .text h3 {
+  color: white;
+  margin-left: 30px;
+  font-size: 2em;
+  text-shadow: -5px 5px 0px rgba(0, 0, 0, 0.7);
+  margin-top: -40px;
+  font-family: monospace;
+  font-weight: bold;
+}
+
+.pagenotfound .torch {
+  position: fixed;
+  width: 450px; /* Increase torch size */
+  height: 350px; /* Increase torch size */
+  border-radius: 50%;
+  box-shadow: 0 0 0 9999em #000000f7;
+  background: rgba(0, 0, 0, 0.3);
+  pointer-events: none; /* Prevent interaction */
+}
+
+.pagenotfound .torch:after {
+  content: '';
+  display: block;
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 40px 2px #ad7171, 0 0 20px 4px rgba(13, 13, 10, 0.2);
+}
+

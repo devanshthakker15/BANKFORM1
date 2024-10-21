@@ -33,14 +33,36 @@ const ProtectedRoute: React.FC<{
   return <Navigate to="*" />;
 };
 
+// Check if user is authenticated
+const PrivateWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const currentUser = localStorage.getItem("currentUser");
+
+  if (!currentUser) {
+    // Redirect to login if user is not authenticated
+    return <Navigate to="/login" />;
+  }
+
+  return <>{children}</>;
+};
+
 const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Unauthenticated route for login */}
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<Layout />}>
+
+        {/* Authenticated routes */}
+        <Route
+          path="/"
+          element={
+            <PrivateWrapper>
+              <Layout />
+            </PrivateWrapper>
+          }
+        >
           <Route index element={<HomePage />} />
-          
+
           {/* Bank related routes */}
           <Route
             path="/banks"
@@ -74,6 +96,5 @@ const App: React.FC = () => {
     </BrowserRouter>
   );
 };
-
 
 export default App;

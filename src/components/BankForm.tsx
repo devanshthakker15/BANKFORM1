@@ -7,7 +7,7 @@ import { saveFormDataAsync } from "../redux/formSlice";
 import { basicSchema } from "../schema/basicSchema";
 import Card from "./Card";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import { bankOptions, countries, states, cities } from "../utils/constants";
 import "../styles/bankStyles.css";
 
@@ -98,7 +98,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
     values: BankFormValues,
     { resetForm }: FormikHelpers<BankFormValues>
   ) => {
-    setIsSubmitting(true); 
+    setIsSubmitting(true);
     const existingData = JSON.parse(
       localStorage.getItem("bankFormData") || "[]"
     ) as BankFormValues[];
@@ -254,8 +254,8 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                               name={`addresses.${index}.country`}
                               options={countries}
                               required={true}
-                              onChange={(e) => {
-                                setSelectedCountry(e.target.value);
+                              onChange={(option) => {
+                                setSelectedCountry(option?.value || "");
                                 setSelectedState("");
                               }}
                               value={address.country}
@@ -267,7 +267,9 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                               name={`addresses.${index}.state`}
                               options={getStateOptions()}
                               required={true}
-                              onChange={(e) => setSelectedState(e.target.value)}
+                              onChange={(option) =>
+                                setSelectedState(option?.value || "")
+                              }
                               value={address.state}
                             />
                           </div>
@@ -361,7 +363,6 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
               >
                 {isSubmitting ? "Submitting..." : "Submit"}
               </button>
-
 
               {/* <button
                 onClick={() => handleNavigation("/bank-details-list")}

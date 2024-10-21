@@ -1,5 +1,6 @@
 import React from 'react';
 import { Field, ErrorMessage } from 'formik';
+import "../styles/bankStyles.css";
 
 interface TextInputProps {
   label: string; 

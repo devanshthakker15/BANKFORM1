@@ -11,7 +11,9 @@ export const bankOptions = [
 export const countries = [
   { id: 1, value: "India", label: "India" },
   { id: 2, value: "USA", label: "USA" },
-  { id: 3, value: "Canada", label: "Canada" },
+  { id: 3, value: "Canada", label: "Canada" },  
+  { id: 4, value: "Australia", label: "Australia" },
+  { id: 5, value: "Brazil", label: "Brazil" },
 ];
 
 export const states = [
@@ -21,6 +23,11 @@ export const states = [
   { id: 4, value: "Texas", label: "Texas", countryId: 2 },
   { id: 5, value: "Ontario", label: "Ontario", countryId: 3 },
   { id: 6, value: "Quebec", label: "Quebec", countryId: 3 },
+  { id: 7, value: "Victoria", label: "Victoria", countryId: 4 },
+  { id: 8, value: "Queensland", label: "Queensland", countryId: 4 },
+  { id: 9, value: "Tasmania", label: "Tasmania", countryId: 4 },
+  { id: 10, value: "Rio de Janeiro", label: "Rio de Janeiro", countryId: 5 },
+  { id: 11, value: "São Paulo", label: "São Paulo", countryId: 5 },
 ];
 
 export const cities = [
@@ -51,4 +58,24 @@ export const cities = [
   // Cities in Quebec
   { id: 15, value: "Montreal", label: "Montreal", stateId: 6 },
   { id: 16, value: "Quebec City", label: "Quebec City", stateId: 6 },
+
+  //Cities in Victoria
+  { id: 17, value: "Melbourne", label: "Melbourne", stateId: 7 },
+  { id: 18, value: "Geelong", label: "Geelong", stateId: 7 },
+
+  //Cities in Queensland
+  { id: 19, value: "Brisbane", label: "Brisbane", stateId: 8 },
+  { id: 20, value: "Gold Coast", label: "Gold Coast", stateId: 8 },
+
+  //Cities in Tasmania
+  { id: 21, value: "Hobart", label: "Hobart", stateId: 9 },
+  { id: 22, value: "Burnie", label: "Burnie", stateId: 9 },
+
+  //Cities in Rio de Janeiro
+  { id: 23, value: "Rio de Janeiro", label: "Rio de Janeiro", stateId: 10 },
+  { id: 24, value: "Petrópolis", label: "Petrópolis", stateId: 10 },
+
+  //Cities in São Paulo
+  { id: 25, value: "São Paulo", label: "São Paulo", stateId: 11 },
+  { id: 26, value: "Santos", label: "Santos", stateId: 11 },
 ];

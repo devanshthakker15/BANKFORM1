@@ -59,9 +59,9 @@ const LoginPage: React.FC = () => {
     <div className="container">
       <div className="row">
         <h2>{isLoginMode ? "Login" : "Register"} Page</h2>
-        <button type="button" onClick={toggleMode} className="can rounded">
+        {/* <button type="button" onClick={toggleMode} className="can rounded">
           {isLoginMode ? "Switch to Register" : "Switch to Login"}
-        </button>
+        </button> */}
       </div>
 
       <form className="modal-content animate p-2" onSubmit={handleSubmit}>
