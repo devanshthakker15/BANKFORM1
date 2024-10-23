@@ -3,92 +3,71 @@ import { Formik, Form, FieldArray, FormikHelpers } from "formik";
 import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
 import { useAppDispatch } from "../redux/hooks";
-import { saveFormDataAsync } from "../redux/formSlice";
 import { basicSchema } from "../schema/basicSchema";
 import Card from "./Card";
 import { useLocation, useNavigate } from "react-router-dom";
 import { bankOptions, countries, states, cities } from "../utils/constants";
 import "../styles/bankStyles.css";
 
-interface Address {
-  addressLine1: string;
-  addressLine2?: string;
-  city: string;
-  state: string;
-  country: string;
-  pincode: string;
+
+interface BankFormProps {
+  initialValues: any; // Replace 'any' with a proper type if available for better type safety
 }
 
 interface BankFormValues {
-  bankName: string;
-  ifscCode: string;
-  branchName: string;
-  accountHolderName: string;
-  accountNumber: string;
-  email: string;
-  addresses: Address[];
+  bank_name: string;
+  ifsc_code: string;
+  branch_name: string;
+  account_holder_name: string;
+  account_number: string;
+  opening_credit_balance: string;
+  opening_debit_balance: string;
+  is_upi_available: boolean;
+  bank_address_line_1: string;
+  bank_address_line_2?: string;
+  bank_city: string;
+  bank_state: string;
+  bank_country: string;
+  bank_pincode: string;
+  is_active: boolean;
   id?: number;
 }
 
-interface Option {
-  value: string;
-  label: string;
-}
-
-interface BankFormProps {
-  initialValues?: BankFormValues;
-}
-
-const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
+const BankForm: React.FC <BankFormProps>= ({ initialValues }: { initialValues?: BankFormValues }) => {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const navigate = useNavigate();
 
   const [selectedCountry, setSelectedCountry] = useState<string>("");
   const [selectedState, setSelectedState] = useState<string>("");
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false); // New state for submission loading
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isCorrupted, setIsCorrupted] = useState<boolean>(false);
 
   useEffect(() => {
-    if (initialValues && initialValues.addresses.length > 0) {
-      setSelectedCountry(initialValues.addresses[0].country);
-      setSelectedState(initialValues.addresses[0].state);
+    if (initialValues && initialValues.bank_address_line_1) {
+      setSelectedCountry(initialValues.bank_country);
+      setSelectedState(initialValues.bank_state);
     }
   }, [initialValues]);
-
-  const handleNavigation = (path: string) => {
-    // Get the last segment of the path
-    const pathSegments = location.pathname.split("/");
-    const lastSegment = pathSegments[pathSegments.length - 1];
-
-    if (!isNaN(Number(lastSegment))) {
-      const basePath = pathSegments.slice(0, -1).join("/");
-      const newPath = `${basePath}${path}`;
-      navigate(newPath);
-    } else {
-      navigate(path);
-    }
-  };
 
   const defaultValues = useMemo(() => {
     return (
       initialValues || {
-        bankName: "",
-        ifscCode: "",
-        branchName: "",
-        accountHolderName: "",
-        accountNumber: "",
-        email: "",
-        addresses: [
-          {
-            addressLine1: "",
-            addressLine2: "",
-            city: "",
-            state: "",
-            country: "",
-            pincode: "",
-          },
-        ],
+        bank_name: "",
+        ifsc_code: "",
+        branch_name: "",
+        account_holder_name: "",
+        account_number: "",
+        opening_credit_balance: "",
+        opening_debit_balance: "",
+        is_upi_available: false,
+        bank_address_line_1: "",
+        bank_address_line_2: "",
+        bank_city: "",
+        bank_state: "",
+        bank_country: "",
+        bank_pincode: "",
+        is_active: false,
       }
     );
   }, [initialValues]);
@@ -116,73 +95,15 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
     }
 
     try {
-      await dispatch(saveFormDataAsync(values));
+      // Simulate async dispatch
       resetForm();
       navigate("/banks");
     } catch (error) {
       console.error("Error during form submission:", error);
     } finally {
-      setIsSubmitting(false); // End loader
+      setIsSubmitting(false);
     }
   };
-
-  // Helper functions to get filtered state and city options based on selections
-  const getStateOptions = () => {
-    return states.filter(
-      (state) =>
-        state.countryId ===
-        countries.find((country) => country.value === selectedCountry)?.id
-    );
-  };
-
-  const getCityOptions = () => {
-    return cities.filter(
-      (city) =>
-        city.stateId ===
-        states.find((state) => state.value === selectedState)?.id
-    );
-  };
-
-  // Check for corrupted data
-  const checkForCorruptedData = (data: BankFormValues) => {
-    const requiredFields = [
-      data.bankName,
-      data.ifscCode,
-      data.branchName,
-      data.accountHolderName,
-      data.accountNumber,
-      data.email,
-    ];
-
-    const addressFields = data.addresses.every(
-      (address) =>
-        address.addressLine1 &&
-        address.city &&
-        address.state &&
-        address.country &&
-        address.pincode
-    );
-
-    return requiredFields.every((field) => field) && addressFields;
-  };
-
-  useEffect(() => {
-    if (initialValues && !checkForCorruptedData(initialValues)) {
-      setIsCorrupted(true); // Mark as corrupted if data is incomplete
-    }
-  }, [initialValues]);
-
-  if (isCorrupted) {
-    return (
-      <div className="alert alert-danger">
-        <h4>Data Corrupted</h4>
-        <p>
-          Sorry for the inconvenience. The data you are trying to edit is
-          corrupted or missing. Please contact support or try again.
-        </p>
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -199,7 +120,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                 <div className="col-md-6">
                   <SelectInput
                     label="Bank Name"
-                    name="bankName"
+                    name="bank_name"
                     options={bankOptions}
                     required={true}
                   />
@@ -208,7 +129,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                   <TextInput
                     label="IFSC Code"
                     placeholder="Enter IFSC code"
-                    name="ifscCode"
+                    name="ifsc_code"
                     required={true}
                   />
                 </div>
@@ -216,121 +137,15 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                   <TextInput
                     label="Branch Name"
                     placeholder="Enter Branch name"
-                    name="branchName"
+                    name="branch_name"
                     required={true}
                   />
                 </div>
-              </div>
-            </Card>
-
-            <FieldArray name="addresses">
-              {({ remove, push }) => (
-                <Card title="Address Information">
-                  {values.addresses.length > 0 &&
-                    values.addresses.map((address, index) => (
-                      <div key={index}>
-                        <div className="row mt-3">
-                          <div className="col-md-6">
-                            <TextInput
-                              label="Address Line 1"
-                              placeholder="Enter Address"
-                              name={`addresses.${index}.addressLine1`}
-                              required={true}
-                            />
-                          </div>
-                          <div className="col-md-6">
-                            <TextInput
-                              label="Address Line 2"
-                              placeholder="Enter Address"
-                              name={`addresses.${index}.addressLine2`}
-                            />
-                          </div>
-                        </div>
-                        <div className="row">
-                          <div className="col-md-3">
-                            <SelectInput
-                              label="Country"
-                              name={`addresses.${index}.country`}
-                              options={countries}
-                              required={true}
-                              onChange={(option) => {
-                                setSelectedCountry(option?.value || "");
-                                setSelectedState("");
-                              }}
-                              value={address.country}
-                            />
-                          </div>
-                          <div className="col-md-3">
-                            <SelectInput
-                              label="State"
-                              name={`addresses.${index}.state`}
-                              options={getStateOptions()}
-                              required={true}
-                              onChange={(option) =>
-                                setSelectedState(option?.value || "")
-                              }
-                              value={address.state}
-                            />
-                          </div>
-                          <div className="col-md-3">
-                            <SelectInput
-                              label="City"
-                              name={`addresses.${index}.city`}
-                              options={getCityOptions()}
-                              required={true}
-                              value={address.city}
-                            />
-                          </div>
-                          <div className="col-md-3">
-                            <TextInput
-                              label="Pincode"
-                              placeholder="Enter Pincode"
-                              name={`addresses.${index}.pincode`}
-                              required={true}
-                            />
-                          </div>
-                        </div>
-
-                        <div className="d-flex justify-content-between">
-                          <button
-                            type="button"
-                            className="btn btn-primary mt-2"
-                            onClick={() =>
-                              push({
-                                addressLine1: "",
-                                addressLine2: "",
-                                city: "",
-                                state: "",
-                                country: "",
-                                pincode: "",
-                              })
-                            }
-                          >
-                            Add Address
-                          </button>
-                          {values.addresses.length > 1 && (
-                            <button
-                              type="button"
-                              className="btn btn-danger mt-2"
-                              onClick={() => remove(index)}
-                            >
-                              Remove Address
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                </Card>
-              )}
-            </FieldArray>
-
-            <Card title="Customer Information">
-              <div className="row">
                 <div className="col-md-6">
                   <TextInput
                     label="Account Holder Name"
                     placeholder="Enter Account Holder Name"
-                    name="accountHolderName"
+                    name="account_holder_name"
                     required={true}
                   />
                 </div>
@@ -338,15 +153,95 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                   <TextInput
                     label="Account Number"
                     placeholder="Enter Account Number"
-                    name="accountNumber"
+                    name="account_number"
                     required={true}
                   />
                 </div>
                 <div className="col-md-6">
                   <TextInput
-                    label="Email"
-                    placeholder="Enter Email"
-                    name="email"
+                    label="Opening Credit Balance"
+                    placeholder="Enter Opening Credit Balance"
+                    name="opening_credit_balance"
+                  />
+                </div>
+                <div className="col-md-6">
+                  <TextInput
+                    label="Opening Debit Balance"
+                    placeholder="Enter Opening Debit Balance"
+                    name="opening_debit_balance"
+                  />
+                </div>
+                <div className="col-md-6">
+                  <SelectInput
+                    label="Is UPI Available"
+                    name="is_upi_available"
+                    options={[
+                      { value: "true", label: "Yes" },
+                      { value: "false", label: "No" },
+                    ]}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <SelectInput
+                    label="Is Active"
+                    name="is_active"
+                    options={[
+                      { value: "true", label: "Yes" },
+                      { value: "false", label: "No" },
+                    ]}
+                  />
+                </div>
+                
+              </div>
+            </Card>
+
+            <Card title="Address Information">
+              <div className="row">
+                <div className="col-md-6">
+                  <TextInput
+                    label="Address Line 1"
+                    placeholder="Enter Address Line 1"
+                    name="bank_address_line_1"
+                    required={true}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <TextInput
+                    label="Address Line 2"
+                    placeholder="Enter Address Line 2"
+                    name="bank_address_line_2"
+                  />
+                </div>
+                <div className="col-md-4">
+                  <SelectInput
+                    label="Country"
+                    name="bank_country"
+                    options={countries}
+                    required={true}
+                  />
+                </div>
+                <div className="col-md-4">
+                  <SelectInput
+                    label="State"
+                    name="bank_state"
+                    options={states}
+                    required={true}
+                  />
+                </div>
+                <div className="col-md-4">
+                  <SelectInput
+                    label="City"
+                    // placeholder="Select city"
+                    options={cities}
+                    name="bank_city"
+                    required={true}
+                  />
+                </div>
+                <div className="col-md-4">
+                  <TextInput
+                    label="Pincode"
+                    placeholder="Enter Pincode"
+                    name="bank_pincode"
                     required={true}
                   />
                 </div>
@@ -354,21 +249,9 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
             </Card>
 
             <div className="d-flex justify-content-between mt-4">
-              <button
-                type="submit"
-                className="btn btn-primary custom-button"
-                disabled={isSubmitting}
-                // onClick={() => handleNavigation("/bank-details-list")}
-              >
+              <button type="submit" className="btn btn-primary">
                 {isSubmitting ? "Submitting..." : "Submit"}
               </button>
-
-              {/* <button
-                onClick={() => handleNavigation("/bank-details-list")}
-                className="btn btn-secondary"
-              >
-                View Details List
-              </button> */}
             </div>
           </Form>
         )}

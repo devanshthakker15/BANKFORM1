@@ -1,3 +1,4 @@
+// src/components/Sidebar.tsx
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -7,21 +8,22 @@ import {
   faHome,
   faList,
   faSignOutAlt,
-  faFolder,
+  faClipboard,
+  faBank,
 } from "@fortawesome/free-solid-svg-icons";
-import { apiGet } from "../utils/getApi"; // Import the apiGet function
+import { apiGet } from "../utils/getApi";
 import "../styles/sidebar.css";
 import { EXCLUDED_MODULES } from "../utils/constants";
 
 const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [modules, setModules] = useState<any[]>([]);
-  const [isManageHsnDropdownOpen, setIsManageHsnDropdownOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
     const fetchPermissions = async () => {
       try {
+        
         const data = await apiGet("/api/account/user/permissions/");
         if (data.success) {
           const userPermissions = data.result.permissions;
@@ -40,10 +42,6 @@ const Sidebar: React.FC = () => {
 
   const toggleSidebar = () => {
     setIsCollapsed((prev) => !prev);
-  };
-
-  const toggleManageHsnDropdown = () => {
-    setIsManageHsnDropdownOpen((prev) => !prev);
   };
 
   const hideContent = location.pathname === "/login";
@@ -77,44 +75,16 @@ const Sidebar: React.FC = () => {
                 </div>
               </Link>
             </li>
-
-            {/* Manage Products Menu */}
-            <li className={`nav-item has-treeview ${isManageHsnDropdownOpen ? "menu-open" : ""}`}>
-              <Link to="#" className="nav-link" onClick={toggleManageHsnDropdown}>
-                <div className="nav-content">
-                  <FontAwesomeIcon icon={faFolder} className="nav-icon" />
-                  <p>
-                    Manage Products
-                    <i className={`right fas fa-angle-${isManageHsnDropdownOpen ? "up" : "down"}`} />
-                  </p>
-                </div>
-              </Link>
-              <ul className={`nav nav-treeview ${isManageHsnDropdownOpen ? 'open' : ''}`}>
-                {modules.map((module) => {
-                  if (module.module.module_name === "Manage HSN Codes") {
-                    return (
-                      <li key={module.id} className="nav-item">
-                        <Link to={`/${module.module.alias}`} className="nav-link">
-                          <div className="nav-content">
-                            <FontAwesomeIcon icon={faList} className="nav-icon" />
-                            <p>{module.module.module_name}</p>
-                          </div>
-                        </Link>
-                      </li>
-                    );
-                  }
-                  return null;
-                })}
-              </ul>
-            </li>
-
-            {/* Render other modules */}
             {modules.map((module) => {
-              if (EXCLUDED_MODULES.includes(module.module.module_name) || module.module.module_name === "Manage HSN Codes") {
-                return null; // Skip rendering excluded modules
+              // Check if the module name is in the excluded list
+              if (EXCLUDED_MODULES.includes(module.module.module_name)) {
+                return null;
               }
               return (
-                <li key={module.id} className="nav-item d-flex justify-content-start">
+                <li
+                  key={module.id}
+                  className="nav-item d-flex justify-content-start"
+                >
                   <Link to={`/${module.module.alias}`} className="nav-link">
                     <div className="nav-content">
                       <FontAwesomeIcon icon={faList} className="nav-icon" />
@@ -124,7 +94,22 @@ const Sidebar: React.FC = () => {
                 </li>
               );
             })}
-
+            <li className="nav-item d-flex justify-content-start">
+              <Link to="/banks" className="nav-link">
+                <div className="nav-content">
+                  <FontAwesomeIcon icon={faBank} className="nav-icon" />
+                  <p>View Banks</p>
+                </div>
+              </Link>
+            </li>
+            <li className="nav-item d-flex justify-content-start">
+              <Link to="/banks/add" className="nav-link">
+                <div className="nav-content">
+                  <FontAwesomeIcon icon={faClipboard} className="nav-icon" />
+                  <p>Add form</p>
+                </div>
+              </Link>
+            </li>
             <li className="nav-item d-flex justify-content-start">
               <Link to="/login" className="nav-link">
                 <div className="nav-content">

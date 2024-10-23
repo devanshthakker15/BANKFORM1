@@ -23,7 +23,9 @@ const HomePage: React.FC = () => {
 
 
   return (
+    <>
     <div className="body">
+      
       <Breadcrumbs />
       <div className="container mt-2">
         {/* Header */}
@@ -104,6 +106,7 @@ const HomePage: React.FC = () => {
         <p>&copy; 2024 Our Company. All Rights Reserved.</p>
       </footer>
     </div>
+    </>
   );
 };
 

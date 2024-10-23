@@ -66,23 +66,27 @@
 
 /* Styles for the dropdown */
 .nav-treeview {
-  display: none; /* Hide dropdown by default */
-  padding-left: 15px; /* Indent dropdown items */
+  display: none; 
+  padding-left: 15px; 
 }
 
 .nav-treeview.open {
-  display: block; /* Show dropdown when open */
-  margin-left: 20px; /* Indent the dropdown to align below */
+  display: block; 
+  margin-left: 20px; 
 }
 
-.nav-item.has-treeview > .nav-link {
-  cursor: pointer; /* Change cursor for clickable items */
+.nav-item.has-treeview  .nav-link {
+  cursor: pointer; 
 }
 
 /* Adjustments for nested dropdowns */
 .nav-item .nav-treeview .nav-item {
-  border-bottom: none; /* Remove border for dropdown items */
+  border-bottom: none;
+  background-color: aquamarine;
 }
+
+
+
 
 @media (max-width: 768px) {
   .main-sidebar {
