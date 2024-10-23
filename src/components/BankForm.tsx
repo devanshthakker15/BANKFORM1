@@ -7,7 +7,6 @@ import { saveFormDataAsync } from "../redux/formSlice";
 import { basicSchema } from "../schema/basicSchema";
 import Card from "./Card";
 import { useLocation, useNavigate } from "react-router-dom";
-// import { Link } from "react-router-dom";
 import { bankOptions, countries, states, cities } from "../utils/constants";
 import "../styles/bankStyles.css";
 

@@ -69,3 +69,5 @@ const formSlice = createSlice({
 
 export const { addFormData } = formSlice.actions;
 export default formSlice.reducer;
+
+

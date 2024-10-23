@@ -91,3 +91,5 @@ const perms: PermissionUser[] = [
 ];
 
 export default perms;
+
+// export const BASE_URL="https://07dlmd6jpi.execute-api.ap-south-1.amazonaws.com/dev";

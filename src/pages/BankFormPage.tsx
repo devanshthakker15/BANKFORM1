@@ -4,13 +4,15 @@ import BankForm from "../components/BankForm";
 import Breadcrumbs from "../components/Breadcrumb";
 import "../App.css";
 
+
 const BankFormPage: React.FC = () => {
   const { id } = useParams<{ id?: string }>(); 
   const [initialValues, setInitialValues] = useState<any>(null); 
   const navigate = useNavigate(); 
-  const location = useLocation(); 
+  // const location = useLocation(); 
 
   useEffect(() => {
+    // axiosFunction();
     if (id) {
       const storedData = JSON.parse(localStorage.getItem("bankFormData") || "[]");
       const bankData = storedData.find((item: { id: number }) => item.id === Number(id));
@@ -19,9 +21,10 @@ const BankFormPage: React.FC = () => {
       } else {
        
         navigate("*");
+        
       }
     }
-  }, [id, navigate]);
+  }, [id]);
 
   // const handleBackToForm = () => {
   //   const newUrl = `${location.pathname}/home/bank-form`;
@@ -32,7 +35,16 @@ const BankFormPage: React.FC = () => {
   //   navigate(newPath);
   // };
 
-  return (
+  // _____________________________________________________________
+  // async function axiosFunction(){
+  //   const result = await axios.get('http://192.168.1.44:8001/api/payment/banks/',{
+  //     headers:{
+  //       'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzI5Njc4MjA3LCJpYXQiOjE3Mjk1OTE4MDcsImp0aSI6ImM2NGU1ZmUxYTM1ODQ1NDdiYzlhNzY0MWEwMDdiMThhIiwiZW1haWwiOiJhZG1pbkBhdmFyeWEuaW4ifQ.seEzUhIA1D8OjH3kn0YmZKCp6HrP1n58lhwbLqh1XCQ'
+  //     }
+  //   })
+  // console.log(result)
+  // ___________________________________________________________________
+   return (
     <div className="body">
       <Breadcrumbs />
       <div className="container mt-2">
@@ -62,7 +74,7 @@ const BankFormPage: React.FC = () => {
       </div>
 
       <footer className="mt-5 d-flex justify-content-center">
-        <p>&copy; 2024 Our Company. All Rights Reserved.</p>
+        <p>&copy; 2024 Our Company. All Rights Reserved.&#174;</p>
       </footer>
     </div>
   );

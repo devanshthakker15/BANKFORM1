@@ -6,6 +6,10 @@ export const bankOptions = [
   { value: "Kotak Bank", label: "Kotak Bank" },
   { value: "SBI", label: "SBI" },
   { value: "Bank of Maharashtra", label: "Bank of Maharashtra" },
+  { value: "Union Bank", label: "Union Bank"},
+  { value: "Canera Bank", label: "Canera Bank" },
+  { value: "Central Bank of India", label: "Central Bank of India" },
+
 ];
 
 export const countries = [
@@ -79,3 +83,8 @@ export const cities = [
   { id: 25, value: "São Paulo", label: "São Paulo", stateId: 11 },
   { id: 26, value: "Santos", label: "Santos", stateId: 11 },
 ];
+
+export const BASE_URL = "http://192.168.1.44:8001";
+
+// Define the array of module names to exclude
+export const EXCLUDED_MODULES = ["Manage Locations"]; 

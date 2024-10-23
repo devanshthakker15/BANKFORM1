@@ -1,88 +1,62 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "../styles/LoginPage.css"; 
-import avatar from "../assets/avatar.jpg";
-// import perms from "../utils/perms"; // Import the permissions
-import perms from "../utils/perms";
-
-interface User {
-  username: string;
-  password: string;
-  userType: string;
-  permissions: string[];
-}
+import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { loginUser } from '../redux/AuthSlice';
+import avatar from '../assets/avatar.jpg';
+import '../styles/LoginPage.css';
+import { AppDispatch } from '../redux/store';
 
 const LoginPage: React.FC = () => {
-  const [isLoginMode, setIsLoginMode] = useState(true);
-  const [username, setUsername] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Clear tokens when the component mounts (user visits login page again)
+  useEffect(() => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isLoginMode) {
-      handleLogin();
+    console.log('Form submitted with:', { email, password });
+    
+    const result = await dispatch(loginUser({ email, password, navigate })); // Pass navigate here
+    console.log('Dispatch result:', result);
+
+    if (loginUser.fulfilled.match(result)) {
+      console.log('Login successful, navigating to home page...');
+      navigate('/'); 
     } else {
-      handleRegister();
+      console.log('Login failed, error message:', result.payload);
+      alert(result.payload); 
     }
-  };
-
-  const handleLogin = () => {
-    const user = perms.find(
-      (u) => u.username === username && u.password === password
-    );
-
-    if (!user) {
-      alert("Invalid username or password!");
-      return;
-    }
-
-    // Store user details in localStorage upon successful login
-    localStorage.setItem("currentUser", JSON.stringify(user));
-    navigate("/");
-  };
-
-  const handleRegister = () => {
-    // Registration logic is not being updated here since perms.ts is used for user management
-    alert("Registration is disabled in this version");
-  };
-
-  const toggleMode = () => {
-    setIsLoginMode(!isLoginMode);
-    setUsername("");
-    setPassword("");
-    setConfirmPassword("");
   };
 
   return (
     <div className="container">
       <div className="row">
-        <h2>{isLoginMode ? "Login" : "Register"} Page</h2>
-        {/* <button type="button" onClick={toggleMode} className="can rounded">
-          {isLoginMode ? "Switch to Register" : "Switch to Login"}
-        </button> */}
+        <h2>Login Page</h2>
       </div>
-
       <form className="modal-content animate p-2" onSubmit={handleSubmit}>
         <div className="imgcontainer">
           <img src={avatar} alt="Avatar" className="avatar" />
         </div>
-
         <div>
           <label htmlFor="uname">
-            <b>Username</b>
+            <b>Email</b>
           </label>
           <input
             className="rounded"
             type="text"
-            placeholder="Enter Username"
+            placeholder="Enter Email"
             name="uname"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
-
           <label htmlFor="psw">
             <b>Password</b>
           </label>
@@ -95,31 +69,9 @@ const LoginPage: React.FC = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-
-          {!isLoginMode && (
-            <>
-              <label htmlFor="confirmPsw">
-                <b>Confirm Password</b>
-              </label>
-              <input
-                className="rounded"
-                type="password"
-                placeholder="Confirm Password"
-                name="confirmPsw"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-              />
-            </>
-          )}
-
           <button className="submit rounded" type="submit">
-            {isLoginMode ? "Login" : "Register"}
+            Login
           </button>
-          {/* <label>
-            <input type="checkbox" name="remember" defaultChecked /> Remember me
-          </label> */}
-          
         </div>
       </form>
     </div>

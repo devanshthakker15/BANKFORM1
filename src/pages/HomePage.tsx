@@ -12,13 +12,15 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
+
   // Fetch the current user from localStorage
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
   const hasViewBanksPermission = currentUser?.permissions?.includes("viewBanks");
 
-  const handleNavigation = (path: string) => {
-    navigate(path);
-  };
+
 
   return (
     <div className="body">
