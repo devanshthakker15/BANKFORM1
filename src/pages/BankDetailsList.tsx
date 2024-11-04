@@ -24,7 +24,9 @@ const BankDetailsList: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { formData, totalCount } = useSelector((state: RootState) => state.form);
+  const { formData, totalCount } = useSelector(
+    (state: RootState) => state.form
+  );
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
   const hasEditBankPermission = currentUser?.permissions?.includes("editBank");
 
@@ -43,7 +45,6 @@ const BankDetailsList: React.FC = () => {
   }, [searchQuery]);
 
   useEffect(() => {
-    // Fetch data when currentPage or debouncedQuery changes
     dispatch(fetchBankDataAsync({ page: currentPage, query: debouncedQuery }));
   }, [dispatch, currentPage, debouncedQuery]);
 
@@ -62,7 +63,14 @@ const BankDetailsList: React.FC = () => {
   };
 
   const handleToggleActive = (id: number, currentStatus: number) => {
-    dispatch(toggleBankActiveStatusAsync({ id, currentStatus, page: currentPage, query: debouncedQuery }));
+    dispatch(
+      toggleBankActiveStatusAsync({
+        id,
+        currentStatus,
+        page: currentPage,
+        query: debouncedQuery,
+      })
+    );
   };
 
   const totalPages = Math.ceil(totalCount / itemsPerPage);
@@ -105,13 +113,16 @@ const BankDetailsList: React.FC = () => {
                     <td>{item.bank_name}</td>
                     <td>{item.account_holder_name}</td>
                     <td>{item.account_number}</td>
-                    <td>{item.bank_country ? item.bank_country.country : "N/A"}</td>
+                    <td>
+                      {item.bank_country ? item.bank_country.country : "N/A"}
+                    </td>
                     <td>
                       <Button
                         variant={item.is_active === 1 ? "success" : "danger"}
-                        onClick={() => handleToggleActive(item.id, item.is_active)}
-                        style={{ width: '90px', margin: "4px"}}
-
+                        onClick={() =>
+                          handleToggleActive(item.id, item.is_active)
+                        }
+                        style={{ width: "90px", margin: "4px" }}
                       >
                         {item.is_active === 1 ? "Active" : "Inactive"}
                       </Button>
@@ -122,8 +133,7 @@ const BankDetailsList: React.FC = () => {
                           type="button"
                           className="btn btn-sm btn-primary mr-2"
                           onClick={() => handleEdit(item.id)}
-                          style={{ width: '70px', margin: "4px"}}
-
+                          style={{ width: "70px", margin: "4px" }}
                         >
                           <FontAwesomeIcon icon={faPen} />
                         </button>
@@ -131,8 +141,7 @@ const BankDetailsList: React.FC = () => {
                           type="button"
                           className="btn btn-sm btn-danger"
                           onClick={() => handleDelete(item.id)}
-                          style={{ width: '70px', margin: "4px"}}
-
+                          style={{ width: "70px", margin: "4px" }}
                         >
                           <FontAwesomeIcon icon={faTrashCan} />
                         </button>

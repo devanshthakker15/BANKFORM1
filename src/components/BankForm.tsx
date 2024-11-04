@@ -165,6 +165,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                     label="Is Active"
                     name="is_active"
                     options={YES_NO}
+                    
                   />
                 </div>
               </div>

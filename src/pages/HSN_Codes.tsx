@@ -9,7 +9,14 @@ import Pagination from "../components/Pagination";
 import TextInput from "../components/TextInput";
 import SelectInput from "../components/SelectInput";
 import { YES_NO } from "../utils/constants";
-import { fetchHSNCodesAsync, setCurrentHSN, toggleHSNActiveStatusAsync, saveHSNCodeAsync, updateHSNCodeAsync, deleteHSNAsync } from "../redux/offcanvasSlice";
+import { 
+  fetchHSNCodesAsync, 
+  setCurrentHSN, 
+  toggleHSNActiveStatusAsync, 
+  saveHSNCodeAsync, 
+  updateHSNCodeAsync, 
+  deleteHSNAsync,
+ } from "../redux/offcanvasSlice";
 import { offcanvasSchema } from "../schema/offcanvasSchema";
 import { useSearchParams } from "react-router-dom";
 
@@ -159,9 +166,9 @@ const HSN_Codes: React.FC = () => {
              <FormikForm>
                <TextInput label="HSN Name" name="hsn_name" placeholder="Enter HSN Name" required />
                <TextInput label="HSN Code" name="hsn_code" placeholder="Enter HSN Code" required />
-               <div className="mb-3">
+               {/* <div className="mb-3">
                  <SelectInput label="Is Active" name="is_active" options={YES_NO} />
-               </div>
+               </div> */}
                <Button variant="primary" type="submit" className="mt-3">
                  {currentHSN ? "Update" : "Submit"}
                </Button>

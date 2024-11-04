@@ -1,6 +1,6 @@
 // src/redux/offcanvasSlice.ts
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { apiGet, apiPost, apiPut, apiDelete} from "../utils/getApi";
+import { apiGet, apiPost, apiPut, apiDelete } from "../utils/getApi";
 import { FormData } from "../types/formTypes";
 
 interface FormState {
@@ -20,27 +20,26 @@ const initialState: FormState = {
 };
 
 // Thunk for fetching HSN codes (GET)
-export const fetchHSNCodesAsync = createAsyncThunk<
-  { data: FormData[]; totalCount: number },
-  { page: number; query: string },
-  { rejectValue: string }
->("offcanvas/fetchHSNCodesAsync", async ({ page , query}, { rejectWithValue }) => {
-  try {
-    const response = await apiGet(`/api/product/hsncodes/`, { page , q: query });
-    return { data: response.result.results, totalCount: response.result.count };
-  } catch (error) {
-    return rejectWithValue("Failed to fetch HSN Codes");
+export const fetchHSNCodesAsync = createAsyncThunk(
+  "offcanvas/fetchHSNCodesAsync",
+  async ({ page, query }: { page: number; query: string }, { rejectWithValue }) => {
+    try {
+      const response = await apiGet(`/api/product/hsncodes/`, { page, q: query });
+      return { data: response.result.results, totalCount: response.result.count };
+    } catch (error) {
+      return rejectWithValue("Failed to fetch HSN Codes");
+    }
   }
-});
+);
 
 // Thunk for saving a new HSN code (POST)
 export const saveHSNCodeAsync = createAsyncThunk(
   "offcanvas/saveHSNCode",
-  async (data: FormData, { rejectWithValue }) => {
+  async (data: FormData, { dispatch, rejectWithValue }) => {
     try {
-      console.log("Adding new HSN data");
       const response = await apiPost("/api/product/hsncodes/", data);
-      return response;
+      dispatch(fetchHSNCodesAsync({ page: 1, query: "" })); 
+      return response.result;
     } catch (error) {
       return rejectWithValue("Failed to save HSN Code");
     }
@@ -50,45 +49,43 @@ export const saveHSNCodeAsync = createAsyncThunk(
 // Thunk for updating an existing HSN code (PUT)
 export const updateHSNCodeAsync = createAsyncThunk(
   "offcanvas/updateHSNCode",
-  async ({ id, data }: { id: number; data: FormData }, { rejectWithValue }) => {
+  async ({ id, data }: { id: number; data: FormData }, { dispatch, rejectWithValue }) => {
     try {
-      console.log("Updating the HSN data");
       const response = await apiPut(`/api/product/hsncodes/${id}/`, data);
-      return response;
+      // dispatch(fetchHSNCodesAsync({ page: 1, query: "" })); 
+      return response.result;
     } catch (error) {
       return rejectWithValue("Failed to update HSN Code");
     }
   }
 );
 
-// AsyncThunk for toggling active status of a HSN record (PUT)
-export const toggleHSNActiveStatusAsync = createAsyncThunk<
-  void,
-  { id: number; currentStatus: number; page: number; query: string },
-  { rejectValue: string }
->("form/toggleHSNActiveStatusAsync", async ({ id, currentStatus, page, query }, { dispatch, rejectWithValue }) => {
-  const updatedStatus = currentStatus === 1 ? 0 : 1;
-  try {
-    await apiPut(`/api/product/hsncodes/${id}/`, { is_active: updatedStatus });
-    dispatch(fetchHSNCodesAsync({ page, query }));
-  } catch (error) {
-    return rejectWithValue("Failed to toggle bank active status");
+// Thunk for toggling active status of an HSN record (PUT)
+export const toggleHSNActiveStatusAsync = createAsyncThunk(
+  "offcanvas/toggleHSNActiveStatusAsync",
+  async ({ id, currentStatus, page, query }: { id: number; currentStatus: number; page: number; query: string }, { dispatch, rejectWithValue }) => {
+    const updatedStatus = currentStatus === 1 ? 0 : 1;
+    try {
+      await apiPut(`/api/product/hsncodes/${id}/`, { is_active: updatedStatus });
+      dispatch(fetchHSNCodesAsync({ page, query }));
+    } catch (error) {
+      return rejectWithValue("Failed to toggle active status");
+    }
   }
-});
+);
 
-// AsyncThunk for deleting a bank record (DELETE)
-export const deleteHSNAsync = createAsyncThunk<
-  void,
-  { id: number; page: number; query: string },
-  { rejectValue: string }
->("form/deleteHSNAsync", async ({ id, page, query }, { dispatch, rejectWithValue }) => {
-  try {
-    await apiDelete(`/api/product/hsncodes/${id}/`);
-    dispatch(fetchHSNCodesAsync({ page, query }));
-  } catch (error) {
-    return rejectWithValue("Failed to delete bank record");
+// Thunk for deleting a bank record (DELETE)
+export const deleteHSNAsync = createAsyncThunk(
+  "offcanvas/deleteHSNAsync",
+  async ({ id, page, query }: { id: number; page: number; query: string }, { dispatch, rejectWithValue }) => {
+    try {
+      await apiDelete(`/api/product/hsncodes/${id}/`);
+      dispatch(fetchHSNCodesAsync({ page, query }));
+    } catch (error) {
+      return rejectWithValue("Failed to delete record");
+    }
   }
-});
+);
 
 const offcanvasSlice = createSlice({
   name: "offcanvas",
@@ -113,16 +110,15 @@ const offcanvasSlice = createSlice({
       })
       .addCase(fetchHSNCodesAsync.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload || "Failed to fetch HSN Codes";
+        // state.error = action.payload || "Failed to fetch HSN Codes";
       })
       .addCase(saveHSNCodeAsync.fulfilled, (state, action) => {
         state.formData.push(action.payload);
       })
       .addCase(updateHSNCodeAsync.fulfilled, (state, action) => {
-        // Replace the updated HSN code in the formData array
-        const index = state.formData.findIndex((item) => item.id === action.meta.arg.id);
+        const index = state.formData.findIndex((item) => item.id === action.payload.id);
         if (index !== -1) {
-          state.formData[index] = action.payload;
+          state.formData[index] = action.payload; // Update specific HSN entry
         }
       });
   },

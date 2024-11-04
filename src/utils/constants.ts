@@ -84,7 +84,7 @@ export const cities = [
   { id: 26, value: "Santos", label: "Santos", stateId: 11 },
 ];
 
-export const BASE_URL = "http://192.168.1.44:8001";
+export const BASE_URL = "https://07dlmd6jpi.execute-api.ap-south-1.amazonaws.com/dev";
 
 export const USER_URL="https://jsonplaceholder.typicode.com"
 
