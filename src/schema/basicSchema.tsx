@@ -45,17 +45,17 @@ export const basicSchema = Yup.object({
     .max(100, 'Address Line 2 must be at most 100 characters long'),
 
   bank_city: Yup.string()
-    .matches(/^[A-Za-z\s]+$/, 'City name must contain only letters and spaces')
+    // .matches(/^[A-Za-z\s]+$/, 'City name must contain only letters and spaces')
     .max(50, 'City name must be at most 50 characters long')
-    .required('City is required'),
+    .required('City is required'),  
 
   bank_state: Yup.string()
-    .matches(/^[A-Za-z\s]+$/, 'State name must contain only letters and spaces')
+    // .matches(/^[A-Za-z\s]+$/, 'State name must contain only letters and spaces')
     .max(50, 'State name must be at most 50 characters long')
     .required('State is required'),
 
   bank_country: Yup.string()
-    .matches(/^[A-Za-z\s]+$/, 'Country name must contain only letters and spaces')
+    // .matches(/^[A-Za-z\s]+$/, 'Country name must contain only letters and spaces')
     .max(50, 'Country name must be at most 50 characters long')
     .required('Country is required'),
 
@@ -63,6 +63,6 @@ export const basicSchema = Yup.object({
     .matches(/^[0-9]{6}$/, 'Pincode must be exactly 6 digits')
     .required('Pincode is required'),
 
-  is_active: Yup.boolean()
+  is_active: Yup.number()
     .required('Active status must be specified'),
 });

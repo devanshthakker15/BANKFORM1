@@ -86,5 +86,13 @@ export const cities = [
 
 export const BASE_URL = "http://192.168.1.44:8001";
 
+export const USER_URL="https://jsonplaceholder.typicode.com"
+
 // Define the array of module names to exclude
 export const EXCLUDED_MODULES = ["Manage Locations"]; 
+
+export const YES_NO =[
+{value: 1, label:"Yes"},
+{value: 0, label: "No"}
+];
+ 

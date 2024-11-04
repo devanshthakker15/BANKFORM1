@@ -23,7 +23,6 @@ const Sidebar: React.FC = () => {
   useEffect(() => {
     const fetchPermissions = async () => {
       try {
-        
         const data = await apiGet("/api/account/user/permissions/");
         if (data.success) {
           const userPermissions = data.result.permissions;
@@ -76,15 +75,11 @@ const Sidebar: React.FC = () => {
               </Link>
             </li>
             {modules.map((module) => {
-              // Check if the module name is in the excluded list
               if (EXCLUDED_MODULES.includes(module.module.module_name)) {
                 return null;
               }
               return (
-                <li
-                  key={module.id}
-                  className="nav-item d-flex justify-content-start"
-                >
+                <li key={module.id} className="nav-item d-flex justify-content-start">
                   <Link to={`/${module.module.alias}`} className="nav-link">
                     <div className="nav-content">
                       <FontAwesomeIcon icon={faList} className="nav-icon" />
@@ -94,14 +89,14 @@ const Sidebar: React.FC = () => {
                 </li>
               );
             })}
-            <li className="nav-item d-flex justify-content-start">
+            {/* <li className="nav-item d-flex justify-content-start">
               <Link to="/banks" className="nav-link">
                 <div className="nav-content">
                   <FontAwesomeIcon icon={faBank} className="nav-icon" />
                   <p>View Banks</p>
                 </div>
               </Link>
-            </li>
+            </li> */}
             <li className="nav-item d-flex justify-content-start">
               <Link to="/banks/add" className="nav-link">
                 <div className="nav-content">

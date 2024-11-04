@@ -1,10 +1,6 @@
-// src/api/apiClient.ts
-import axios from "axios";
-import { apiRequest } from "./commonFunction";
-import { redirectToLogin } from "../utils/redirectToLogin";
-import {BASE_URL} from "../utils/constants"
-
-// const BASE_URL = "http://192.168.1.44:8001";
+import axios from 'axios';
+import { redirectToLogin } from '../utils/redirectToLogin';
+import { BASE_URL } from '../utils/constants';
 
 // Create an Axios instance
 const apiClient = axios.create({
@@ -12,8 +8,8 @@ const apiClient = axios.create({
 });
 
 // Get access token from localStorage
-const getAccessToken = () => localStorage.getItem("access_token");
-const getRefreshToken = () => localStorage.getItem("refresh_token");
+const getAccessToken = () => localStorage.getItem('access_token');
+const getRefreshToken = () => localStorage.getItem('refresh_token');
 
 // Function to initialize the API client with navigate
 export const initializeApiClient = (navigate: () => void) => {
@@ -24,8 +20,8 @@ export const initializeApiClient = (navigate: () => void) => {
     
       if (!token) {
         // If the token is missing, redirect to login
-        redirectToLogin("Access token missing. Please log in again.", navigate);
-        return Promise.reject("Access token missing."); // Prevent the request from being sent
+        redirectToLogin('Access token missing. Please log in again.', navigate);
+        return Promise.reject('Access token missing.'); // Prevent the request from being sent
       }
 
       // If token is available, attach it to the request
@@ -33,7 +29,7 @@ export const initializeApiClient = (navigate: () => void) => {
       return config;
     },
     (error) => {
-      console.log("Request error:", error);
+      console.log('Request error:', error);
       return Promise.reject(error);
     }
   );
@@ -41,7 +37,7 @@ export const initializeApiClient = (navigate: () => void) => {
   // Interceptor to handle token refreshing on 401 errors
   apiClient.interceptors.response.use(
     (response) => {
-      console.log("API request successful:", response);
+      console.log('API request successful:', response);
       return response;
     },
     async (error) => {
@@ -51,27 +47,27 @@ export const initializeApiClient = (navigate: () => void) => {
         const refreshToken = getRefreshToken();
 
         if (!refreshToken) {
-          redirectToLogin("Session expired. Please log in again.", navigate);
-          return Promise.reject("Refresh token missing. Redirecting to login.");
+          redirectToLogin('Session expired. Please log in again.', navigate);
+          return Promise.reject('Refresh token missing. Redirecting to login.');
         }
 
         try {
           const newAccessToken = await refreshAccessToken(navigate);
           apiClient.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
           error.config.headers.Authorization = `Bearer ${newAccessToken}`;
-          console.log("Access token refreshed, retrying request...");
+          console.log('Access token refreshed, retrying request...');
           return apiClient(error.config);
         } catch (refreshError) {
-          redirectToLogin("Token refresh failed. Please log in again.", navigate);
+          redirectToLogin('Token refresh failed. Please log in again.', navigate);
           return Promise.reject(refreshError);
         }
       }
 
       if (error.response.status === 403) {
-        redirectToLogin("Unauthorized access. Please log in.", navigate);
+        redirectToLogin('Unauthorized access. Please log in.', navigate);
       }
 
-      console.log("Response error:", error);
+      console.log('Response error:', error);
       return Promise.reject(error);
     }
   );
@@ -82,24 +78,24 @@ const refreshAccessToken = async (navigate: () => void) => {
   const refreshToken = getRefreshToken();
 
   if (!refreshToken) {
-    redirectToLogin("Refresh token missing. Please log in again.", navigate);
-    throw new Error("Refresh token missing.");
+    redirectToLogin('Refresh token missing. Please log in again.', navigate);
+    throw new Error('Refresh token missing.');
   }
 
-  const response = await apiRequest("POST", "/api/account/user/refresh", {
+  const response = await axios.post(`${BASE_URL}/api/account/user/refresh`, {
     refresh_token: refreshToken,
   });
 
-  const { access_token, refresh_token } = response;
+  const { access_token, refresh_token } = response.data;
 
   if (!access_token || !refresh_token) {
-    redirectToLogin("Invalid token response. Please log in again.", navigate);
-    throw new Error("Invalid token response.");
+    redirectToLogin('Invalid token response. Please log in again.', navigate);
+    throw new Error('Invalid token response.');
   }
 
   // Save the new tokens in localStorage
-  localStorage.setItem("access_token", access_token);
-  localStorage.setItem("refresh_token", refresh_token);
+  localStorage.setItem('access_token', access_token);
+  localStorage.setItem('refresh_token', refresh_token);
 
   return access_token;
 };

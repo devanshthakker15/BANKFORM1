@@ -1,68 +1,103 @@
-import React, { useEffect } from "react";
+// BankDetailsPage.tsx
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Pagination from "../components/Pagination";
 import Breadcrumbs from "../components/Breadcrumb";
-import { RootState, AppDispatch } from "../redux/store"; // Import AppDispatch
-import { fetchBankDataAsync } from "../redux/formSlice";
+import { RootState, AppDispatch } from "../redux/store";
+import { fetchBankDataAsync, setCurrentBank } from "../redux/formSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronLeft, faTrashCan, faPen } from "@fortawesome/free-solid-svg-icons";
-import "../styles/bankStyles.css"
+import { faTrashCan, faPen } from "@fortawesome/free-solid-svg-icons";
+import "../styles/bankStyles.css";
+import { BASE_URL } from "../utils/constants";
+import { apiDelete, apiPut, apiGet } from "../utils/getApi";
+import { Button } from "react-bootstrap";
 
 const BankDetailsList: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const dispatch: AppDispatch = useDispatch(); // Use typed dispatch
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
+  const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
+
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Fetch state from Redux
-  const { formData, status } = useSelector((state: RootState) => state.form);
+  const { formData, totalCount } = useSelector(
+    (state: RootState) => state.form
+  );
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
   const hasEditBankPermission = currentUser?.permissions?.includes("editBank");
 
-  const itemsPerPage = 5;
+  const itemsPerPage = 10;
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
-  const query = searchParams.get("q") || "";
+
+  // Debounce the search query
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 1000); // 1000ms debounce time
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery]);
+
+
 
   useEffect(() => {
-    console.log("Component mounted, current status:", status);
-    if (status === "idle") {
-      dispatch(fetchBankDataAsync());
-    }
-  }, [dispatch, status]);
-
-  useEffect(() => {
-    console.log("Form data updated:", formData);
-  }, [formData]);
-
-  const filteredData = formData.filter((item) =>
-    item.bank_name.toLowerCase().includes(query.toLowerCase()) ||
-    item.account_holder_name.toLowerCase().includes(query.toLowerCase()) ||
-    item.account_number.toLowerCase().includes(query.toLowerCase()) ||
-    (item.bank_country?.country.toLowerCase().includes(query.toLowerCase()) || "")
-  );
+    // Fetch data when currentPage or debouncedQuery changes
+    dispatch(fetchBankDataAsync({ page: currentPage, query: debouncedQuery }));
+  }, [dispatch, currentPage, debouncedQuery]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+    setSearchQuery(value);
     setSearchParams({ page: "1", q: value });
   };
 
-  const handleEdit = (id: number) => {
-    navigate(`/banks/edit/${id}`);
+  const handleEdit = async (id: number) => {
+    try {
+      const bankData = await apiGet(`/api/payment/banks/${id}/`);
+      dispatch(setCurrentBank(bankData));
+      navigate(`/banks/edit/${id}`);
+    } catch (error) {
+      console.error("Failed to fetch bank details for editing:", error);
+    }
   };
 
-  const handleDelete = (id: number) => {
-    // For now, just remove the data locally
-    const updatedData = formData.filter((item) => item.id !== id);
-    // Ideally, here should be an API call to delete the bank data from the backend
+  const handleDelete = async (id: number) => {
+    const token = localStorage.getItem("access_token") || "";
+    if (id) {
+      try {
+        await apiDelete(`${BASE_URL}/api/payment/banks/${id}/`, token);
+        dispatch(fetchBankDataAsync({ page: currentPage, query: debouncedQuery }));
+      } catch (error) {
+        console.error("Failed to delete bank record:", error);
+      }
+    } else {
+      console.error("Invalid ID for deletion:", id);
+    }
   };
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const handleToggleActive = async (id: number, currentStatus: number) => {
+    const token = localStorage.getItem("access_token") || "";
+    const updatedStatus = currentStatus === 1 ? 0 : 1;
+    try {
+      await apiPut(
+        `/api/payment/banks/${id}/`,
+        { is_active: updatedStatus },
+        token
+      );
+      dispatch(fetchBankDataAsync({ page: currentPage, query: debouncedQuery }));
+    } catch (error) {
+      console.error("Failed to toggle bank record status:", error);
+    }
+  };
+
+  // Calculate totalPages based on totalCount and itemsPerPage
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
   const handlePageChange = (page: number) => {
-    setSearchParams({ page: page.toString(), q: query });
+    setSearchParams({ page: page.toString(), q: debouncedQuery });
   };
-
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentEntries = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <>
@@ -75,7 +110,7 @@ const BankDetailsList: React.FC = () => {
             type="text"
             placeholder="Search by Bank Name, Account Holder, Number, or Country"
             className="form-control"
-            value={query}
+            value={searchQuery}
             onChange={handleSearch}
           />
         </div>
@@ -89,43 +124,55 @@ const BankDetailsList: React.FC = () => {
                 <th>Account Holder Name</th>
                 <th>Account Number</th>
                 <th>Country</th>
+                <th>Is Active</th>
                 {hasEditBankPermission && <th>Actions</th>}
               </tr>
             </thead>
             <tbody>
-              {currentEntries.length > 0 ? (
-                currentEntries.map((item, index) => (
+              {formData.length > 0 ? (
+                formData.map((item, index) => (
                   <tr key={item.id}>
-                    <td>{startIndex + index + 1}</td>
+                    <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                     <td>{item.bank_name}</td>
                     <td>{item.account_holder_name}</td>
                     <td>{item.account_number}</td>
                     <td>{item.bank_country?.country || "N/A"}</td>
+                    <td>
+                      <label className="switch">
+                        <input
+                          type="checkbox"
+                          checked={item.is_active === 1}
+                          onChange={() =>
+                            handleToggleActive(item.id, item.is_active)
+                          }
+                        />
+                        <span className="slider round"></span>
+                      </label>
+                    </td>
                     {hasEditBankPermission && (
                       <td>
-                        <button
-                          className="btn btn-sm m-1 btn-primary"
+                        <Button
+                          variant="primary"
+                          style={{ width: '70px', margin: "4px"}}
                           onClick={() => handleEdit(item.id)}
-                          style={{ width: '80px' }}
                         >
                           <FontAwesomeIcon icon={faPen} />
-                        </button>
-                        <button
-                          className="btn btn-sm m-1 btn-danger"
+                        </Button>
+                        <Button
+                          variant="danger"
+                          style={{ width: '70px', margin: "4px" }}
                           onClick={() => handleDelete(item.id)}
-                          style={{ width: '80px' }}
-                          
                         >
                           <FontAwesomeIcon icon={faTrashCan} />
-                        </button>
+                        </Button>
                       </td>
                     )}
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={hasEditBankPermission ? 6 : 5} className="text-center">
-                    No data found
+                  <td colSpan={7} className="text-center">
+                    No records found
                   </td>
                 </tr>
               )}
@@ -138,13 +185,6 @@ const BankDetailsList: React.FC = () => {
           totalPages={totalPages}
           onPageChange={handlePageChange}
         />
-
-        <button
-          className="btn btn-primary mb-5"
-          onClick={() => navigate("/banks/add")}
-        >
-          Go to Form
-        </button>
       </div>
     </>
   );

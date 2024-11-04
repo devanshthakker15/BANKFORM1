@@ -50,6 +50,7 @@ const BankFormPage: React.FC = () => {
       <div className="container mt-2">
         {/* View Submissions Button */}
         <div className="text-right mb-4 d-flex justify-content-end">
+        
         <Link to="/banks" className="btn btn-secondary m-2">
           View Submissions
         </Link>

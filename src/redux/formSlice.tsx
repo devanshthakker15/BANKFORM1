@@ -1,82 +1,85 @@
+// src/redux/formSlice.ts
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { BASE_URL } from "../utils/constants";
 import { apiGet } from "../utils/getApi";
 
-// Define interface for bank data
 interface BankData {
   id: number;
   bank_name: string;
   account_holder_name: string;
   account_number: string;
   ifsc_code: string;
-  bank_country: {
-    country: string;
-  } | null;
+  bank_country: { country: string } | null;
+  is_active: number;
 }
 
-// Define the initial state
 interface FormState {
   formData: BankData[];
   status: "idle" | "loading" | "succeeded" | "failed";
+  currentBank: BankData | null;
+  countries: [];
   error: string | null;
+  totalCount: number;
 }
 
 const initialState: FormState = {
   formData: [],
   status: "idle",
+  currentBank: null,
+  countries: [],
   error: null,
+  totalCount: 0,
 };
 
-// Async thunk to fetch bank data from the API
+// Updated thunk to accept page and query arguments
 export const fetchBankDataAsync = createAsyncThunk<
-  BankData[],
-  void,
+  { data: BankData[]; totalCount: number },
+  { page: number; query: string },
   { rejectValue: string }
->("form/fetchBankDataAsync", async (_, { rejectWithValue }) => {
+>("form/fetchBankDataAsync", async ({ page, query }, { rejectWithValue }) => {
   try {
-    // Retrieve access token from localStorage
-    const accessToken = localStorage.getItem("access_token");
-
-    // Add the access token to the request headers
-    
-
-    const data = await apiGet("/api/payment/banks/");
-
+    const data = await apiGet(`/api/payment/banks/`, { page, q: query });
     if (data.success) {
-      return data.result.results; // Return bank data
-    } else {
-      return rejectWithValue("Failed to fetch bank data");
+      return { data: data.result.results, totalCount: data.result.count };
     }
+    return rejectWithValue("Failed to fetch bank data");
   } catch (error) {
     return rejectWithValue("Error fetching bank data");
   }
 });
 
-// Create form slice
-const formSlice = createSlice({
+export const formSlice = createSlice({
   name: "form",
   initialState,
-  reducers: {},
+  reducers: {
+    setCurrentBank: (state, action: PayloadAction<BankData | null>) => {
+      state.currentBank = action.payload;
+    },
+    clearCurrentBank: (state) => {
+      state.currentBank = null;
+    },
+    saveFormData: (state, action: PayloadAction<BankData>) => {
+      state.formData.push(action.payload);
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchBankDataAsync.pending, (state) => {
-        console.log("Fetching bank data - status: loading");
         state.status = "loading";
       })
-      .addCase(fetchBankDataAsync.fulfilled, (state, action: PayloadAction<BankData[]>) => {
-        console.log("Fetching bank data - status: succeeded");
-        state.status = "succeeded";
-        state.formData = action.payload;
-        console.log("Fetched data:", action.payload);
-      })
+      .addCase(
+        fetchBankDataAsync.fulfilled,
+        (state, action: PayloadAction<{ data: BankData[]; totalCount: number }>) => {
+          state.status = "succeeded";
+          state.formData = action.payload.data;
+          state.totalCount = action.payload.totalCount;
+        }
+      )
       .addCase(fetchBankDataAsync.rejected, (state, action) => {
-        console.log("Fetching bank data - status: failed");
         state.status = "failed";
         state.error = action.payload || "Failed to fetch bank data";
-        console.error("Error message:", state.error);
       });
   },
 });
 
+export const { setCurrentBank, clearCurrentBank, saveFormData } = formSlice.actions;
 export default formSlice.reducer;

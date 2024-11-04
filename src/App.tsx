@@ -1,3 +1,4 @@
+// src/App.tsx
 import React from "react";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 
@@ -7,38 +8,38 @@ import LoginPage from "./pages/LoginPage";
 import BankDetailsList from "./pages/BankDetailsList";
 import PageNotFound from "./pages/PageNotFound";
 import Layout from "./components/Layout";
+import FormPage from "./pages/FormPage";
+
+import HSN_Codes from "./pages/HSN_Codes";
+import ManageEmployees from "./pages/ManageEmployees";
+import ManageRoles from "./pages/ManageRoles";
+import ManageProducts from "./pages/ManageProducts";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "admin-lte/dist/css/adminlte.min.css";
 import "admin-lte/dist/js/adminlte.min.js";
 
-// Protected Route Component
 const ProtectedRoute: React.FC<{
   permission: string;
   children: React.ReactNode;
 }> = ({ permission, children }) => {
-  const currentUser = localStorage.getItem("currentUser");
-  if (!currentUser) {
+  const accessToken = localStorage.getItem("access_token");
+  if (!accessToken) {
     return <Navigate to="/login" />;
   }
 
-  const user = JSON.parse(currentUser);
-
-  // Redirect if permission not present
-  if (user.permissions.includes(permission)) {
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+  if (currentUser.permissions && currentUser.permissions.includes(permission)) {
     return <>{children}</>;
   }
 
   return <Navigate to="*" />;
 };
 
-// Check if user is authenticated
 const PrivateWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const currentUser = localStorage.getItem("currentUser");
-
-  if (!currentUser) {
-    // Redirect to login if user is not authenticated
+  const accessToken = localStorage.getItem("access_token");
+  if (!accessToken) {
     return <Navigate to="/login" />;
   }
 
@@ -49,49 +50,24 @@ const App: React.FC = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Unauthenticated route for login */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/banks/hsn" element={<FormPage />} />
 
-        {/* Authenticated routes */}
-        <Route
-          path="/"
-          element={
-            <PrivateWrapper>
-              <Layout />
-            </PrivateWrapper>
-          }
-        >
+        <Route path="/" element={<PrivateWrapper><Layout /></PrivateWrapper>}>
           <Route index element={<HomePage />} />
 
-          {/* Bank related routes */}
-          <Route
-            path="/banks"
-            element={
-              <ProtectedRoute permission="viewBanks">
-                <BankDetailsList />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/banks/add"
-            element={
-              <ProtectedRoute permission="addBank">
-                <BankFormPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/banks/edit/:id"
-            element={
-              <ProtectedRoute permission="editBank">
-                <BankFormPage />
-              </ProtectedRoute>
-            }
-          />
-        </Route>
+          <Route path="/banks" element={<ProtectedRoute permission="viewBanks"><BankDetailsList /></ProtectedRoute>} />
+          <Route path="/banks/add" element={<ProtectedRoute permission="addBank"><BankFormPage /></ProtectedRoute>} />
+          <Route path="/banks/edit/:id" element={<ProtectedRoute permission="editBank"><BankFormPage /></ProtectedRoute>} />
 
-        {/* Fallback for non-existing routes */}
-        <Route path="*" element={<PageNotFound />} />
+          {/* Dynamic routes for modules */}
+          <Route path="/hsncodes" element={<HSN_Codes />} />
+          <Route path="/account" element={<ManageEmployees />} />
+          <Route path="/permissions" element={<ManageRoles />} />
+          <Route path="/manage" element={<ManageProducts />} />
+
+          <Route path="*" element={<PageNotFound />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

@@ -1,5 +1,5 @@
 import apiClient  from './apiClient';
-import axios, { Method } from 'axios';
+import { Method } from 'axios';
 
 // export const getBanksWithAccessToken = async () => {
 //   console.log('Fetching banks with access token...');

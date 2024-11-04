@@ -1,17 +1,23 @@
-import React, { useState, useMemo, useEffect } from "react";
-import { Formik, Form, FieldArray, FormikHelpers } from "formik";
+import React, { useMemo, useEffect } from "react";
+import { Formik, Form } from "formik";
 import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
-import { useAppDispatch } from "../redux/hooks";
-import { basicSchema } from "../schema/basicSchema";
 import Card from "./Card";
-import { useLocation, useNavigate } from "react-router-dom";
-import { bankOptions, countries, states, cities } from "../utils/constants";
+import { basicSchema } from "../schema/basicSchema";
+import { YES_NO } from "../utils/constants";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import {
+  fetchCountries,
+  fetchStates,
+  fetchCities,
+} from "../redux/locationSlice";
 import "../styles/bankStyles.css";
-
+import { bankOptions } from "../utils/constants";
+import { submitBankFormData } from "../utils/getApi";
+import { useNavigate } from "react-router-dom";
 
 interface BankFormProps {
-  initialValues: any; // Replace 'any' with a proper type if available for better type safety
+  initialValues?: BankFormValues;
 }
 
 interface BankFormValues {
@@ -20,8 +26,8 @@ interface BankFormValues {
   branch_name: string;
   account_holder_name: string;
   account_number: string;
-  opening_credit_balance: string;
-  opening_debit_balance: string;
+  opening_credit_balance: number;
+  opening_debit_balance: number;
   is_upi_available: boolean;
   bank_address_line_1: string;
   bank_address_line_2?: string;
@@ -29,29 +35,18 @@ interface BankFormValues {
   bank_state: string;
   bank_country: string;
   bank_pincode: string;
-  is_active: boolean;
+  is_active: number;
   id?: number;
 }
 
-const BankForm: React.FC <BankFormProps>= ({ initialValues }: { initialValues?: BankFormValues }) => {
+const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
   const dispatch = useAppDispatch();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const { countries, states, cities } = useAppSelector(
+    (state) => state.location
+  );
 
-  const [selectedCountry, setSelectedCountry] = useState<string>("");
-  const [selectedState, setSelectedState] = useState<string>("");
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [isCorrupted, setIsCorrupted] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (initialValues && initialValues.bank_address_line_1) {
-      setSelectedCountry(initialValues.bank_country);
-      setSelectedState(initialValues.bank_state);
-    }
-  }, [initialValues]);
-
-  const defaultValues = useMemo(() => {
-    return (
+  const defaultValues = useMemo(
+    () =>
       initialValues || {
         bank_name: "",
         ifsc_code: "",
@@ -60,49 +55,33 @@ const BankForm: React.FC <BankFormProps>= ({ initialValues }: { initialValues?: 
         account_number: "",
         opening_credit_balance: "",
         opening_debit_balance: "",
-        is_upi_available: false,
+        is_upi_available: 1,
         bank_address_line_1: "",
         bank_address_line_2: "",
         bank_city: "",
         bank_state: "",
         bank_country: "",
         bank_pincode: "",
-        is_active: false,
-      }
-    );
-  }, [initialValues]);
+        is_active: 1,
+      },
+    [initialValues]
+  );
 
-  const onSubmit = async (
-    values: BankFormValues,
-    { resetForm }: FormikHelpers<BankFormValues>
-  ) => {
-    setIsSubmitting(true);
-    const existingData = JSON.parse(
-      localStorage.getItem("bankFormData") || "[]"
-    ) as BankFormValues[];
+  useEffect(() => {
+    dispatch(fetchCountries());
+  }, [dispatch]);
 
-    if (values.id !== undefined) {
-      const updatedData = existingData.map((item) =>
-        item.id === values.id ? values : item
-      );
-      localStorage.setItem("bankFormData", JSON.stringify(updatedData));
-    } else {
-      const newId = existingData.length
-        ? Math.max(...existingData.map((item) => item.id || 0)) + 1
-        : 0;
-      const updatedData = [...existingData, { ...values, id: newId }];
-      localStorage.setItem("bankFormData", JSON.stringify(updatedData));
-    }
 
+  const navigate=useNavigate();
+  const handleSubmit = async (values: BankFormValues) => {
     try {
-      // Simulate async dispatch
-      resetForm();
-      navigate("/banks");
+      console.log("Submitting form data:", values);
+      const response = await submitBankFormData(values);
+      console.log("API Response:", response);
     } catch (error) {
-      console.error("Error during form submission:", error);
-    } finally {
-      setIsSubmitting(false);
+      console.error("Failed to submit form data:", error);
     }
+    navigate("/banks/");
   };
 
   return (
@@ -110,10 +89,10 @@ const BankForm: React.FC <BankFormProps>= ({ initialValues }: { initialValues?: 
       <Formik
         initialValues={defaultValues}
         validationSchema={basicSchema}
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit}
         enableReinitialize={true}
       >
-        {({ values }) => (
+        {({ values, setFieldValue }) => (
           <Form>
             <Card title="General Information">
               <div className="row">
@@ -123,6 +102,9 @@ const BankForm: React.FC <BankFormProps>= ({ initialValues }: { initialValues?: 
                     name="bank_name"
                     options={bankOptions}
                     required={true}
+                    onChange={(newValue) =>
+                      setFieldValue("bank_name", newValue.value)
+                    }
                   />
                 </div>
                 <div className="col-md-6">
@@ -175,23 +157,16 @@ const BankForm: React.FC <BankFormProps>= ({ initialValues }: { initialValues?: 
                   <SelectInput
                     label="Is UPI Available"
                     name="is_upi_available"
-                    options={[
-                      { value: "true", label: "Yes" },
-                      { value: "false", label: "No" },
-                    ]}
+                    options={YES_NO}
                   />
                 </div>
                 <div className="col-md-6">
                   <SelectInput
                     label="Is Active"
                     name="is_active"
-                    options={[
-                      { value: "true", label: "Yes" },
-                      { value: "false", label: "No" },
-                    ]}
+                    options={YES_NO}
                   />
                 </div>
-                
               </div>
             </Card>
 
@@ -218,6 +193,22 @@ const BankForm: React.FC <BankFormProps>= ({ initialValues }: { initialValues?: 
                     name="bank_country"
                     options={countries}
                     required={true}
+                    onChange={(newValue) => {
+                      setFieldValue(
+                        "bank_country",
+                        newValue ? newValue.value : ""
+                      );
+                      setFieldValue("bank_state", "");
+                      setFieldValue("bank_city", "");
+                      if (newValue) dispatch(fetchStates(newValue.value));
+                    }}
+                    // onChange={(newValue, actions) => {
+                    //   if (actions.action === "clear") {
+                    //     setFieldValue("bank_state", "");
+                    //   } else {
+                    //     dispatch(fetchStates(newValue.value));
+                    //   }
+                    // }}
                   />
                 </div>
                 <div className="col-md-4">
@@ -226,15 +217,34 @@ const BankForm: React.FC <BankFormProps>= ({ initialValues }: { initialValues?: 
                     name="bank_state"
                     options={states}
                     required={true}
+                    value={values.bank_state || ""}
+                    onChange={(newValue) => {
+                      setFieldValue(
+                        "bank_state",
+                        newValue ? newValue.value : ""
+                      );
+                      setFieldValue("bank_city", "");
+                      if (newValue) dispatch(fetchCities(newValue.value));
+                    }}
+                    // onChange={(newValue, actions) => {
+                    //   if (actions.action === "clear") {
+                    //     setFieldValue("bank_city", "");
+                    //   } else {
+                    //     dispatch(fetchCities(newValue.value));
+                    //   }
+                    // }}
                   />
                 </div>
                 <div className="col-md-4">
                   <SelectInput
                     label="City"
-                    // placeholder="Select city"
-                    options={cities}
                     name="bank_city"
+                    options={cities}
                     required={true}
+                    value={values.bank_city || ""}
+                    onChange={(newValue) =>
+                      setFieldValue("bank_city", newValue ? newValue.value : "")
+                    }
                   />
                 </div>
                 <div className="col-md-4">
@@ -250,7 +260,7 @@ const BankForm: React.FC <BankFormProps>= ({ initialValues }: { initialValues?: 
 
             <div className="d-flex justify-content-between mt-4">
               <button type="submit" className="btn btn-primary">
-                {isSubmitting ? "Submitting..." : "Submit"}
+                Submit
               </button>
             </div>
           </Form>

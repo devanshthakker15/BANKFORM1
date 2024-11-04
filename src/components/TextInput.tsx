@@ -8,6 +8,8 @@ interface TextInputProps {
   type?: string; 
   placeholder?: string; 
   required?: boolean; 
+  value?: string;
+  // onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const TextInput: React.FC<TextInputProps> = ({ label, name, type = "text", placeholder, required = false }) => {

@@ -2,9 +2,10 @@ import React from "react";
 import Select from "react-select";
 import { useField, FieldInputProps, FieldMetaProps, FieldHelperProps } from "formik";
 import "../App.css";
+import { number } from "yup";
 
 interface Option {
-  value: string;
+  value: string | number;
   label: string;
 }
 
@@ -13,7 +14,7 @@ interface SelectInputProps {
   name: string;
   options: Option[];
   required?: boolean;
-  onChange?: (option: Option | null) => void; 
+  onChange?: (value, action) => void; 
   value?: string; 
 }
 
@@ -24,13 +25,13 @@ const SelectInput: React.FC<SelectInputProps> = ({ label, name, options, require
     FieldHelperProps<string>
   ] = useField(name);
 
-  const handleChange = (option: Option | null) => {
-    const selectedValue = option ? option.value : "";
-    helpers.setValue(selectedValue); 
-    if (onChange) {
-      onChange(option); 
-    }
-  };
+  // const handleChange = (option: Option | null) => {
+  //   const selectedValue = option ? option.value : "";
+  //   helpers.setValue(selectedValue); 
+  //   if (onChange) {
+  //     onChange(option); 
+  //   }
+  // };
 
   const selectedOption = options.find((option) => option.value === value || option.value === field.value);
 
@@ -45,8 +46,9 @@ const SelectInput: React.FC<SelectInputProps> = ({ label, name, options, require
         name={name}
         value={selectedOption}
         options={options}
-        onChange={handleChange}
-        isClearable // Allows clearing the selection
+        // value={}
+        onChange={onChange}
+        isClearable 
         placeholder="Select an option"
       />
       {meta.touched && meta.error ? (

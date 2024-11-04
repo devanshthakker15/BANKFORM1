@@ -1,5 +1,3 @@
-// src/utils/redirectToLogin.ts
-
 import { NavigateFunction } from 'react-router-dom';
 
 export const redirectToLogin = (message:string, navigate: NavigateFunction) => {
