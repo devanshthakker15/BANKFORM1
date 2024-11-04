@@ -4,7 +4,7 @@ import { Button } from "react-bootstrap";
 import { offcanvasSchema } from "../schema/offcanvasSchema";
 import { FormData } from "../types/formTypes";
 import { useAppDispatch } from "../redux/hooks";
-import { saveHSNCodeAsync } from "../redux/offcanvasSlice";
+import { saveHSNCodeAsync, updateHSNCodeAsync } from "../redux/offcanvasSlice";
 import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
 import { YES_NO } from "../utils/constants";
@@ -28,7 +28,15 @@ const CustomForm: React.FC<CustomFormProps> = ({ editData, onClose }) => {
       validationSchema={offcanvasSchema}
       onSubmit={(values: FormData) => {
         console.log("Submitting form with values:", values);
-        dispatch(saveHSNCodeAsync(values)); // Dispatch the async action to post the data
+
+        // Dispatch PUT if editing; otherwise, POST for a new entry
+        if (editData) {
+          console.log("Updating HSN data");
+          dispatch(updateHSNCodeAsync({ id: editData.id, data: values }));
+        } else {
+          console.log("Adding new HSN data");
+          dispatch(saveHSNCodeAsync(values));
+        }
         onClose();
       }}
     >

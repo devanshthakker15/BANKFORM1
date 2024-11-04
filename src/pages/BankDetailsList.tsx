@@ -1,16 +1,19 @@
-// BankDetailsPage.tsx
-import React, { useEffect, useState, useCallback } from "react";
+// src/pages/BankDetailsList.tsx
+import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Pagination from "../components/Pagination";
 import Breadcrumbs from "../components/Breadcrumb";
 import { RootState, AppDispatch } from "../redux/store";
-import { fetchBankDataAsync, setCurrentBank } from "../redux/formSlice";
+import {
+  fetchBankDataAsync,
+  fetchBankByIdAsync,
+  deleteBankAsync,
+  toggleBankActiveStatusAsync,
+} from "../redux/formSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan, faPen } from "@fortawesome/free-solid-svg-icons";
 import "../styles/bankStyles.css";
-import { BASE_URL } from "../utils/constants";
-import { apiDelete, apiPut, apiGet } from "../utils/getApi";
 import { Button } from "react-bootstrap";
 
 const BankDetailsList: React.FC = () => {
@@ -21,9 +24,7 @@ const BankDetailsList: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { formData, totalCount } = useSelector(
-    (state: RootState) => state.form
-  );
+  const { formData, totalCount } = useSelector((state: RootState) => state.form);
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
   const hasEditBankPermission = currentUser?.permissions?.includes("editBank");
 
@@ -41,8 +42,6 @@ const BankDetailsList: React.FC = () => {
     };
   }, [searchQuery]);
 
-
-
   useEffect(() => {
     // Fetch data when currentPage or debouncedQuery changes
     dispatch(fetchBankDataAsync({ page: currentPage, query: debouncedQuery }));
@@ -54,46 +53,18 @@ const BankDetailsList: React.FC = () => {
     setSearchParams({ page: "1", q: value });
   };
 
-  const handleEdit = async (id: number) => {
-    try {
-      const bankData = await apiGet(`/api/payment/banks/${id}/`);
-      dispatch(setCurrentBank(bankData));
-      navigate(`/banks/edit/${id}`);
-    } catch (error) {
-      console.error("Failed to fetch bank details for editing:", error);
-    }
+  const handleEdit = (id: number) => {
+    dispatch(fetchBankByIdAsync(id)).then(() => navigate(`/banks/edit/${id}`));
   };
 
-  const handleDelete = async (id: number) => {
-    const token = localStorage.getItem("access_token") || "";
-    if (id) {
-      try {
-        await apiDelete(`${BASE_URL}/api/payment/banks/${id}/`, token);
-        dispatch(fetchBankDataAsync({ page: currentPage, query: debouncedQuery }));
-      } catch (error) {
-        console.error("Failed to delete bank record:", error);
-      }
-    } else {
-      console.error("Invalid ID for deletion:", id);
-    }
+  const handleDelete = (id: number) => {
+    dispatch(deleteBankAsync({ id, page: currentPage, query: debouncedQuery }));
   };
 
-  const handleToggleActive = async (id: number, currentStatus: number) => {
-    const token = localStorage.getItem("access_token") || "";
-    const updatedStatus = currentStatus === 1 ? 0 : 1;
-    try {
-      await apiPut(
-        `/api/payment/banks/${id}/`,
-        { is_active: updatedStatus },
-        token
-      );
-      dispatch(fetchBankDataAsync({ page: currentPage, query: debouncedQuery }));
-    } catch (error) {
-      console.error("Failed to toggle bank record status:", error);
-    }
+  const handleToggleActive = (id: number, currentStatus: number) => {
+    dispatch(toggleBankActiveStatusAsync({ id, currentStatus, page: currentPage, query: debouncedQuery }));
   };
 
-  // Calculate totalPages based on totalCount and itemsPerPage
   const totalPages = Math.ceil(totalCount / itemsPerPage);
   const handlePageChange = (page: number) => {
     setSearchParams({ page: page.toString(), q: debouncedQuery });
@@ -104,7 +75,6 @@ const BankDetailsList: React.FC = () => {
       <Breadcrumbs />
       <div className="container mt-2">
         <h2>Bank Details Submissions</h2>
-
         <div className="mb-4">
           <input
             type="text"
@@ -114,7 +84,6 @@ const BankDetailsList: React.FC = () => {
             onChange={handleSearch}
           />
         </div>
-
         <div className="table-responsive-mobile">
           <table className="table table-bordered">
             <thead>
@@ -136,55 +105,56 @@ const BankDetailsList: React.FC = () => {
                     <td>{item.bank_name}</td>
                     <td>{item.account_holder_name}</td>
                     <td>{item.account_number}</td>
-                    <td>{item.bank_country?.country || "N/A"}</td>
+                    <td>{item.bank_country ? item.bank_country.country : "N/A"}</td>
                     <td>
-                      <label className="switch">
-                        <input
-                          type="checkbox"
-                          checked={item.is_active === 1}
-                          onChange={() =>
-                            handleToggleActive(item.id, item.is_active)
-                          }
-                        />
-                        <span className="slider round"></span>
-                      </label>
+                      <Button
+                        variant={item.is_active === 1 ? "success" : "danger"}
+                        onClick={() => handleToggleActive(item.id, item.is_active)}
+                        style={{ width: '90px', margin: "4px"}}
+
+                      >
+                        {item.is_active === 1 ? "Active" : "Inactive"}
+                      </Button>
                     </td>
                     {hasEditBankPermission && (
                       <td>
-                        <Button
-                          variant="primary"
-                          style={{ width: '70px', margin: "4px"}}
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-primary mr-2"
                           onClick={() => handleEdit(item.id)}
+                          style={{ width: '70px', margin: "4px"}}
+
                         >
                           <FontAwesomeIcon icon={faPen} />
-                        </Button>
-                        <Button
-                          variant="danger"
-                          style={{ width: '70px', margin: "4px" }}
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-danger"
                           onClick={() => handleDelete(item.id)}
+                          style={{ width: '70px', margin: "4px"}}
+
                         >
                           <FontAwesomeIcon icon={faTrashCan} />
-                        </Button>
+                        </button>
                       </td>
                     )}
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7} className="text-center">
-                    No records found
-                  </td>
+                  <td colSpan={7}>No records found.</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
-
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
+        {totalPages > 1 && (
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          />
+        )}
       </div>
     </>
   );
