@@ -53,7 +53,6 @@ export const fetchBankDataAsync = createAsyncThunk<
 
 
 
-
 // AsyncThunk for fetching bank details by ID (for editing) (GET)
 export const fetchBankByIdAsync = createAsyncThunk<
   BankData,
@@ -67,7 +66,6 @@ export const fetchBankByIdAsync = createAsyncThunk<
     return rejectWithValue("Failed to fetch bank details");
   }
 });
-
 
 
 
@@ -87,7 +85,6 @@ export const deleteBankAsync = createAsyncThunk<
 
 
 
-
 // AsyncThunk for toggling active status of a bank record (PUT)
 export const toggleBankActiveStatusAsync = createAsyncThunk<
   void,
@@ -102,6 +99,7 @@ export const toggleBankActiveStatusAsync = createAsyncThunk<
     return rejectWithValue("Failed to toggle bank active status");
   }
 });
+
 
 
 // AsyncThunk for updating or creating new bank data (PUT/POST)
