@@ -12,5 +12,5 @@ export const offcanvasSchema = Yup.object({
     .required("HSN code is required"),
 
   is_active: Yup.number()
-  .required("Active status must be specified"),
+  // .required("Active status must be specified"),
 });

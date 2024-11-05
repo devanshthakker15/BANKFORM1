@@ -9,8 +9,8 @@ export interface Country {
     branch_name: string;
     account_holder_name: string;
     account_number: string;
-    opening_credit_balance: string;
-    opening_debit_balance: string;
+    opening_credit_balance: number;
+    opening_debit_balance: number;
     is_upi_available: boolean;
     bank_address_line_1: string;
     bank_address_line_2?: string;

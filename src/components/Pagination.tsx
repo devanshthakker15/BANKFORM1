@@ -13,6 +13,23 @@ const Pagination: React.FC<PaginationProps> = ({
   totalPages,
   onPageChange,
 }) => {
+  const pageGroupSize = 5;
+
+  // Calculate dynamic start and end pages to keep currentPage in the center 
+  const calculatePageRange = () => {
+    let startPage = Math.max(1, currentPage - Math.floor(pageGroupSize / 2));
+    let endPage = startPage + pageGroupSize - 1;
+
+    if (endPage > totalPages) {
+      endPage = totalPages;
+      startPage = Math.max(1, endPage - pageGroupSize + 1);
+    }
+
+    return { startPage, endPage };
+  };
+
+  const { startPage, endPage } = calculatePageRange();
+
   const handlePrev = () => {
     if (currentPage > 1) {
       onPageChange(currentPage - 1);
@@ -29,17 +46,26 @@ const Pagination: React.FC<PaginationProps> = ({
     <div className="pagination d-flex justify-content-end align-items-center mt-4 mb-3">
       <button
         className="btn btn-primary"
-        style={{ width: '40px', marginRight: '10px'}}
+        style={{ width: '40px', marginRight: '10px' }}
         disabled={currentPage === 1}
         onClick={handlePrev}
-         aria-label="Previous page"
+        aria-label="Previous page"
       >
         <FontAwesomeIcon icon={faChevronLeft} />
       </button>
 
-      <span>
-        Page {currentPage} of {totalPages}
-      </span>
+      <div className="d-flex">
+        {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((page) => (
+          <button
+          style={{ width: '40px', marginRight: '10px' }}
+            key={page}
+            className={`btn ${page === currentPage ? 'btn-primary' : 'btn-outline-primary'} mx-1`}
+            onClick={() => onPageChange(page)}
+          >
+            {page}
+          </button>
+        ))}
+      </div>
 
       <button
         className="btn btn-primary"

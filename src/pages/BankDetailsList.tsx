@@ -55,7 +55,9 @@ const BankDetailsList: React.FC = () => {
   };
 
   const handleEdit = (id: number) => {
-    dispatch(fetchBankByIdAsync(id)).then(() => navigate(`/banks/edit/${id}`));
+    dispatch(fetchBankByIdAsync(id));
+    navigate(`/banks/edit/${id}`);
+    // navigate(`/banks/add/`);
   };
 
   const handleDelete = (id: number) => {

@@ -7,8 +7,8 @@ import { faTrashCan, faPen } from "@fortawesome/free-solid-svg-icons";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import Pagination from "../components/Pagination";
 import TextInput from "../components/TextInput";
-import SelectInput from "../components/SelectInput";
-import { YES_NO } from "../utils/constants";
+// import SelectInput from "../components/SelectInput";
+// import { YES_NO } from "../utils/constants";
 import { 
   fetchHSNCodesAsync, 
   setCurrentHSN, 
@@ -19,6 +19,7 @@ import {
  } from "../redux/offcanvasSlice";
 import { offcanvasSchema } from "../schema/offcanvasSchema";
 import { useSearchParams } from "react-router-dom";
+import Breadcrumbs from "../components/Breadcrumb";
 
 interface HSNFormData {
  hsn_name: string;
@@ -85,7 +86,10 @@ const HSN_Codes: React.FC = () => {
 
 
  return (
+  <div>
+    <Breadcrumbs />
    <div className="container">
+    
      <div className="head d-flex justify-content-between">
        <h1>HSN Codes</h1>
        <Button variant="primary" onClick={handleShow}>
@@ -177,6 +181,7 @@ const HSN_Codes: React.FC = () => {
          </Formik>
        </Offcanvas.Body>
      </Offcanvas>
+   </div>
    </div>
  );
 };

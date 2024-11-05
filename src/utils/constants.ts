@@ -5,6 +5,8 @@ export const bankOptions = [
   { value: "IDFC First Bank", label: "IDFC First Bank" },
   { value: "Kotak Bank", label: "Kotak Bank" },
   { value: "SBI", label: "SBI" },
+  { value: "Axis Bank", label: "Axis Bank" },
+  { value: "Bank Of India", label: "Bank Of India" },
   { value: "Bank of Maharashtra", label: "Bank of Maharashtra" },
   { value: "Union Bank", label: "Union Bank"},
   { value: "Canera Bank", label: "Canera Bank" },

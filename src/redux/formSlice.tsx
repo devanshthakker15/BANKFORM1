@@ -1,6 +1,8 @@
 // src/redux/formSlice.ts
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
-import { apiGet, apiDelete, apiPut } from "../utils/getApi";
+import { apiGet, apiDelete, apiPut, submitBankFormData } from "../utils/getApi";
+import { BankFormValues } from "../components/BankForm";
+
 
 interface BankData {
   id: number;
@@ -98,6 +100,30 @@ export const toggleBankActiveStatusAsync = createAsyncThunk<
     dispatch(fetchBankDataAsync({ page, query }));
   } catch (error) {
     return rejectWithValue("Failed to toggle bank active status");
+  }
+});
+
+
+// AsyncThunk for updating or creating new bank data (PUT/POST)
+export const submitBankDataAsync = createAsyncThunk<
+  void,
+  { values: BankFormValues; id?: string },
+  { rejectValue: string }
+>("form/submitBankDataAsync", async ({ values, id }, { rejectWithValue, dispatch }) => {
+  try {
+    if (id) {
+      // Update bank data if id is provided
+      await apiPut(`/api/payment/banks/${id}/`, values);
+      console.log("Bank data updated successfully");
+    } else {
+      // Create new bank data if no id is provided
+      await submitBankFormData(values);
+      console.log("Bank data created successfully");
+    }
+    // Refresh the bank list after creating/updating
+    dispatch(fetchBankDataAsync({ page: 1, query: "" }));
+  } catch (error) {
+    return rejectWithValue("Failed to submit bank data");
   }
 });
 
