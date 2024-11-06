@@ -10,6 +10,14 @@ import {
   faSignOutAlt,
   faClipboard,
   faBank,
+  faCarAlt,
+  faPercentage,
+  faUser,
+  faTasks,
+  faShoppingCart,
+  faCode,
+  faBan,
+  faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import { apiGet } from "../utils/getApi";
 import "../styles/sidebar.css";
@@ -49,6 +57,16 @@ const Sidebar: React.FC = () => {
     return null;
   }
 
+  const moduleIcons = {
+    Home: faHome,
+    account: faUser ,
+    permissions: faTasks,
+    manage: faShoppingCart,
+    hsncodes: faCode,
+    banks: faBank,
+  };
+
+   
   return (
     <aside
       className={`main-sidebar sidebar-dark-secondary elevation-4 ${
@@ -78,25 +96,26 @@ const Sidebar: React.FC = () => {
               if (EXCLUDED_MODULES.includes(module.module.module_name)) {
                 return null;
               }
+              const icon = moduleIcons[module.module.alias] || faList;
               return (
                 <li key={module.id} className="nav-item d-flex justify-content-start">
                   <Link to={`/${module.module.alias}`} className="nav-link">
                     <div className="nav-content">
-                      <FontAwesomeIcon icon={faList} className="nav-icon" />
+                      <FontAwesomeIcon icon={icon} className="nav-icon" />
                       <p>{module.module.module_name}</p>
                     </div>
                   </Link>
                 </li>
               );
             })}
-            {/* <li className="nav-item d-flex justify-content-start">
-              <Link to="/banks" className="nav-link">
+            <li className="nav-item d-flex justify-content-start">
+              <Link to="/account/add" className="nav-link">
                 <div className="nav-content">
-                  <FontAwesomeIcon icon={faBank} className="nav-icon" />
-                  <p>View Banks</p>
+                  <FontAwesomeIcon icon={faUsers} className="nav-icon" />
+                  <p>Add Employee</p>
                 </div>
               </Link>
-            </li> */}
+            </li>
             <li className="nav-item d-flex justify-content-start">
               <Link to="/banks/add" className="nav-link">
                 <div className="nav-content">

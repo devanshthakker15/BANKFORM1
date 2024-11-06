@@ -19,6 +19,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "admin-lte/dist/css/adminlte.min.css";
 import "admin-lte/dist/js/adminlte.min.js";
+import EmployeeForm from "./components/EmployeeForm";
 
 const ProtectedRoute: React.FC<{
   permission: string;
@@ -63,6 +64,7 @@ const App: React.FC = () => {
           {/* Dynamic routes for modules */}
           <Route path="/hsncodes" element={<HSN_Codes />} />
           <Route path="/account" element={<ManageEmployees />} />
+          <Route path="/account/add" element={<EmployeeForm />} />
           <Route path="/permissions" element={<ManageRoles />} />
           <Route path="/manage" element={<ManageProducts />} />
 

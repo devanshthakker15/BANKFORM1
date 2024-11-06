@@ -116,3 +116,5 @@ export const EXCLUDED_MODULES = ["Manage Locations"];
 
 // export const BASE_URL = "https://07dlmd6jpi.execute-api.ap-south-1.amazonaws.com/dev";
 export const USER_URL="https://jsonplaceholder.typicode.com"
+
+export const PRODUCTS_URL="https://fakestoreapi.com/products"

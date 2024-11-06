@@ -137,7 +137,7 @@ const HSN_Codes: React.FC = () => {
            ) : (
              <tr>
                <td colSpan={5} className="text-center">
-                 No records found
+                 Loading Codes...
                </td>
              </tr>
            )}

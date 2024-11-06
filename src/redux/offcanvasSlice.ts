@@ -27,7 +27,9 @@ export const fetchHSNCodesAsync = createAsyncThunk(
   async ({ page, query }: { page: number; query: string }, { rejectWithValue }) => {
     try {
       const response = await apiGet(`/api/product/hsncodes/`, { page, q: query });
+      console.log("HSN data fetched:",response.result.results);
       return { data: response.result.results, totalCount: response.result.count };
+      
     } catch (error) {
       return rejectWithValue("Failed to fetch HSN Codes");
     }

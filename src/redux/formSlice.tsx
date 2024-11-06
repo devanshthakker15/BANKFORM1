@@ -43,6 +43,7 @@ export const fetchBankDataAsync = createAsyncThunk<
   try {
     const data = await apiGet(`/api/payment/banks/`, { page, q: query });
     if (data.success) {
+      console.log("Bank Data:",data.result.results);
       return { data: data.result.results, totalCount: data.result.count };
     }
     return rejectWithValue("Failed to fetch bank data");
@@ -61,6 +62,7 @@ export const fetchBankByIdAsync = createAsyncThunk<
 >("form/fetchBankByIdAsync", async (id, { rejectWithValue }) => {
   try {
     const data = await apiGet(`/api/payment/banks/${id}/`);
+    console.log(data);
     return data;
   } catch (error) {
     return rejectWithValue("Failed to fetch bank details");
