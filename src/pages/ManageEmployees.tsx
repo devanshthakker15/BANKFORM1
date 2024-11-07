@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan, faPen } from "@fortawesome/free-solid-svg-icons";
 import { Link} from "react-router-dom";
 import Breadcrumbs from "../components/Breadcrumb";
+import Loader from "../components/Loader";
 const ManageEmployees: React.FC = () => {
 
   const [employees, setEmployees] = useState([]);
@@ -77,7 +78,8 @@ const ManageEmployees: React.FC = () => {
           </tbody>
         </table>
       ) : (
-        <p>Loading employees...</p>
+        // <p>Loading employees...</p>
+        <Loader />
       )}
     </div>
     </div>

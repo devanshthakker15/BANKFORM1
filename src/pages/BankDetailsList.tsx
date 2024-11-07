@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Pagination from "../components/Pagination";
 import Breadcrumbs from "../components/Breadcrumb";
+import Loader from "../components/Loader";
 import { RootState, AppDispatch } from "../redux/store";
 import {
   fetchBankDataAsync,
@@ -152,9 +153,13 @@ const BankDetailsList: React.FC = () => {
                   </tr>
                 ))
               ) : (
-                <tr>
-                  <td colSpan={7}>No records found.</td>
-                </tr>
+                // <tr>
+                //   <td colSpan={7}>No records found.</td>
+                // </tr>
+                <td colSpan={7}>
+                  <Loader />
+                </td>
+                
               )}
             </tbody>
           </table>

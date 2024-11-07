@@ -21,6 +21,16 @@ export const apiGet = async (url: string, params = {}) => {
   }
 };
 
+// Handle GET requests for users
+export const userGet = async (url: string) => {
+  try {
+    const response = await axios.get(`${USER_URL}${url}`);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
 // Handle POST requests with token
 export const apiPost = async (url: string, data: any) => {
   const token = getAccessToken();

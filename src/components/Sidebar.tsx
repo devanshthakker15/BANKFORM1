@@ -10,13 +10,10 @@ import {
   faSignOutAlt,
   faClipboard,
   faBank,
-  faCarAlt,
-  faPercentage,
   faUser,
   faTasks,
   faShoppingCart,
   faCode,
-  faBan,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import { apiGet } from "../utils/getApi";

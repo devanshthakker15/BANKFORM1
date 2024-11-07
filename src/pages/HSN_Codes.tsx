@@ -7,6 +7,7 @@ import { faTrashCan, faPen } from "@fortawesome/free-solid-svg-icons";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import Pagination from "../components/Pagination";
 import TextInput from "../components/TextInput";
+import Loader from "../components/Loader";
 // import SelectInput from "../components/SelectInput";
 // import { YES_NO } from "../utils/constants";
 import { 
@@ -136,8 +137,8 @@ const HSN_Codes: React.FC = () => {
              ))
            ) : (
              <tr>
-               <td colSpan={5} className="text-center">
-                 Loading Codes...
+               <td colSpan={5} >
+                  <Loader />
                </td>
              </tr>
            )}

@@ -27,7 +27,7 @@ export const YES_NO =[
 
   
 // Define the array of module names to exclude
-export const EXCLUDED_MODULES = ["Manage Locations"]; 
+export const EXCLUDED_MODULES = ["Manage Locations", "Manage Roles"]; 
 
 
  
