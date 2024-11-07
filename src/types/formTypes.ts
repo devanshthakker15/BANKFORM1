@@ -16,7 +16,7 @@ export interface Country {
     bank_address_line_2?: string;
     bank_city: string;
     bank_state: string;
-    bank_country: string | Country;  // Allow both string and Country in form
+    bank_country: string | Country;  
     bank_pincode: string;
     is_active: number;
     id?: number;
@@ -28,7 +28,7 @@ export interface Country {
     account_holder_name: string;
     account_number: string;
     ifsc_code: string;
-    bank_country: Country;  // Require Country object for API data
+    bank_country: Country;
     bank_state: string;
     bank_city: string;
     bank_pincode: string;

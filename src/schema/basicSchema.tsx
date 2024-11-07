@@ -34,7 +34,7 @@ export const basicSchema = Yup.object({
     .min(0, 'Opening Debit Balance cannot be negative')
     .required('Opening Debit Balance is required'),
 
-  is_upi_available: Yup.boolean()
+  is_upi_available: Yup.number()
     .required('UPI availability must be specified'),
 
   bank_address_line_1: Yup.string()

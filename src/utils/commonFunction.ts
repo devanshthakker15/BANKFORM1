@@ -3,7 +3,6 @@ import { Method } from 'axios';
 
 
 
-
 // export const getBanksWithAccessToken = async () => {
 //   console.log('Fetching banks with access token...');
 //   try {
@@ -30,5 +29,4 @@ export const apiRequest = async (method: Method, url: string, data: any = {}) =>
       throw error;
     }
   };
-
 

@@ -19,7 +19,7 @@ export interface BankFormValues {
   account_number: string;
   opening_credit_balance: number;
   opening_debit_balance: number;
-  is_upi_available: number;
+  is_upi_available: boolean;
   bank_address_line_1: string;
   bank_address_line_2?: string;
   bank_city: any;
@@ -68,14 +68,14 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
         account_number: "",
         opening_credit_balance: 0,
         opening_debit_balance: 0,
-        is_upi_available: 1,
+        is_upi_available: null,
         bank_address_line_1: "",
         bank_address_line_2: "",
         bank_city: "",
         bank_state: "",
         bank_country: "",
         bank_pincode: "",
-        is_active: 1,
+        is_active: null,
       },
     [formData]
   );
@@ -159,18 +159,20 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                       placeholder="Enter opening debit balance"
                     />
                   </div>
-                  <div className="col-md-6">
+                  {/* <div className="col-md-6">
                     <SelectInput
                       label="Is UPI Available"
                       name="is_upi_available"
                       options={YES_NO}
+                      onChange={(newValue) => setFieldValue("is_upi_available", newValue.value)}
                     />
-                  </div>
-                  <div className="col-md-6">
+                  </div> */}
+                  <div className="col-md-3">
                     <SelectInput
                       label="Is Active"
                       name="is_active"
                       options={YES_NO}
+                      onChange={(newValue) => setFieldValue("is_active", newValue.value)}
                     />
                   </div>
                 </div>

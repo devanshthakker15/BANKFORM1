@@ -1,7 +1,7 @@
 // src/pages/FormPage.tsx
 import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
-import OffcanvasForm from '../components/OffcanvasForm';
+// import OffcanvasForm from '../components/OffcanvasForm';
 import { FormData } from '../types/formTypes';
 
 const FormPage: React.FC = () => {

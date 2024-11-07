@@ -12,6 +12,7 @@ interface Employee {
 
 interface EmployeeState {
   employees: Employee[];
+  selectedEmployee: Employee | null; 
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
   totalCount: number;
@@ -19,26 +20,40 @@ interface EmployeeState {
 
 const initialState: EmployeeState = {
   employees: [],
+  selectedEmployee: null, 
   status: "idle",
   error: null,
   totalCount: 0,
 };
 
-// Thunk for fetching employee data with pagination
 export const fetchEmployeeDataAsync = createAsyncThunk<
-  { data: Employee[]; totalCount: number }
-  // { page: number; query: string },
-  // { rejectValue: string }
->("employee/fetchEmployeeDataAsync", async ( ) => {
+  { data: Employee[]; totalCount: number },
+  void,
+  { rejectValue: string }
+>("employee/fetchEmployeeDataAsync", async (_, { rejectWithValue }) => {
   try {
     const data = await userGet(`/users`);
     if (data.success) {
-      console.log(data.result.results);
       return { data: data.result.results, totalCount: data.result.count };
+    } else {
+      return rejectWithValue("Failed to fetch employee data");
     }
-    // return rejectWithValue("Failed to fetch employee data");
   } catch (error) {
-    // return rejectWithValue("Error fetching employee data");
+    return rejectWithValue("Error fetching employee data");
+  }
+});
+
+export const fetchEmployeeByIdAsync = createAsyncThunk<
+  Employee,
+  number, 
+  { rejectValue: string }
+>("form/fetchEmployeeByIdAsync", async (id, { rejectWithValue }) => {
+  try {
+    const data = await userGet(`/users/${id}/`);
+    console.log(data);
+    return data;
+  } catch (error) {
+    return rejectWithValue("Failed to fetch employee details");
   }
 });
 
@@ -63,10 +78,10 @@ const employeeSlice = createSlice({
         state.employees = action.payload.data;
         state.totalCount = action.payload.totalCount;
       })
-      // .addCase(fetchEmployeeDataAsync.rejected, (state, action: PayloadAction<string | undefined>) => {
-      //   state.status = "failed";
-      //   state.error = action.payload || "Failed to fetch employee data";
-      // });
+      .addCase(fetchEmployeeByIdAsync.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload || "Failed to fetch employee details";
+      });
   },
 });
 

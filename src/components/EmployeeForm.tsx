@@ -1,11 +1,14 @@
-import React, { useState, useMemo } from "react";
-import axios from "axios";
+import React, { useEffect, useMemo } from "react";
 import { Formik, Form } from "formik";
-import TextInput from "./TextInput"; // Assuming you have a TextInput component
-import Card from "./Card"; // Assuming you have a Card component
+import TextInput from "./TextInput";
+import Card from "./Card";
 import { employeeSchema } from "../schema/employeeSchema";
-// import { Breadcrumb } from "react-bootstrap";
 import Breadcrumb from "./Breadcrumb";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { RootState, AppDispatch } from "../redux/store";
+import { fetchEmployeeByIdAsync } from "../redux/employeeSlice";
+import axios from "axios";
 
 interface EmployeeFormProps {
   initialValues?: {
@@ -16,26 +19,38 @@ interface EmployeeFormProps {
   };
 }
 
-
-
 const EmployeeForm: React.FC<EmployeeFormProps> = ({ initialValues }) => {
-  const [formData, setFormData] = useState<
-    EmployeeFormProps["initialValues"] | null
-  >(initialValues || null);
+  const dispatch: AppDispatch = useDispatch();
+  const { id } = useParams<{ id: string }>();
+  const selectedEmployee = useSelector((state: RootState) => state.employee.selectedEmployee);
 
-  const defaultValues = useMemo(
-    () =>
-      formData || {
-        name: "",
-        username: "",
-        email: "",
-        company_name: "",
-      },
-    [formData]
+  // Fetch employee details if editing (i.e., if an ID is present)
+  useEffect(() => {
+    if (id) {
+      console.log(`Fetching employee data for ID: ${id}`);
+      dispatch(fetchEmployeeByIdAsync(Number(id)));
+    }
+  }, [dispatch, id]);
+
+  // UseMemo to create form initial values based on selectedEmployee data
+  const formInitialValues = useMemo(
+    () => ({
+      name: selectedEmployee?.name || "",
+      username: selectedEmployee?.username || "",
+      email: selectedEmployee?.email || "",
+      company_name: selectedEmployee?.company_name || "",
+    }),
+    [selectedEmployee]
   );
 
+  // Log to verify selectedEmployee data and formInitialValues
+  console.log("Selected Employee Data:", selectedEmployee);
+  console.log("Form Initial Values:", formInitialValues);
+
+  // Form submission handler
   const handleSubmit = async (values: EmployeeFormProps["initialValues"]) => {
     try {
+      console.log("Form submitted with values:", values);
       const response = await axios.post(`{USER_URL}/users`, values);
       console.log("Employee data submitted successfully:", response.data);
     } catch (error) {
@@ -45,18 +60,17 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ initialValues }) => {
 
   return (
     <div>
-        <Breadcrumb />
-    <div className="container">
-      <div className="header mb-2">
-        <h2>Add Employee Details</h2>
-      </div>
-      <Formik
-        initialValues={defaultValues}
-        validationSchema={employeeSchema} 
-        onSubmit={handleSubmit}
-        enableReinitialize
-      >
-        {({ values }) => (
+      <Breadcrumb />
+      <div className="container">
+        <div className="header mb-2">
+          <h2>{id ? "Edit Employee Details" : "Add Employee Details"}</h2>
+        </div>
+        <Formik
+          initialValues={formInitialValues}
+          validationSchema={employeeSchema}
+          onSubmit={handleSubmit}
+          enableReinitialize
+        >
           <Form>
             <Card title="Employee Information">
               <div className="row">
@@ -96,14 +110,12 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ initialValues }) => {
                 </div>
               </div>
             </Card>
-
             <button type="submit" className="btn btn-primary mt-4">
-              Submit
+              {id ? "Update" : "Submit"}
             </button>
           </Form>
-        )}
-      </Formik>
-    </div>
+        </Formik>
+      </div>
     </div>
   );
 };

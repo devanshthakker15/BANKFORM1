@@ -65,6 +65,7 @@ const App: React.FC = () => {
           <Route path="/hsncodes" element={<HSN_Codes />} />
           <Route path="/account" element={<ManageEmployees />} />
           <Route path="/account/add" element={<EmployeeForm />} />
+          <Route path="/account/edit/:id" element={<EmployeeForm />} />
           <Route path="/permissions" element={<ManageRoles />} />
           <Route path="/manage" element={<ManageProducts />} />
 

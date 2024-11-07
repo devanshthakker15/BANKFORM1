@@ -1,6 +1,6 @@
 // src/utils/getApi.ts
 import axios from "axios";
-import { BASE_URL, USER_URL } from "./constants";
+import { BASE_URL, USER_URL, PRODUCTS_URL } from "./constants";
 
 // Get access token from local storage
 const getAccessToken = () => localStorage.getItem("access_token") || "";
@@ -25,6 +25,17 @@ export const apiGet = async (url: string, params = {}) => {
 export const userGet = async (url: string) => {
   try {
     const response = await axios.get(`${USER_URL}${url}`);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
+};
+
+
+// Handle GET requests for users
+export const productGet = async (url: string) => {
+  try {
+    const response = await axios.get(`${PRODUCTS_URL}${url}`);
     return response.data;
   } catch (error) {
     handleApiError(error);
