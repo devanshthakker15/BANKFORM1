@@ -9,6 +9,8 @@ import { useParams } from "react-router-dom";
 import { RootState, AppDispatch } from "../redux/store";
 import { fetchEmployeeByIdAsync } from "../redux/employeeSlice";
 import axios from "axios";
+import { useAppDispatch } from "../redux/hooks";
+import Button from "./Button";
 
 interface EmployeeFormProps {
   initialValues?: {
@@ -20,9 +22,11 @@ interface EmployeeFormProps {
 }
 
 const EmployeeForm: React.FC<EmployeeFormProps> = ({ initialValues }) => {
-  const dispatch: AppDispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { id } = useParams<{ id: string }>();
-  const selectedEmployee = useSelector((state: RootState) => state.employee.selectedEmployee);
+  const selectedEmployee = useSelector(
+    (state: RootState) => state.employee.selectedEmployee
+  );
 
   // Fetch employee details if editing (i.e., if an ID is present)
   useEffect(() => {
@@ -60,7 +64,7 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ initialValues }) => {
 
   return (
     <div>
-      <Breadcrumb />
+      {/* <Breadcrumb /> */}
       <div className="container">
         <div className="header mb-2">
           <h2>{id ? "Edit Employee Details" : "Add Employee Details"}</h2>
@@ -110,9 +114,11 @@ const EmployeeForm: React.FC<EmployeeFormProps> = ({ initialValues }) => {
                 </div>
               </div>
             </Card>
-            <button type="submit" className="btn btn-primary mt-4">
-              {id ? "Update" : "Submit"}
-            </button>
+            <Button
+              type="submit"
+              variant="primary"
+              text={id ? "Update" : "Submit"}
+            />
           </Form>
         </Formik>
       </div>

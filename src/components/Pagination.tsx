@@ -1,6 +1,7 @@
 import React from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import Button from "./Button";
 
 interface PaginationProps {
   currentPage: number;
@@ -44,38 +45,36 @@ const Pagination: React.FC<PaginationProps> = ({
 
   return (
     <div className="pagination d-flex justify-content-end align-items-center mt-4 mb-3">
-      <button
-        className="btn btn-primary"
-        style={{ width: '40px', marginRight: '10px' }}
-        disabled={currentPage === 1}
-        onClick={handlePrev}
-        aria-label="Previous page"
-      >
-        <FontAwesomeIcon icon={faChevronLeft} />
-      </button>
+<Button
+  variant="primary"
+  disabled={currentPage === 1}
+  onClick={handlePrev}
+  style={{ marginRight: '10px' , width: "50px" }}
+>
+  <FontAwesomeIcon icon={faChevronLeft} />
+</Button>
 
-      <div className="d-flex">
-        {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((page) => (
-          <button
-          style={{ width: '40px', marginRight: '10px' }}
-            key={page}
-            className={`btn ${page === currentPage ? 'btn-primary' : 'btn-outline-primary'} mx-1`}
-            onClick={() => onPageChange(page)}
-          >
-            {page}
-          </button>
-        ))}
-      </div>
+<div className="d-flex">
+  {Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i).map((page) => (
+    <Button
+      key={page}
+      variant={page === currentPage ? 'primary' : 'outline-primary'}
+      onClick={() => onPageChange(page)}
+      style={{ marginRight: '10px', width: "50px" }}
+    >
+      {page}
+    </Button>
+  ))}
+</div>
 
-      <button
-        className="btn btn-primary"
-        style={{ width: '40px', marginLeft: '10px' }}
-        disabled={currentPage === totalPages}
-        onClick={handleNext}
-        aria-label="Next page"
-      >
-        <FontAwesomeIcon icon={faChevronRight} />
-      </button>
+<Button
+  variant="primary"
+  disabled={currentPage === totalPages}
+  onClick={handleNext}
+  style={{  width: "50px" }}
+>
+  <FontAwesomeIcon icon={faChevronRight} />
+</Button>
     </div>
   );
 };

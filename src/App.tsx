@@ -1,6 +1,7 @@
 // src/App.tsx
 import React from "react";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import HomePage from "./pages/HomePage";
 import BankFormPage from "./pages/BankFormPage";
@@ -25,12 +26,12 @@ const ProtectedRoute: React.FC<{
   permission: string;
   children: React.ReactNode;
 }> = ({ permission, children }) => {
-  const accessToken = localStorage.getItem("access_token");
+  const accessToken = localStorage.getItem('access_token');
   if (!accessToken) {
     return <Navigate to="/login" />;
   }
 
-  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
   if (currentUser.permissions && currentUser.permissions.includes(permission)) {
     return <>{children}</>;
   }
@@ -39,7 +40,7 @@ const ProtectedRoute: React.FC<{
 };
 
 const PrivateWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const accessToken = localStorage.getItem("access_token");
+  const accessToken = localStorage.getItem('access_token');
   if (!accessToken) {
     return <Navigate to="/login" />;
   }
@@ -47,32 +48,87 @@ const PrivateWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) =
   return <>{children}</>;
 };
 
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: (
+      <PrivateWrapper>
+        <Layout />
+      </PrivateWrapper>
+    ),
+    children: [
+      {
+        path: '/',
+        element: <HomePage />,
+      },
+      {
+        path: '/banks',
+        element: (
+          <ProtectedRoute permission="viewBanks">
+            <BankDetailsList />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/banks/add',
+        element: (
+          <ProtectedRoute permission="addBank">
+            <BankFormPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/banks/edit/:id',
+        element: (
+          <ProtectedRoute permission="editBank">
+            <BankFormPage />
+          </ProtectedRoute>
+        ),
+      },
+      // Dynamic routes for modules
+      {
+        path: '/hsncodes',
+        element: <HSN_Codes />,
+      },
+      {
+        path: '/account',
+        element: <ManageEmployees />,
+      },
+      {
+        path: '/account/add',
+        element: <EmployeeForm />,
+      },
+      {
+        path: '/account/edit/:id',
+        element: <EmployeeForm />,
+      },
+      {
+        path: '/permissions',
+        element: <ManageRoles />,
+      },
+      {
+        path: '/manage',
+        element: <ManageProducts />,
+      },
+      {
+        path: '*',
+        element: <PageNotFound />,
+      },
+    ],
+  },
+  {
+    path: '/login',
+    element: <LoginPage />,
+  },
+  {
+    path: '/banks/hsn',
+    element: <FormPage />,
+  },
+]);
+
 const App: React.FC = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/banks/hsn" element={<FormPage />} />
-
-        <Route path="/" element={<PrivateWrapper><Layout /></PrivateWrapper>}>
-          <Route index element={<HomePage />} />
-
-          <Route path="/banks" element={<ProtectedRoute permission="viewBanks"><BankDetailsList /></ProtectedRoute>} />
-          <Route path="/banks/add" element={<ProtectedRoute permission="addBank"><BankFormPage /></ProtectedRoute>} />
-          <Route path="/banks/edit/:id" element={<ProtectedRoute permission="editBank"><BankFormPage /></ProtectedRoute>} />
-
-          {/* Dynamic routes for modules */}
-          <Route path="/hsncodes" element={<HSN_Codes />} />
-          <Route path="/account" element={<ManageEmployees />} />
-          <Route path="/account/add" element={<EmployeeForm />} />
-          <Route path="/account/edit/:id" element={<EmployeeForm />} />
-          <Route path="/permissions" element={<ManageRoles />} />
-          <Route path="/manage" element={<ManageProducts />} />
-
-          <Route path="*" element={<PageNotFound />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <RouterProvider router={router} />
   );
 };
 

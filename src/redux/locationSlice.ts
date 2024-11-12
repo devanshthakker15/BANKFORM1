@@ -47,7 +47,12 @@ export const fetchCities = createAsyncThunk("location/fetchCities", async (state
 const locationSlice = createSlice({
  name: "location",
  initialState,
- reducers: {},
+ reducers: {
+
+  setCountry:(state,action)=>{
+    state.countries=action.payload
+  }
+ },
  extraReducers: (builder) => {
    builder
      .addCase(fetchCountries.fulfilled, (state, action) => {

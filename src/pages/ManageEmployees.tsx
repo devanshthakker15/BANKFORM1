@@ -9,17 +9,23 @@ import Breadcrumbs from "../components/Breadcrumb";
 import Loader from "../components/Loader";
 import { fetchEmployeeByIdAsync } from "../redux/employeeSlice";
 import { RootState, AppDispatch } from "../redux/store";
+import { useAppDispatch } from "../redux/hooks";
+import Button from "../components/Button";
 
 const ManageEmployees: React.FC = () => {
-  const dispatch: AppDispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
-  const selectedEmployee = useSelector((state: RootState) => state.employee.selectedEmployee);
+  const selectedEmployee = useSelector(
+    (state: RootState) => state.employee.selectedEmployee
+  );
 
   // Fetch all employees
   const fetchEmployees = async () => {
     try {
-      const response = await axios.get("https://jsonplaceholder.typicode.com/users");
+      const response = await axios.get(
+        "https://jsonplaceholder.typicode.com/users"
+      );
       setEmployees(response.data);
     } catch (error) {
       console.error("Error fetching employees:", error);
@@ -37,13 +43,16 @@ const ManageEmployees: React.FC = () => {
 
   return (
     <div>
-      <Breadcrumbs />
+      {/* <Breadcrumbs /> */}
       <div className="container">
         <div className="text-right mb-4 d-flex justify-content-between">
           <h1>Employee Account</h1>
-          <Link to="/account/add" className="btn btn-secondary m-2">
-            Add Employee
-          </Link>
+          <Button
+            text="Add Employee"
+            variant="secondary"
+            link="/account/add"
+            // className="m-2"
+          />
         </div>
 
         {employees.length > 0 ? (
@@ -67,21 +76,20 @@ const ManageEmployees: React.FC = () => {
                   <td>{employee.email}</td>
                   <td>{employee.company.name}</td>
                   <td>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-primary mr-2"
+                    <Button
+                      icon={faPen}
+                      variant="primary"
+                      size="sm"
                       onClick={() => handleEdit(employee.id)}
                       style={{ width: "70px", margin: "4px" }}
-                    >
-                      <FontAwesomeIcon icon={faPen} />
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-danger"
+                    />
+                    <Button
+                      icon={faTrashCan}
+                      variant="danger"
+                      size="sm"
+                      // onClick={() => handleDelete(employee.id)}
                       style={{ width: "70px", margin: "4px" }}
-                    >
-                      <FontAwesomeIcon icon={faTrashCan} />
-                    </button>
+                    />
                   </td>
                 </tr>
               ))}

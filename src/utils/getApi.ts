@@ -1,5 +1,6 @@
 // src/utils/getApi.ts
 import axios from "axios";
+// const axios = require('axios');
 import { BASE_URL, USER_URL, PRODUCTS_URL } from "./constants";
 
 // Get access token from local storage
@@ -129,6 +130,7 @@ export const submitHSNFormData = async (formData: any) => {
  export const submitBankFormData = async (formData: any) => {
   try {
     const response = await apiPost("/api/payment/banks/", formData);
+    console.log("Submit bank form data")
     return response;
   } catch (error) {
     console.error("Error submitting bank form data:", error);

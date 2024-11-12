@@ -11,18 +11,21 @@ import {
   fetchBankByIdAsync,
   deleteBankAsync,
   toggleBankActiveStatusAsync,
+  // toggleUpiActiveStatusAsync
 } from "../redux/formSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan, faPen } from "@fortawesome/free-solid-svg-icons";
 import "../styles/bankStyles.css";
-import { Button } from "react-bootstrap";
+// import { Button } from "react-bootstrap";
+import { useAppDispatch } from "../redux/hooks";
+import Button from "../components/Button";
 
 const BankDetailsList: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
 
-  const dispatch: AppDispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const { formData, totalCount } = useSelector(
@@ -56,9 +59,8 @@ const BankDetailsList: React.FC = () => {
   };
 
   const handleEdit = (id: number) => {
-    dispatch(fetchBankByIdAsync(id));
+    // dispatch(fetchBankByIdAsync(id));
     navigate(`/banks/edit/${id}`);
-    // navigate(`/banks/add/`);
   };
 
   const handleDelete = (id: number) => {
@@ -76,6 +78,18 @@ const BankDetailsList: React.FC = () => {
     );
   };
 
+
+  // const handleUpiAvailable = (id:number, currentStatus:number) =>{
+  //   dispatch(
+  //     toggleUpiActiveStatusAsync({
+  //       id,
+  //       currentStatus,
+  //       page: currentPage,
+  //       query: debouncedQuery,
+  //     })
+  //   );
+  // };
+
   const totalPages = Math.ceil(totalCount / itemsPerPage);
   const handlePageChange = (page: number) => {
     setSearchParams({ page: page.toString(), q: debouncedQuery });
@@ -83,7 +97,7 @@ const BankDetailsList: React.FC = () => {
 
   return (
     <>
-      <Breadcrumbs />
+      {/* <Breadcrumbs /> */}
       <div className="container mt-2">
         <h2>Bank Details Submissions</h2>
         <div className="mb-4">
@@ -105,6 +119,7 @@ const BankDetailsList: React.FC = () => {
                 <th>Account Number</th>
                 <th>Country</th>
                 <th>Is Active</th>
+                {/* <th>Is Upi Available</th> */}
                 {hasEditBankPermission && <th>Actions</th>}
               </tr>
             </thead>
@@ -121,33 +136,38 @@ const BankDetailsList: React.FC = () => {
                     </td>
                     <td>
                       <Button
+                        text={item.is_active === 1 ? "Active" : "Inactive"}
                         variant={item.is_active === 1 ? "success" : "danger"}
                         onClick={() =>
                           handleToggleActive(item.id, item.is_active)
                         }
                         style={{ width: "90px", margin: "4px" }}
-                      >
-                        {item.is_active === 1 ? "Active" : "Inactive"}
-                      </Button>
+                      />
                     </td>
+                    {/* <td>
+                      <Button
+                        text={item.is_upi_available === 1 ? "Available" : "Unavailable"}
+                        variant={item.is_upi_available === 1 ? "success" : "danger"}
+                        onClick={() =>
+                          handleUpiAvailable(item.id, item.is_upi_available)
+                        }
+                        style={{ width: "110px", margin: "4px" }}
+                      />
+                    </td> */}
                     {hasEditBankPermission && (
                       <td>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-primary mr-2"
+                        <Button
+                          icon={faPen}
+                          variant="primary"
                           onClick={() => handleEdit(item.id)}
                           style={{ width: "70px", margin: "4px" }}
-                        >
-                          <FontAwesomeIcon icon={faPen} />
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-danger"
+                        />
+                        <Button
+                          icon={faTrashCan}
+                          variant="danger"
                           onClick={() => handleDelete(item.id)}
                           style={{ width: "70px", margin: "4px" }}
-                        >
-                          <FontAwesomeIcon icon={faTrashCan} />
-                        </button>
+                        />
                       </td>
                     )}
                   </tr>
@@ -159,7 +179,6 @@ const BankDetailsList: React.FC = () => {
                 <td colSpan={7}>
                   <Loader />
                 </td>
-                
               )}
             </tbody>
           </table>

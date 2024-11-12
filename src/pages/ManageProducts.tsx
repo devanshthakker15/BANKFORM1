@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "../App.css";
-import Button from "react-bootstrap/Button";
+// import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import Loader from "../components/Loader";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import axios from "axios";
+import Button from "../components/Button";
 
 const ManageProducts: React.FC = () => {
   const [products, setProducts] = useState([]);
@@ -125,9 +126,11 @@ const ManageProducts: React.FC = () => {
                 </div>
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                  Close
-                </Button>
+                <Button
+                  text="Close"
+                  variant="secondary"
+                  onClick={handleClose}
+                />
               </Modal.Footer>
             </Modal>
           )}

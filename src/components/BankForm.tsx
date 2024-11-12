@@ -3,11 +3,16 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Formik, Form } from "formik";
 import TextInput from "./TextInput";
 import SelectInput from "./SelectInput";
+import Button from "./Button";
 import Card from "./Card";
 import { basicSchema } from "../schema/basicSchema";
 import { YES_NO, bankOptions } from "../utils/constants";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { fetchCountries, fetchStates, fetchCities } from "../redux/locationSlice";
+import {
+  fetchCountries,
+  fetchStates,
+  fetchCities,
+} from "../redux/locationSlice";
 import "../styles/bankStyles.css";
 import { submitBankDataAsync } from "../redux/formSlice";
 
@@ -19,7 +24,7 @@ export interface BankFormValues {
   account_number: string;
   opening_credit_balance: number;
   opening_debit_balance: number;
-  is_upi_available: boolean;
+  is_upi_available: number;
   bank_address_line_1: string;
   bank_address_line_2?: string;
   bank_city: any;
@@ -38,9 +43,13 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { countries, states, cities } = useAppSelector((state) => state.location);
+  const { countries, states, cities } = useAppSelector(
+    (state) => state.location
+  );
 
-  const [formData, setFormData] = useState<BankFormValues | null>(initialValues || null);
+  const [formData, setFormData] = useState<BankFormValues | null>(
+    initialValues || null
+  );
 
   useEffect(() => {
     if (initialValues) {
@@ -49,10 +58,13 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
         bank_country: initialValues.bank_country?.id || "",
         bank_state: initialValues.bank_state?.id || "",
         bank_city: initialValues.bank_city?.id || "",
+        is_upi_available: initialValues.is_upi_available ? 1 : 0,
       });
 
-      if (initialValues.bank_country) dispatch(fetchStates(initialValues.bank_country.id));
-      if (initialValues.bank_state) dispatch(fetchCities(initialValues.bank_state.id));
+      if (initialValues.bank_country)
+        dispatch(fetchStates(initialValues.bank_country.id));
+      if (initialValues.bank_state)
+        dispatch(fetchCities(initialValues.bank_state.id));
     } else {
       dispatch(fetchCountries());
     }
@@ -68,21 +80,23 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
         account_number: "",
         opening_credit_balance: 0,
         opening_debit_balance: 0,
-        is_upi_available: null,
         bank_address_line_1: "",
         bank_address_line_2: "",
         bank_city: "",
         bank_state: "",
         bank_country: "",
         bank_pincode: "",
-        is_active: null,
+        is_upi_available: 1,
+        is_active: 1,
       },
     [formData]
   );
 
-  const handleSubmit = async (values: BankFormValues) => {
+  const handleSubmit = async (values) => {
     try {
+      console.log(values);
       dispatch(submitBankDataAsync({ values, id }));
+      console.log("Button Clicked");
       navigate("/banks");
     } catch (error) {
       console.error("Failed to submit form data:", error);
@@ -98,7 +112,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
           onSubmit={handleSubmit}
           enableReinitialize
         >
-          {({ values, setFieldValue }) => (
+          {({ values, setFieldValue, errors }) => (
             <Form>
               <Card title="General Information">
                 <div className="row">
@@ -159,20 +173,32 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                       placeholder="Enter opening debit balance"
                     />
                   </div>
-                  {/* <div className="col-md-6">
-                    <SelectInput
-                      label="Is UPI Available"
-                      name="is_upi_available"
-                      options={YES_NO}
-                      onChange={(newValue) => setFieldValue("is_upi_available", newValue.value)}
-                    />
-                  </div> */}
                   <div className="col-md-3">
                     <SelectInput
                       label="Is Active"
                       name="is_active"
                       options={YES_NO}
-                      onChange={(newValue) => setFieldValue("is_active", newValue.value)}
+                      onChange={(newValue, action) => {
+                        if (action === "clear" || !newValue) {
+                          setFieldValue("is_active", null); 
+                        } else {
+                          setFieldValue("is_active", newValue.value ? 1 : 0);
+                        }
+                      }}
+                    />
+                  </div>
+                  <div className="col-md-3">
+                    <SelectInput
+                      label="UPI Available"
+                      name="is_upi_available"
+                      options={YES_NO}
+                      onChange={(newValue, action) => {
+                        if (action === "clear" || !newValue) {
+                          setFieldValue("is_upi_available", null);
+                        } else {
+                          setFieldValue("is_upi_available", newValue.value ? 1 : 0);
+                        }
+                      }}
                     />
                   </div>
                 </div>
@@ -201,11 +227,16 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                       name="bank_country"
                       options={countries}
                       required
-                      onChange={(newValue) => {
-                        setFieldValue("bank_country", newValue ? newValue.value : "");
-                        setFieldValue("bank_state", "");
-                        setFieldValue("bank_city", "");
-                        if (newValue) dispatch(fetchStates(newValue.value));
+                      onChange={(newValue, action) => {
+                        if (action === "clear" || !newValue) {
+                          setFieldValue("bank_country", "");
+                          setFieldValue("bank_state", "");
+                          setFieldValue("bank_city", "");
+                        } else {
+                          setFieldValue("bank_country", newValue.value);
+                          dispatch(fetchStates(newValue.value));
+                          dispatch(fetchCities(newValue.value));
+                        }
                       }}
                       value={values.bank_country}
                     />
@@ -216,10 +247,14 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                       name="bank_state"
                       options={states}
                       required
-                      onChange={(newValue) => {
-                        setFieldValue("bank_state", newValue ? newValue.value : "");
-                        setFieldValue("bank_city", "");
-                        if (newValue) dispatch(fetchCities(newValue.value));
+                      onChange={(newValue, action) => {
+                        if (action === "clear" || !newValue) {
+                          setFieldValue("bank_state", "");
+                          setFieldValue("bank_city", "");
+                        } else {
+                          setFieldValue("bank_state", newValue.value);
+                          dispatch(fetchCities(newValue.value));
+                        }
                       }}
                       value={values.bank_state}
                     />
@@ -231,7 +266,10 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                       options={cities}
                       required
                       onChange={(newValue) => {
-                        setFieldValue("bank_city", newValue ? newValue.value : "");
+                        setFieldValue(
+                          "bank_city",
+                          newValue ? newValue.value : ""
+                        );
                       }}
                       value={values.bank_city}
                     />
@@ -247,9 +285,12 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                 </div>
               </Card>
 
-              <button type="submit" className="btn btn-primary mt-4">
+              <Button
+                type="submit"
+                // onClick={() => console.log("errors", errors)}
+              >
                 Submit
-              </button>
+              </Button>
             </Form>
           )}
         </Formik>
