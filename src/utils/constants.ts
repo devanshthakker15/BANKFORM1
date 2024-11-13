@@ -29,7 +29,13 @@ export const YES_NO =[
 // Define the array of module names to exclude
 export const EXCLUDED_MODULES = ["Manage Locations", "Manage Roles"]; 
 
-
+ // Permission constants
+export const PERMISSIONS = {
+  VIEW: 'perm_view',
+  ADD: 'perm_add',
+  UPDATE: 'perm_edit',
+  DELETE: 'perm_delete'
+};
  
 
 

@@ -1,6 +1,9 @@
 // src/components/Sidebar.tsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import Loader from "./Loader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronLeft,
@@ -16,71 +19,37 @@ import {
   faCode,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
-import { apiGet } from "../utils/getApi";
-import "../styles/sidebar.css";
 import { EXCLUDED_MODULES } from "../utils/constants";
-
+import "../styles/sidebar.css";
+import { useAppDispatch } from "../redux/hooks";
+import { logout } from "../redux/AuthSlice";
 const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const [modules, setModules] = useState<any[]>([]);
+  const { permissions, loading } = useSelector((state: RootState) => state.auth);
   const location = useLocation();
+  const dispatch = useAppDispatch();
+  const toggleSidebar = () => setIsCollapsed((prev) => !prev);
 
-  useEffect(() => {
-    const fetchPermissions = async () => {
-      try {
-        const data = await apiGet("/api/account/user/permissions/");
-        if (data.success) {
-          const userPermissions = data.result.permissions;
-          const viewableModules = userPermissions.filter(
-            (perm: any) => perm.module.action_view === 1
-          );
-          setModules(viewableModules);
-        }
-      } catch (error) {
-        console.error("Error fetching permissions:", error);
-      }
-    };
+  if (location.pathname === "/login") return null;
+  if (loading) return <Loader />;
 
-    fetchPermissions();
-  }, []);
-
-  const toggleSidebar = () => {
-    setIsCollapsed((prev) => !prev);
-  };
-
-  const hideContent = location.pathname === "/login";
-
-  if (hideContent) {
-    return null;
-  }
-
-  const moduleIcons = {
+  const moduleIcons: { [key: string]: any } = {
     Home: faHome,
-    account: faUser ,
+    account: faUser,
     permissions: faTasks,
     manage: faShoppingCart,
     hsncodes: faCode,
     banks: faBank,
   };
-
-   
+  
   return (
-    <aside
-      className={`main-sidebar sidebar-dark-secondary elevation-4 ${
-        isCollapsed ? "collapsed" : ""
-      }`}
-    >
+    <aside className={`main-sidebar sidebar-dark-secondary elevation-4 ${isCollapsed ? "collapsed" : ""}`}>
       <div className="sidebar-toggle" onClick={toggleSidebar}>
         <FontAwesomeIcon icon={isCollapsed ? faBars : faChevronLeft} />
       </div>
       <div className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
         <nav className="mt-2">
-          <ul
-            className="nav nav-pills nav-sidebar flex-column"
-            data-widget="treeview"
-            role="menu"
-            data-accordion="false"
-          >
+          <ul className="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <li className="nav-item d-flex justify-content-start">
               <Link to={`/`} className="nav-link">
                 <div className="nav-content">
@@ -89,22 +58,21 @@ const Sidebar: React.FC = () => {
                 </div>
               </Link>
             </li>
-            {modules.map((module) => {
-              if (EXCLUDED_MODULES.includes(module.module.module_name)) {
-                return null;
-              }
-              const icon = moduleIcons[module.module.alias] || faList;
-              return (
-                <li key={module.id} className="nav-item d-flex justify-content-start">
-                  <Link to={`/${module.module.alias}`} className="nav-link">
-                    <div className="nav-content">
-                      <FontAwesomeIcon icon={icon} className="nav-icon" />
-                      <p>{module.module.module_name}</p>
-                    </div>
-                  </Link>
-                </li>
-              );
-            })}
+            {permissions
+              .filter((perm) => !EXCLUDED_MODULES.includes(perm.module.module_name))
+              .map((perm) => {
+                const icon = moduleIcons[perm.module.alias] || faList;
+                return (
+                  <li key={perm.id} className="nav-item d-flex justify-content-start">
+                    <Link to={`/${perm.module.alias}`} className="nav-link">
+                      <div className="nav-content">
+                        <FontAwesomeIcon icon={icon} className="nav-icon" />
+                        <p>{perm.module.module_name}</p>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
             <li className="nav-item d-flex justify-content-start">
               <Link to="/account/add" className="nav-link">
                 <div className="nav-content">
@@ -122,7 +90,7 @@ const Sidebar: React.FC = () => {
               </Link>
             </li>
             <li className="nav-item d-flex justify-content-start">
-              <Link to="/login" className="nav-link">
+              <Link to="/login" className="nav-link" onClick={() => dispatch(logout())}>
                 <div className="nav-content">
                   <FontAwesomeIcon icon={faSignOutAlt} className="nav-icon" />
                   <p>Logout</p>

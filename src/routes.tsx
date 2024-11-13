@@ -1,5 +1,6 @@
+// /src/routes.tsx
 import React from "react";
-import { Navigate, createBrowserRouter, RouterProvider } from "react-router-dom";
+import { Navigate, createBrowserRouter } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "./redux/store";
 import Layout from "./components/Layout";
@@ -16,7 +17,7 @@ import PageNotFound from "./pages/PageNotFound";
 import { hasPermission } from "./utils/commonFunction";
 import { PERMISSIONS } from "./utils/constants";
 
-// Map module alias to components for each permission type
+// Mapping of module alias to components based on permissions
 const moduleComponentMap: { [key: string]: { [key: string]: React.ReactNode } } = {
   banks: {
     [PERMISSIONS.VIEW]: <BankDetailsList />,
@@ -37,6 +38,31 @@ const moduleComponentMap: { [key: string]: { [key: string]: React.ReactNode } } 
   manage: {
     [PERMISSIONS.VIEW]: <ManageProducts />,
   },
+};
+
+// ProtectedRoute component for permission-based access
+const ProtectedRoute: React.FC<{ moduleAlias: string; action: string; children: React.ReactNode }> = ({
+  moduleAlias,
+  action,
+  children,
+}) => {
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const permissions = useSelector((state: RootState) => state.auth.permissions);
+
+  if (!isAuthenticated) return <Navigate to="/login" />;
+  if (!hasPermission(permissions, moduleAlias, action)) {
+    console.warn(`Access denied for ${action} on module ${moduleAlias}`);
+    return <Navigate to="*" />;
+  }
+
+  return <>{children}</>;
+};
+
+// PrivateWrapper component for authenticated access
+const PrivateWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const accessToken = localStorage.getItem("access_token");
+  if (!accessToken) return <Navigate to="/login" />;
+  return <>{children}</>;
 };
 
 // Generate routes based on permissions
@@ -80,36 +106,11 @@ const generateRoutes = (permissions: any[]) => {
   });
 };
 
-// ProtectedRoute component for permission-based access
-const ProtectedRoute: React.FC<{ moduleAlias: string; action: string; children: React.ReactNode }> = ({
-  moduleAlias,
-  action,
-  children,
-}) => {
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
-  const permissions = useSelector((state: RootState) => state.auth.permissions);
-
-  if (!isAuthenticated) return <Navigate to="/login" />;
-  if (!hasPermission(permissions, moduleAlias, action)) {
-    console.warn(`Access denied for ${action} on module ${moduleAlias}`);
-    return <Navigate to="*" />;
-  }
-
-  return <>{children}</>;
-};
-
-// PrivateWrapper component for authenticated access
-const PrivateWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const accessToken = localStorage.getItem("access_token");
-  if (!accessToken) return <Navigate to="/login" />;
-  return <>{children}</>;
-};
-
-const App: React.FC = () => {
-  const permissions = useSelector((state: RootState) => state.auth.permissions);
+// Define and export the main router with dynamic routes
+export const createAppRouter = (permissions: any[]) => {
   const dynamicRoutes = generateRoutes(permissions);
 
-  const router = createBrowserRouter([
+  return createBrowserRouter([
     { path: "/login", element: <LoginPage /> },
     {
       path: "/",
@@ -118,15 +119,12 @@ const App: React.FC = () => {
           <Layout />
         </PrivateWrapper>
       ),
-      children: [{ path: "/", element: <HomePage /> }, 
-        { path: "/account/add", element: <EmployeeForm /> }, 
-        ...dynamicRoutes],
+      children: [
+        { path: "/", element: <HomePage /> },
+        { path: "/account/add", element: <EmployeeForm /> },
+        ...dynamicRoutes,
+      ],
     },
-    
     { path: "*", element: <PageNotFound /> },
   ]);
-
-  return <RouterProvider router={router} />;
 };
-
-export default App;
