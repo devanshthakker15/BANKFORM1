@@ -80,7 +80,8 @@
   >("form/deleteBankAsync", async ({ id, page, query }, { dispatch, rejectWithValue }) => {
     try {
       await apiDelete(`/api/payment/banks/${id}/`);
-      dispatch(fetchBankDataAsync({ page, query }));
+      dispatch(removeBankById(id));
+      // dispatch(fetchBankDataAsync({ page, query }));
     } catch (error) {
       return rejectWithValue("Failed to delete bank record");
     }
@@ -150,6 +151,10 @@
     name: "form",
     initialState,
     reducers: {
+      removeBankById: (state, action: PayloadAction<number>) => {
+        state.formData = state.formData.filter((bank) => bank.id !== action.payload);
+        
+      },
       setCurrentBank: (state, action: PayloadAction<BankData | null>) => {
         state.currentBank = action.payload;
       },
@@ -183,5 +188,5 @@
     },
   });
 
-  export const { setCurrentBank, clearCurrentBank, saveFormData } = formSlice.actions;
+  export const { setCurrentBank, clearCurrentBank, saveFormData, removeBankById } = formSlice.actions;
   export default formSlice.reducer;

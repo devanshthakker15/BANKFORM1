@@ -120,7 +120,7 @@ const BankDetailsList: React.FC = () => {
                 <th>Country</th>
                 <th>Is Active</th>
                 {/* <th>Is Upi Available</th> */}
-                {hasEditBankPermission && <th>Actions</th>}
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -154,7 +154,7 @@ const BankDetailsList: React.FC = () => {
                         style={{ width: "110px", margin: "4px" }}
                       />
                     </td> */}
-                    {hasEditBankPermission && (
+                   
                       <td>
                         <Button
                           icon={faPen}
@@ -169,7 +169,7 @@ const BankDetailsList: React.FC = () => {
                           style={{ width: "70px", margin: "4px" }}
                         />
                       </td>
-                    )}
+                    
                   </tr>
                 ))
               ) : (

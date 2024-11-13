@@ -27,16 +27,7 @@ const LoginPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted with:", { email, password });
-    const result = await dispatch(loginUser({ email, password }));
-
-    if (loginUser.fulfilled.match(result)) {
-      console.log("Login successful, navigating to home page...");
-      // Redirection handled by useEffect
-    } else {
-      console.log("Login failed, error message:", result.payload);
-      alert(result.payload);
-    }
+    dispatch(loginUser({ email, password }));
   };
 
   return (
