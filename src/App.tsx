@@ -41,35 +41,35 @@ const moduleComponentMap: { [key: string]: { [key: string]: React.ReactNode } } 
 
 // Generate routes based on permissions
 const generateRoutes = (permissions: any[]) => {
-  return permissions.flatMap((perm) => {
-    const alias = perm.module.alias;
+  return permissions.flatMap((currentperm) => {
+    const alias = currentperm.module.alias;
     const routesForModule = [];
 
-    if (perm.perm_view) {
+    if (currentperm.perm_view) {
       routesForModule.push({
         path: `/${alias}`,
         element: (
-          <ProtectedRoute moduleAlias={alias} action={PERMISSIONS.VIEW}>
+          <ProtectedRoute moduleName={alias} action={PERMISSIONS.VIEW}>
             {moduleComponentMap[alias]?.[PERMISSIONS.VIEW]}
           </ProtectedRoute>
         ),
       });
     }
-    if (perm.perm_add) {
+    if (currentperm.perm_add) {
       routesForModule.push({
         path: `/${alias}/add`,
         element: (
-          <ProtectedRoute moduleAlias={alias} action={PERMISSIONS.ADD}>
+          <ProtectedRoute moduleName={alias} action={PERMISSIONS.ADD}>
             {moduleComponentMap[alias]?.[PERMISSIONS.ADD]}
           </ProtectedRoute>
         ),
       });
     }
-    if (perm.perm_edit) {
+    if (currentperm.perm_edit) {
       routesForModule.push({
         path: `/${alias}/edit/:id`,
         element: (
-          <ProtectedRoute moduleAlias={alias} action={PERMISSIONS.UPDATE}>
+          <ProtectedRoute moduleName={alias} action={PERMISSIONS.UPDATE}>
             {moduleComponentMap[alias]?.[PERMISSIONS.UPDATE]}
           </ProtectedRoute>
         ),
@@ -81,8 +81,8 @@ const generateRoutes = (permissions: any[]) => {
 };
 
 // ProtectedRoute component for permission-based access
-const ProtectedRoute: React.FC<{ moduleAlias: string; action: string; children: React.ReactNode }> = ({
-  moduleAlias,
+const ProtectedRoute: React.FC<{ moduleName: string; action: string; children: React.ReactNode }> = ({
+  moduleName,
   action,
   children,
 }) => {
@@ -90,8 +90,8 @@ const ProtectedRoute: React.FC<{ moduleAlias: string; action: string; children: 
   const permissions = useSelector((state: RootState) => state.auth.permissions);
 
   if (!isAuthenticated) return <Navigate to="/login" />;
-  if (!hasPermission(permissions, moduleAlias, action)) {
-    console.warn(`Access denied for ${action} on module ${moduleAlias}`);
+  if (!hasPermission(permissions, moduleName, action)) {
+    console.warn(`Access denied for ${action} on module ${moduleName}`);
     return <Navigate to="*" />;
   }
 
@@ -116,7 +116,7 @@ const App: React.FC = () => {
       element: (
         <PrivateWrapper>
           <Layout />
-        </PrivateWrapper>
+        </PrivateWrapper> 
       ),
       children: [{ path: "/", element: <HomePage /> }, 
         { path: "/account/add", element: <EmployeeForm /> }, 

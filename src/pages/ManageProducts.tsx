@@ -66,7 +66,7 @@ const ManageProducts: React.FC = () => {
                 >
                   <img
                     src={product.image}
-                    className="card-img-top"
+                    className="productcard-img-top"
                     alt={product.title}
                   />
                   <div className="card-body">
