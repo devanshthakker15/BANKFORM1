@@ -131,6 +131,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                     <TextInput
                       label="IFSC Code"
                       name="ifsc_code"
+                      type="text"
                       placeholder="Enter IFSC Code"
                       required
                     />
@@ -139,6 +140,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                     <TextInput
                       label="Branch Name"
                       name="branch_name"
+                      type="text"
                       placeholder="Enter Branch name"
                       required
                     />
@@ -147,32 +149,12 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                     <TextInput
                       label="Account Holder Name"
                       name="account_holder_name"
+                      type="text"
                       placeholder="Enter account holder name"
                       required
                     />
                   </div>
-                  <div className="col-md-6">
-                    <TextInput
-                      label="Account Number"
-                      name="account_number"
-                      placeholder="Enter account number"
-                      required
-                    />
-                  </div>
-                  <div className="col-md-3">
-                    <TextInput
-                      label="Opening Credit Balance"
-                      name="opening_credit_balance"
-                      placeholder="Enter opening credit balance"
-                    />
-                  </div>
-                  <div className="col-md-3">
-                    <TextInput
-                      label="Opening Debit Balance"
-                      name="opening_debit_balance"
-                      placeholder="Enter opening debit balance"
-                    />
-                  </div>
+
                   <div className="col-md-3">
                     <SelectInput
                       label="Is Active"
@@ -188,18 +170,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                     />
                   </div>
                   <div className="col-md-3">
-                    <SelectInput
-                      label="UPI Available"
-                      name="is_upi_available"
-                      options={YES_NO}
-                      onChange={(newValue, action) => {
-                        if (action === "clear" || !newValue) {
-                          setFieldValue("is_upi_available", null);
-                        } else {
-                          setFieldValue("is_upi_available", newValue.value ? 1 : 0);
-                        }
-                      }}
-                    />
+                    
                   </div>
                 </div>
               </Card>
@@ -210,6 +181,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                     <TextInput
                       label="Address Line 1"
                       name="bank_address_line_1"
+                      type="text"
                       placeholder="Enter Address line 1"
                       required
                     />
@@ -218,6 +190,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                     <TextInput
                       label="Address Line 2"
                       name="bank_address_line_2"
+                      type="text"
                       placeholder="Enter Address line 2"
                     />
                   </div>
@@ -278,10 +251,55 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                     <TextInput
                       label="Pincode"
                       name="bank_pincode"
+                      type="number"
                       placeholder="Enter pincode"
                       required
                     />
                   </div>
+                </div>
+              </Card>
+              <Card title="Account Information">
+                <div className="row">
+                  <div className="col-md-4">
+                  <TextInput
+                      label="Account Number"
+                      name="account_number"
+                      type="number"
+                      placeholder="Enter account number"
+                      required
+                    />
+                  </div>
+                  <div className="col-md-4">
+                  <TextInput
+                      label="Opening Credit Balance"
+                      name="opening_credit_balance"
+                      type="number"
+                      placeholder="Enter opening credit balance"
+                    />
+                  </div>
+                  <div className="col-md-4">
+                  <TextInput
+                      label="Opening Debit Balance"
+                      name="opening_debit_balance"
+                      type="number"
+                      placeholder="Enter opening debit balance"
+                    />
+                  </div>
+                  <div className="col-md-4">
+                  <SelectInput
+                      label="UPI Available"
+                      name="is_upi_available"
+                      options={YES_NO}
+                      onChange={(newValue, action) => {
+                        if (action === "clear" || !newValue) {
+                          setFieldValue("is_upi_available", null);
+                        } else {
+                          setFieldValue("is_upi_available", newValue.value ? 1 : 0);
+                        }
+                      }}
+                    />
+                  </div>
+
                 </div>
               </Card>
 

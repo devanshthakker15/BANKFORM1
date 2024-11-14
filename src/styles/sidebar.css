@@ -85,8 +85,25 @@
   background-color: aquamarine;
 }
 
+.nav-item:hover {
+  background-color: #747474;
+}
 
+.nav-item:hover .nav-link {
+  color: #333;
+}
 
+.nav-item.active {
+  background-color: #747474;
+}
+
+.nav-item.active .nav-link {
+  color: #333;
+}
+
+.nav-item.active:not(:first-child) {
+  background-color: #747474;
+}
 
 @media (max-width: 768px) {
   .main-sidebar {

@@ -34,7 +34,7 @@ const HSN_Codes: React.FC = () => {
   const [showOffcanvas, setShowOffcanvas] = useState(false);
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
   const itemsPerPage = 10;
-  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("query") || "");
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
 
   const dispatch = useAppDispatch();
@@ -97,6 +97,12 @@ const HSN_Codes: React.FC = () => {
     dispatch(deleteHSNAsync({ id, page: currentPage, query: debouncedQuery }));
   };
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    setSearchParams({ page: "1", query: value });
+  };
+
   return (
     <div>
       {/* <Breadcrumbs /> */}
@@ -105,7 +111,15 @@ const HSN_Codes: React.FC = () => {
           <h1>HSN Codes</h1>
           <Button text="Add HSN Code" variant="primary" onClick={handleShow} />
         </div>
-
+        <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search by Bank Name, Account Holder, Number, or Country"
+          className="form-control"
+          value={searchQuery}
+          onChange={handleSearch}
+        />
+      </div>
         <div className="table-responsive-mobile mt-4">
           <table className="table table-bordered">
             <thead>
@@ -146,6 +160,7 @@ const HSN_Codes: React.FC = () => {
                         variant="danger"
                         onClick={() => handleDelete(item.id)}
                         style={{ width: "70px", margin: "4px" }}
+                        disabled={item.is_active !== 1}
                       />
                     </td>
                   </tr>

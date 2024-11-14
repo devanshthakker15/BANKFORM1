@@ -1,4 +1,3 @@
-// src/components/Sidebar.tsx
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -24,11 +23,15 @@ import { EXCLUDED_MODULES } from "../utils/constants";
 import "../styles/sidebar.css";
 import { useAppDispatch } from "../redux/hooks";
 import { logout } from "../redux/AuthSlice";
+
 const Sidebar: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(true);
-  const { permissions, loading } = useSelector((state: RootState) => state.auth);
+  const { permissions, loading } = useSelector(
+    (state: RootState) => state.auth
+  );
   const location = useLocation();
   const dispatch = useAppDispatch();
+
   const toggleSidebar = () => setIsCollapsed((prev) => !prev);
 
   if (location.pathname === "/login") return null;
@@ -42,17 +45,26 @@ const Sidebar: React.FC = () => {
     hsncodes: faCode,
     banks: faBank,
   };
-  
+
   return (
-    <aside className={`main-sidebar sidebar-dark-secondary elevation-4 ${isCollapsed ? "collapsed" : ""}`}>
+    <aside
+      className={`main-sidebar sidebar-dark-secondary elevation-4 ${
+        isCollapsed ? "collapsed" : ""
+      }`}
+    >
       <div className="sidebar-toggle" onClick={toggleSidebar}>
         <FontAwesomeIcon icon={isCollapsed ? faBars : faChevronLeft} />
       </div>
       <div className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
         <nav className="mt-2">
-          <ul className="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            <li className="nav-item d-flex justify-content-start">
-              <Link to={`/`} className="nav-link">
+          <ul
+            className="nav nav-pills nav-sidebar flex-column"
+            data-widget="treeview"
+            role="menu"
+            data-accordion="false"
+          >
+            <li className="nav-item d-flex justify-content-start ">
+              <Link to="/" className="nav-link">
                 <div className="nav-content">
                   <FontAwesomeIcon icon={faHome} className="nav-icon" />
                   <p>Home</p>
@@ -60,11 +72,21 @@ const Sidebar: React.FC = () => {
               </Link>
             </li>
             {permissions
-              .filter((perm) => !EXCLUDED_MODULES.includes(perm.module.module_name))
+              .filter(
+                (perm) => !EXCLUDED_MODULES.includes(perm.module.module_name)
+              )
               .map((perm) => {
                 const icon = moduleIcons[perm.module.alias] || faList;
+                const isActive = location.pathname.startsWith(
+                  `/${perm.module.alias}`
+                );
                 return (
-                  <li key={perm.id} className="nav-item d-flex justify-content-start">
+                  <li
+                    key={perm.id}
+                    className={`nav-item d-flex justify-content-start ${
+                      isActive ? "active" : ""
+                    }`}
+                  >
                     <Link to={`/${perm.module.alias}`} className="nav-link">
                       <div className="nav-content">
                         <FontAwesomeIcon icon={icon} className="nav-icon" />
@@ -74,8 +96,8 @@ const Sidebar: React.FC = () => {
                   </li>
                 );
               })}
-            <li className="nav-item d-flex justify-content-start">
-              <Link to="/account/add" className="nav-link">
+            {/* <li className="nav-item d-flex justify-content-start"> */}
+            {/* <Link to="/account/add" className="nav-link">
                 <div className="nav-content">
                   <FontAwesomeIcon icon={faUsers} className="nav-icon" />
                   <p>Add Employee</p>
@@ -97,9 +119,13 @@ const Sidebar: React.FC = () => {
                   <p>Settings</p>
                 </div>
               </Link>
-            </li>
+            </li> */}
             <li className="nav-item d-flex justify-content-start">
-              <Link to="/login" className="nav-link" onClick={() => dispatch(logout())}>
+              <Link
+                to="/login"
+                className="nav-link"
+                onClick={() => dispatch(logout())}
+              >
                 <div className="nav-content">
                   <FontAwesomeIcon icon={faSignOutAlt} className="nav-icon" />
                   <p>Logout</p>

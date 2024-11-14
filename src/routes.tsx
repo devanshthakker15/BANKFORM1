@@ -90,9 +90,9 @@ export const generateRoutes = (permissions: any[]) => {
     {
       path: "/",
       element: (
-        <PrivateWrapper>
+        <ProtectedRoute>
           <Layout />
-        </PrivateWrapper> 
+        </ProtectedRoute> 
       ),
       children: [{ path: "/", element: <HomePage /> }, 
         { path: "/account/add", element: <EmployeeForm /> }, 
@@ -105,26 +105,22 @@ export const generateRoutes = (permissions: any[]) => {
 };
 
 // ProtectedRoute component for permission-based access
-const ProtectedRoute: React.FC<{ moduleName: string; action: string; children: React.ReactNode }> = ({
-  moduleName,
-  action,
-  children,
-}) => {
+const ProtectedRoute: React.FC<{
+  moduleName?: string;
+  action?: string;
+  children: React.ReactNode;
+}> = ({ moduleName, action, children }) => {
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const permissions = useSelector((state: RootState) => state.auth.permissions);
 
-  if (!isAuthenticated) return <Navigate to="/login" />;
-  if (!hasPermission(permissions, moduleName, action)) {
-    console.warn(`Access denied for ${action} on module ${moduleName}`);
-    return <Navigate to="*" />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" />;
   }
 
-  return <>{children}</>;
+  if (moduleName && action && !hasPermission(permissions, moduleName, action)) {
+    return <Navigate to="*" />;
+  }
+  return children;
 };
 
-// PrivateWrapper component for authenticated access
-export const PrivateWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const accessToken = localStorage.getItem("access_token");
-  if (!accessToken) return <Navigate to="/login" />;
-  return <>{children}</>;
-};
+export default ProtectedRoute;

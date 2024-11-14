@@ -15,7 +15,7 @@ import ManageProducts from "./pages/ManageProducts";
 import PageNotFound from "./pages/PageNotFound";
 import { hasPermission } from "./utils/commonFunction";
 import { PERMISSIONS } from "./utils/constants";
-import { generateRoutes, PrivateWrapper } from "./routes";
+import { generateRoutes } from "./routes";
 
 
 

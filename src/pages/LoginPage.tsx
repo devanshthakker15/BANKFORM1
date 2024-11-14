@@ -8,6 +8,7 @@ import Button from "../components/Button";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { loginSchema } from "../schema/loginSchema";
 import Modal from "react-bootstrap/Modal";
+import TextInput from "../components/TextInput";
 
 
 const LoginPage: React.FC = () => {
@@ -55,28 +56,8 @@ const LoginPage: React.FC = () => {
               <img src={avatar} alt="Avatar" className="avatar" />
             </div>
             <div>
-              <label htmlFor="email">
-                <b>Email</b>
-              </label>
-              <Field
-                className="rounded"
-                type="text"
-                placeholder="Enter Email"
-                name="email"
-              />
-              <ErrorMessage name="email" component="div" className="error-message" />
-
-              <label htmlFor="password">
-                <b>Password</b>
-              </label>
-              <Field
-                className="rounded"
-                type="password"
-                placeholder="Enter Password"
-                name="password"
-              />
-              <ErrorMessage name="password" component="div" className="error-message" />
-
+              <TextInput label="Email" name="email" placeholder="Enter Email" />
+              <TextInput label="Password" name="password" type="password" placeholder="Enter Password" />
               <Button type="submit" text={isLoading ? "Logging In..." : "Login"} disabled={isSubmitting || isLoading} />
             </div>
           </Form>

@@ -12,7 +12,7 @@ interface TextInputProps {
   // onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const TextInput: React.FC<TextInputProps> = ({ label, name, type = "text", placeholder, required = false }) => {
+const TextInput: React.FC<TextInputProps> = ({ label, name, type, placeholder, required = false }) => {
   return (
     <div className="form-group">
       <label htmlFor={name} className="text-form-label">

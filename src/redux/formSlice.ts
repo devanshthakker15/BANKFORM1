@@ -37,22 +37,21 @@
 
   // Updated thunk to accept page and query arguments (page working, query not working) (GET)
   export const fetchBankDataAsync = createAsyncThunk<
-    { data: BankData[]; totalCount: number },
-    { page: number; query: string },
-    { rejectValue: string }
-  >("form/fetchBankDataAsync", async ({ page, query }, { rejectWithValue }) => {
-    try {
-      const data = await apiGet(`/api/payment/banks/`, { page, q: query });
-      if (data.success) {
-        console.log("Bank Data:",data.result.results);
-        return { data: data.result.results, totalCount: data.result.count };
-      }
-      return rejectWithValue("Failed to fetch bank data");
-    } catch (error) {
-      return rejectWithValue("Error fetching bank data");
+  { data: BankData[]; totalCount: number },
+  { page: number; query: string },
+  { rejectValue: string }
+>("form/fetchBankDataAsync", async ({ page, query }, { rejectWithValue }) => {
+  try {
+    const data = await apiGet(`/api/payment/banks/?page=${page}&query=${query}`);
+    if (data.success) {
+      console.log("Bank Data:", data.result.results);
+      return { data: data.result.results, totalCount: data.result.count };
     }
-  });
-
+    return rejectWithValue("Failed to fetch bank data");
+  } catch (error) {
+    return rejectWithValue("Error fetching bank data");
+  }
+});
 
 
   // AsyncThunk for fetching bank details by ID (for editing) (GET)

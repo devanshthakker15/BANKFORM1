@@ -26,7 +26,7 @@ export const fetchHSNCodesAsync = createAsyncThunk(
   "offcanvas/fetchHSNCodesAsync",
   async ({ page, query }: { page: number; query: string }, { rejectWithValue }) => {
     try {
-      const response = await apiGet(`/api/product/hsncodes/`, { page, q: query });
+      const response = await apiGet(`/api/product/hsncodes/?page=${page}&query=${query}`);
       console.log("HSN data fetched:",response.result.results);
       return { data: response.result.results, totalCount: response.result.count };
       
