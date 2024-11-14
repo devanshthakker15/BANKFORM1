@@ -1,72 +1,100 @@
-import React, { useState, useEffect } from "react";
+import React, {useState} from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "../redux/AuthSlice";
 import avatar from "../assets/avatar.jpg";
 import "../styles/LoginPage.css";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import Button from "../components/Button";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import { loginSchema } from "../schema/loginSchema";
+import Modal from "react-bootstrap/Modal";
+
 
 const LoginPage: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const loginError = useAppSelector((state) => state.auth.loginError); 
+  const isLoading = useAppSelector((state) => state.auth.loading);
+  const [showModal, setShowModal] = useState(false);
 
-  useEffect(() => {
+
+
+  const initialValues = {
+    email: "",
+    password: "",
+  };
+
+
+
+  const handleSubmit = async (values: typeof initialValues) => {
+    dispatch(loginUser(values));
+    setShowModal(true);
+  };
+
+  React.useEffect(() => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
   }, []);
 
-  // Redirect to home page if login is successful
-  useEffect(() => {
+  React.useEffect(() => {
     if (isAuthenticated) {
       navigate("/");
     }
   }, [isAuthenticated, navigate]);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    dispatch(loginUser({ email, password }));
-  };
 
   return (
     <div className="container">
       <div className="row">
         <h2>Login Page</h2>
       </div>
-      <form className="modal-content animate p-2" onSubmit={handleSubmit}>
-        <div className="imgcontainer">
-          <img src={avatar} alt="Avatar" className="avatar" />
-        </div>
-        <div>
-          <label htmlFor="uname">
-            <b>Email</b>
-          </label>
-          <input
-            className="rounded"
-            type="text"
-            placeholder="Enter Email"
-            name="uname"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <label htmlFor="psw">
-            <b>Password</b>
-          </label>
-          <input
-            className="rounded"
-            type="password"
-            placeholder="Enter Password"
-            name="psw"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <Button type="submit" text="Login" />
-        </div>
-      </form>
+      <Formik initialValues={initialValues} validationSchema={loginSchema} onSubmit={handleSubmit}>
+        {({ isSubmitting }) => (
+          <Form className="modal-content animate p-2">
+            <div className="imgcontainer">
+              <img src={avatar} alt="Avatar" className="avatar" />
+            </div>
+            <div>
+              <label htmlFor="email">
+                <b>Email</b>
+              </label>
+              <Field
+                className="rounded"
+                type="text"
+                placeholder="Enter Email"
+                name="email"
+              />
+              <ErrorMessage name="email" component="div" className="error-message" />
+
+              <label htmlFor="password">
+                <b>Password</b>
+              </label>
+              <Field
+                className="rounded"
+                type="password"
+                placeholder="Enter Password"
+                name="password"
+              />
+              <ErrorMessage name="password" component="div" className="error-message" />
+
+              <Button type="submit" text={isLoading ? "Logging In..." : "Login"} disabled={isSubmitting || isLoading} />
+            </div>
+          </Form>
+        )}
+      </Formik>
+      <Modal show={showModal && !isLoading} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Login Failed</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p style={{ fontSize: "15px", color: "red" }}>Try again!! {loginError}</p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="danger" onClick={() => setShowModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };

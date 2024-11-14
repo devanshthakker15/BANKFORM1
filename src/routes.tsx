@@ -96,6 +96,7 @@ export const generateRoutes = (permissions: any[]) => {
       ),
       children: [{ path: "/", element: <HomePage /> }, 
         { path: "/account/add", element: <EmployeeForm /> }, 
+        { path: "/settings", element: <EmployeeForm /> }, 
         ...dynamicRoutes],
     },
     

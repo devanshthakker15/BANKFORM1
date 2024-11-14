@@ -26,6 +26,9 @@ const BankFormPage: React.FC = () => {
           navigate("*");
         }
       }
+      else{
+        setInitialValues(null);
+      }
     };
     fetchData();
   }, [id]);

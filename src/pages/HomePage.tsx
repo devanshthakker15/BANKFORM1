@@ -19,8 +19,8 @@ const HomePage: React.FC = () => {
 
   // Fetch the current user from localStorage
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
-  const hasViewBanksPermission =
-    currentUser?.permissions?.includes("viewBanks");
+  // const hasViewBanksPermission =
+  //   currentUser?.permissions?.includes("viewBanks");
 
   return (
     <>
@@ -89,7 +89,7 @@ const HomePage: React.FC = () => {
           </div>
 
           {/* Conditionally Render "Go to Bank Details" Button */}
-          {hasViewBanksPermission && (
+
             <div className="d-flex justify-content-center mt-4">
               {/* <button
               className="btn btn-primary mb-5 me-2"
@@ -104,7 +104,7 @@ const HomePage: React.FC = () => {
                 onClick={() => handleNavigation("/banks")}
               />
             </div>
-          )}
+         
         </div>
 
         {/* <footer className="mt-5 d-flex justify-content-center">

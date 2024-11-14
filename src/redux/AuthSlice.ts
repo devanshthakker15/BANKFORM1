@@ -33,6 +33,7 @@ const initialState = {
   permissions: JSON.parse(localStorage.getItem("permissions") || "[]"),  // Loading permissions from localStorage
   isAuthenticated: !!localStorage.getItem("access_token"),
   loading: false,
+  loginError: null,
 };
 
 const authSlice = createSlice({
@@ -52,6 +53,7 @@ const authSlice = createSlice({
    builder
      .addCase(loginUser.pending, (state) => {
        state.loading = true;
+       state.loginError = null;
      })
      .addCase(loginUser.fulfilled, (state, action) => {
        state.user = action.payload.user;
@@ -59,8 +61,9 @@ const authSlice = createSlice({
        state.isAuthenticated = true;
        state.loading = false;
      })
-     .addCase(loginUser.rejected, (state) => {
+     .addCase(loginUser.rejected, (state, action) => {
        state.loading = false;
+       state.loginError = action.payload;
      });
  },
 });

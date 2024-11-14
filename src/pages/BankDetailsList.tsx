@@ -32,7 +32,7 @@ const BankDetailsList: React.FC = () => {
     (state: RootState) => state.form
   );
   const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
-  const hasEditBankPermission = currentUser?.permissions?.includes("editBank");
+  // const hasEditBankPermission = currentUser?.permissions?.includes("editBank");
 
   const itemsPerPage = 10;
   const currentPage = parseInt(searchParams.get("page") || "1", 10);

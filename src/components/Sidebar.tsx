@@ -18,6 +18,7 @@ import {
   faShoppingCart,
   faCode,
   faUsers,
+  faGear,
 } from "@fortawesome/free-solid-svg-icons";
 import { EXCLUDED_MODULES } from "../utils/constants";
 import "../styles/sidebar.css";
@@ -86,6 +87,14 @@ const Sidebar: React.FC = () => {
                 <div className="nav-content">
                   <FontAwesomeIcon icon={faClipboard} className="nav-icon" />
                   <p>Add form</p>
+                </div>
+              </Link>
+            </li>
+            <li className="nav-item d-flex justify-content-start">
+              <Link to="/settings" className="nav-link">
+                <div className="nav-content">
+                  <FontAwesomeIcon icon={faGear} className="nav-icon" />
+                  <p>Settings</p>
                 </div>
               </Link>
             </li>
