@@ -1,16 +1,15 @@
-// src/pages/HSN_Codes.tsx
 import React, { useEffect, useState } from "react";
-import { Offcanvas } from "react-bootstrap";
-import { Formik, Form as FormikForm } from "formik";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan, faPen } from "@fortawesome/free-solid-svg-icons";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import Pagination from "../components/Pagination";
 import TextInput from "../components/TextInput";
+import SelectInput from "../components/SelectInput";
 import Loader from "../components/Loader";
 import Button from "../components/Button";
+import { Formik, Form } from "formik";
 // import SelectInput from "../components/SelectInput";
-// import { YES_NO } from "../utils/constants";
+import { YES_NO } from "../utils/constants";
 import {
   fetchHSNCodesAsync,
   setCurrentHSN,
@@ -42,12 +41,12 @@ const HSN_Codes: React.FC = () => {
     (state) => state.offcanvas
   );
 
-  const handleClose = () => {
+  const handleCloseOffcanvas = () => {
     setShowOffcanvas(false);
     dispatch(setCurrentHSN(null));
   };
 
-  const handleShow = () => {
+  const handleShowOffcanvas = () => {
     setShowOffcanvas(true);
   };
 
@@ -61,7 +60,7 @@ const HSN_Codes: React.FC = () => {
       dispatch(
         fetchHSNCodesAsync({ page: currentPage, query: debouncedQuery })
       );
-      handleClose();
+      handleCloseOffcanvas();
     } catch (error) {
       console.error("Failed to submit HSN form data:", error);
     }
@@ -69,7 +68,7 @@ const HSN_Codes: React.FC = () => {
 
   const handleEdit = (data: HSNFormData) => {
     dispatch(setCurrentHSN(data));
-    handleShow();
+    handleShowOffcanvas();
   };
 
   const handlePageChange = (page: number) => {
@@ -105,21 +104,21 @@ const HSN_Codes: React.FC = () => {
 
   return (
     <div>
-      {/* <Breadcrumbs /> */}
+      {/* ... Your other components ... */}
       <div className="container">
         <div className="head d-flex justify-content-between">
           <h1>HSN Codes</h1>
-          <Button text="Add HSN Code" variant="primary" onClick={handleShow} />
+          <Button text="Add HSN Code" variant="primary" onClick={handleShowOffcanvas} />
         </div>
         <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Search by Bank Name, Account Holder, Number, or Country"
-          className="form-control"
-          value={searchQuery}
-          onChange={handleSearch}
-        />
-      </div>
+          <input
+            type="text"
+            placeholder="Search by Bank Name, Account Holder, Number, or Country"
+            className="form-control"
+            value={searchQuery}
+            onChange={handleSearch}
+          />
+        </div>
         <div className="table-responsive-mobile mt-4">
           <table className="table table-bordered">
             <thead>
@@ -182,13 +181,13 @@ const HSN_Codes: React.FC = () => {
           onPageChange={handlePageChange}
         />
 
-        <Offcanvas show={showOffcanvas} onHide={handleClose} placement="end">
-          <Offcanvas.Header closeButton>
-            <Offcanvas.Title>
-              {currentHSN ? "Edit HSN Code" : "Add HSN Code"}
-            </Offcanvas.Title>
-          </Offcanvas.Header>
-          <Offcanvas.Body>
+        {/* Offcanvas using Bootstrap */}
+        <div className={`offcanvas offcanvas-end ${showOffcanvas ? 'show' : ''}`} id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+          <div className="offcanvas-header">
+            <h5 id="offcanvasRightLabel">{currentHSN ? "Edit HSN Code" : "Add HSN Code"}</h5>
+            <button type="button" className="btn-close" data-bs-dismiss="offcanvas" aria-label="Close" onClick={handleCloseOffcanvas}></button>
+          </div>
+          <div className="offcanvas-body">
             <Formik
               initialValues={{
                 hsn_name: currentHSN?.hsn_name || "",
@@ -200,7 +199,7 @@ const HSN_Codes: React.FC = () => {
               onSubmit={handleSubmit}
             >
               {() => (
-                <FormikForm>
+                <Form>
                   <TextInput
                     label="HSN Name"
                     name="hsn_name"
@@ -213,19 +212,19 @@ const HSN_Codes: React.FC = () => {
                     placeholder="Enter HSN Code"
                     required
                   />
-                  {/* <div className="mb-3">
-                 <SelectInput label="Is Active" name="is_active" options={YES_NO} />
-               </div> */}
+                  <div className="mb-3">
+                    <SelectInput label="Is Active" name="is_active" options={YES_NO} />
+                  </div>
                   <Button
                     type="submit"
                     variant="primary"
                     text={currentHSN ? "Update" : "Submit"}
                   />
-                </FormikForm>
+                </Form>
               )}
             </Formik>
-          </Offcanvas.Body>
-        </Offcanvas>
+          </div>
+        </div>
       </div>
     </div>
   );

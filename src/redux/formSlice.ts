@@ -157,7 +157,7 @@
       setCurrentBank: (state, action: PayloadAction<BankData | null>) => {
         state.currentBank = action.payload;
       },
-      clearCurrentBank: (state) => {
+      clearCurrentBank: (state) => {  
         state.currentBank = null;
       },
       saveFormData: (state, action: PayloadAction<BankData>) => {

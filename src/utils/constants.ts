@@ -27,7 +27,9 @@ export const YES_NO =[
 
   
 // Define the array of module names to exclude
-export const EXCLUDED_MODULES = ["Manage Locations", "Manage Roles"]; 
+export const EXCLUDED_MODULES = ["Manage Locations", "Manage Roles", null
+  // "Manage Product Category", "Manage Customer", "Manage Product Brands", "Manage UOM", "Manage Product Tax", "Manage Payment Term", "Manage Payment Mode", "Manage Product Sub Category", "Manage Product Groups",  "Manage Orders", "Cancel Order", "Manage Returns/Refunds", "Manage Hold Bill", "Manage Branches/Store", 
+  ]; 
 
  // Permission constants
 export const PERMISSIONS = {

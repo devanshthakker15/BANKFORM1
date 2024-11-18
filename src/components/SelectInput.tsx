@@ -2,7 +2,6 @@ import React from "react";
 import Select from "react-select";
 import { useField, FieldInputProps, FieldMetaProps, FieldHelperProps } from "formik";
 import "../App.css";
-import { number } from "yup";
 
 interface Option {
   value: string | number;

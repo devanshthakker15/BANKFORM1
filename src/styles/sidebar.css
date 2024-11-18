@@ -2,10 +2,13 @@
   background-color: #343a40; /* Sidebar background */
   transition: width 0.3s ease;
   width: 250px;
+  height: 1830px;
 }
 
 .main-sidebar.collapsed {
   width: 80px;
+  height: 1330px;
+  /* height: 100vh; */
 }
 
 .sidebar {

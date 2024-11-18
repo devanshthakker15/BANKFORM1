@@ -117,7 +117,7 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
               <Card title="General Information">
                 <div className="row">
                   <div className="col-md-6">
-                    <SelectInput
+                    {/* <SelectInput
                       label="Bank Name"
                       name="bank_name"
                       options={bankOptions}
@@ -125,6 +125,13 @@ const BankForm: React.FC<BankFormProps> = ({ initialValues }) => {
                       onChange={(newValue) =>
                         setFieldValue("bank_name", newValue.value)
                       }
+                    /> */}
+                    <TextInput
+                      label="Bank Name"
+                      name="bank_name"
+                      type="text"
+                      placeholder="Enter Bank Name"
+                      required
                     />
                   </div>
                   <div className="col-md-6">

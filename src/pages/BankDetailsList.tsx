@@ -96,7 +96,7 @@ const BankDetailsList: React.FC = () => {
         />
       </div>
       <div className="table-responsive-mobile">
-        <table className="table table-bordered">
+        <table className="table table-bordered table-hover table-sm">
           <thead>
             <tr>
               <th>Serial No.</th>

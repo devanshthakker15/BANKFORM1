@@ -5,11 +5,10 @@ import { apiGet } from "../utils/getApi";
 
 export const loginUser = createAsyncThunk(
  "auth/login",
- async ({ email, password }: { email: string; password: string;  }, thunkAPI) => {
+ async ({ email, password }: { email: string; password: string; }, thunkAPI) => {
    try {
      const response = await apiRequest("POST", "/api/account/login/", { email, password });
      const { access_token, refresh_token, user_details: user } = response.result;
-    //  console.log("New log: ",user);
 
      localStorage.setItem("access_token", access_token);
      localStorage.setItem("refresh_token", refresh_token);
@@ -17,7 +16,6 @@ export const loginUser = createAsyncThunk(
      // Fetch permissions after successful login
      const permissionsResponse = await apiGet("/api/account/user/permissions/");
      const permissions = permissionsResponse.result.permissions;
-     console.log("Fetched Permissions:", permissions);
 
      localStorage.setItem("permissions", JSON.stringify(permissions));  // Saving permissions to localStorage
 

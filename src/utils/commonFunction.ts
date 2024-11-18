@@ -62,7 +62,7 @@ export const hasPermission = (permissions, moduleAlias, action) => {
 
   // Find the permissions for the specified module
   const modulePermissions = permissions.find(
-    (perm) => perm.module.alias === moduleAlias
+    (perm) => perm.module?.alias === moduleAlias
   );
 
   if (!modulePermissions) {
@@ -75,3 +75,15 @@ export const hasPermission = (permissions, moduleAlias, action) => {
   console.log(`Permission for ${action} on ${moduleAlias}:`, isAllowed);
   return isAllowed;
 };
+
+
+export function formatDate(dateString) {
+  const date = new Date(dateString);
+  const options: Intl.DateTimeFormatOptions = {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric' };
+  const   
+ formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
+  return `${formattedDate} at ${date.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}`;
+}

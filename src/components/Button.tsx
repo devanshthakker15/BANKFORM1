@@ -1,8 +1,7 @@
 import React from 'react';
-import { Button as BootstrapButton } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Link } from 'react-router-dom';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { Link } from 'react-router-dom';
 
 interface ButtonProps {
   variant?: 'primary' | 'secondary' | 'success' | 'danger' | 'link' | 'outline-primary';
@@ -15,7 +14,7 @@ interface ButtonProps {
   disabled?: boolean;
   style?: React.CSSProperties;
   className?: string;
-  children?: React.ReactNode; 
+  children?: React.ReactNode;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -38,35 +37,38 @@ const Button: React.FC<ButtonProps> = ({
     </>
   );
 
+  const buttonClasses = [
+    'btn',
+    `btn-${variant}`,
+    size && `btn-${size}`,
+    className,
+  ].filter(Boolean).join(' ');
+
   if (link) {
     return (
       <Link to={link}>
-        <BootstrapButton
-          variant={variant}
-          size={size}
-          onClick={onClick}
+        <button
+          type="button"
+          className={buttonClasses}
           style={style}
           disabled={disabled}
-          className={className}
         >
           {buttonContent}
-        </BootstrapButton>
+        </button>
       </Link>
     );
   }
 
   return (
-    <BootstrapButton
-      variant={variant}
-      size={size}
-      onClick={onClick}
+    <button
       type={type}
+      className={buttonClasses}
       style={style}
       disabled={disabled}
-      className={className}
+      onClick={onClick}
     >
       {buttonContent}
-    </BootstrapButton>
+    </button>
   );
 };
 

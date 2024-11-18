@@ -6,29 +6,32 @@ import "../App.css";
 import { apiGetBankDataById } from "../utils/getApi";
 import { BankFormValues } from "../components/BankForm";
 import Button from "../components/Button";
+import Loader from "../components/Loader"; 
 
 const BankFormPage: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const [initialValues, setInitialValues] = useState<BankFormValues | null>(
     null
   );
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       if (id) {
         try {
           const data = await apiGetBankDataById(id);
           console.log(data.result);
-          setInitialValues(data.result); 
+          setInitialValues(data.result);
         } catch (error) {
           console.error("Failed to fetch bank data:", error);
           navigate("*");
         }
-      }
-      else{
+      } else {
         setInitialValues(null);
       }
+      setIsLoading(false);
     };
     fetchData();
   }, [id]);
@@ -48,8 +51,11 @@ const BankFormPage: React.FC = () => {
           <h2>{id ? "Edit Bank Details" : "Add Bank Details"}</h2>
         </div>
 
-        {/* Render BankForm with initialValues for editing or empty for new entry */}
-        <BankForm initialValues={(initialValues) || undefined} />
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <BankForm initialValues={(initialValues) || undefined} />
+        )}
       </div>
     </div>
   );

@@ -13,10 +13,11 @@ import EmployeeForm from "./components/EmployeeForm";
 import ManageRoles from "./pages/ManageRoles";
 import ManageProducts from "./pages/ManageProducts";
 import PageNotFound from "./pages/PageNotFound";
+import OrderListingPage from "./pages/OrdersListingPage";
 import { hasPermission } from "./utils/commonFunction";
 import { PERMISSIONS } from "./utils/constants";
 
-// Map module alias to components for each permission type
+// Map module aliases to components for each permission type
 const moduleComponentMap: { [key: string]: { [key: string]: React.ReactNode } } = {
   banks: {
     [PERMISSIONS.VIEW]: <BankDetailsList />,
@@ -37,18 +38,23 @@ const moduleComponentMap: { [key: string]: { [key: string]: React.ReactNode } } 
   manage: {
     [PERMISSIONS.VIEW]: <ManageProducts />,
   },
+  orders: {
+    [PERMISSIONS.VIEW]: <OrderListingPage />,
+    [PERMISSIONS.ADD]: <HomePage />,
+    [PERMISSIONS.UPDATE]: <HomePage />,
+    [PERMISSIONS.DELETE]: <HomePage />,
+  },
 };
 
-// Generate routes based on permissions
+// Function to generate routes dynamically based on permissions
 export const generateRoutes = (permissions: any[]) => {
+  const dynamicRoutes = permissions.flatMap((currentPerm) => {
+    if (!currentPerm.module) return []; // Skipping entries with a null or undefined alias 
+    const alias = currentPerm.module?.alias;
 
-  const dynamicRoutes =  permissions.flatMap((currentperm) => {
-
-    const alias = currentperm.module.alias;
-    console.log(alias);
     const routesForModule = [];
 
-    if (currentperm.perm_view) {
+    if (currentPerm.perm_view) {
       routesForModule.push({
         path: `/${alias}`,
         element: (
@@ -57,9 +63,9 @@ export const generateRoutes = (permissions: any[]) => {
           </ProtectedRoute>
         ),
       });
-      console.log(" view Routes created for: ", alias)
+      console.log(`Route with permission generated for ${alias}`)
     }
-    if (currentperm.perm_add) {
+    if (currentPerm.perm_add) {
       routesForModule.push({
         path: `/${alias}/add`,
         element: (
@@ -68,9 +74,9 @@ export const generateRoutes = (permissions: any[]) => {
           </ProtectedRoute>
         ),
       });
-      console.log(" add Routes created for: ", alias)
+      console.log(`Route with permission generated for ${alias}`)
     }
-    if (currentperm.perm_edit) {
+    if (currentPerm.perm_edit) {
       routesForModule.push({
         path: `/${alias}/edit/:id`,
         element: (
@@ -79,9 +85,8 @@ export const generateRoutes = (permissions: any[]) => {
           </ProtectedRoute>
         ),
       });
-      console.log(" edit Routes created for: ", alias)
+      console.log(`Route with permission generated for ${alias}`)
     }
-
     return routesForModule;
   });
 
@@ -92,16 +97,12 @@ export const generateRoutes = (permissions: any[]) => {
       element: (
         <ProtectedRoute>
           <Layout />
-        </ProtectedRoute> 
+        </ProtectedRoute>
       ),
-      children: [{ path: "/", element: <HomePage /> }, 
-        { path: "/account/add", element: <EmployeeForm /> }, 
-        { path: "/settings", element: <EmployeeForm /> }, 
-        ...dynamicRoutes],
+      children: [{ path: "/", element: <HomePage /> }, ...dynamicRoutes],
     },
-    
     { path: "*", element: <PageNotFound /> },
-  ]
+  ];
 };
 
 // ProtectedRoute component for permission-based access
@@ -120,7 +121,8 @@ const ProtectedRoute: React.FC<{
   if (moduleName && action && !hasPermission(permissions, moduleName, action)) {
     return <Navigate to="*" />;
   }
-  return children;
+
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

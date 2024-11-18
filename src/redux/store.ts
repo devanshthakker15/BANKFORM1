@@ -5,6 +5,7 @@ import authReducer from "./AuthSlice";
 import locationReducer from "./locationSlice"
 import offcanvasReducer from "./offcanvasSlice"
 import employeeReducer from "./employeeSlice"
+import ordersReducer from "./orderSlice"
 
 
 export const store = configureStore({
@@ -14,6 +15,8 @@ export const store = configureStore({
     location: locationReducer,
     offcanvas: offcanvasReducer,
     employee: employeeReducer,
+    orders: ordersReducer,
+    
   },
 });
 
