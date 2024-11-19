@@ -14,7 +14,7 @@ interface SelectInputProps {
   options: Option[];
   required?: boolean;
   onChange?: (value, action) => void; 
-  value?: string; 
+  value?: Option; 
 }
 
 const SelectInput: React.FC<SelectInputProps> = ({ label, name, options, required = false, onChange, value }) => {
@@ -24,15 +24,11 @@ const SelectInput: React.FC<SelectInputProps> = ({ label, name, options, require
     FieldHelperProps<string>
   ] = useField(name);
 
-  // const handleChange = (option: Option | null) => {
-  //   const selectedValue = option ? option.value : "";
-  //   helpers.setValue(selectedValue); 
-  //   if (onChange) {
-  //     onChange(option); 
-  //   }
-  // };
 
-  const selectedOption = options.find((option) => option.value === value || option.value === field.value);
+
+  const selectedOption = options.find(
+    (option) => option.value === (value?.value || field.value)
+  );
 
   return (
     <div className="form-group">

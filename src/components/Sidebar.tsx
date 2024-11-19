@@ -17,6 +17,9 @@ import {
   faBank,
   faGift,
   faMoneyBill,
+  faPerson,
+  faCodeBranch,
+  faLocation,
 } from "@fortawesome/free-solid-svg-icons";
 import "../styles/sidebar.css";
 import { useAppDispatch } from "../redux/hooks";
@@ -31,9 +34,9 @@ const Sidebar: React.FC = () => {
   const toggleSidebar = () => setIsCollapsed((prev) => !prev);
 
   const moduleIcons: { [key: string]: any } = {
-    location: faList,
+    location: faLocation,
     category: faList,
-    customer: faList,
+    customer: faPerson,
     brands: faList,
     uom: faList,
     tax: faList,
@@ -44,7 +47,7 @@ const Sidebar: React.FC = () => {
     orders: faShoppingCart,
     returns: faList,
     hold: faList,
-    store: faList,
+    store: faCodeBranch,
     account: faUser,
     permissions: faTasks,
     manage: faShoppingCart,

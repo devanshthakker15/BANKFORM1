@@ -2,23 +2,21 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { apiGet } from "../utils/getApi";
 
 interface Order {
-    id: number;
-    invoice_code: string;
-    customer: {
-      id: number;
-      name: string;
-      // ...other customer properties
-    };
-    bill_amount: number;
-    payable_amount: number;
-    payment_type: number;
-    status: string;
-    created_at: string;
-    products: {
-      // ...product properties
-    }[];
-    // ...other order properties
-  }
+  id: number;
+  invoice_code: string;
+  customer: { 
+    id: number; 
+    name: string; 
+  };
+  customer_name?: string;
+  bill_amount: number;
+  order_invoice_number: number;
+  payable_amount: number;
+  payment_type: number;
+  status: string;
+  created_at: string;
+  products: any[];
+}
 
 interface OrderState {
   orders: Order[];
@@ -32,71 +30,79 @@ const initialState: OrderState = {
   status: "idle",
   error: null,
   totalCount: 0,
- 
 };
 
-// Async thunk to fetch orders
-// export const fetchOrders = createAsyncThunk<
-// { data: Order[]; totalCount: number },
-// { page: number; query: string },
-// { rejectValue: string }
-// >("orders/fetchOrders", async ({ page, query }, { rejectWithValue }) => {
-//   try {
-//     const params = new URLSearchParams();
-//     params.append('page', page.toString());
-
-//     if (query) {
-//       params.append('query', query);
-//     }
-
-//     const url = `/api/orders/manage?${params.toString()}`;
-//     const data = await apiGet(url);
-
-//     if (data.success) {
-//       console.log("Fetched Orders:", data.result.results);
-//     //   return data.result.results;
-//       return { data: data.result.results, totalCount: data.result.count };
-//     }
-//     return rejectWithValue("Failed to fetch orders");
-//   } catch (error) {
-//     return rejectWithValue("Error fetching orders");
-//   }
-// });
-
-export const fetchOrders = createAsyncThunk<
-{data: Order[]; totalCount:number},
-{page:number; query:string;},
-{rejectValue: string}
->("orders/fetchOrders", async ({page, query}, {rejectWithValue}) =>{
-    try{
-        const data = await apiGet(`/api/orders/manage/?page=${page}&query=${query}`);
-        if(data.success) {
-            console.log("Orders Fetched:", data.result.results);
-            return { data: data.result.results, totalCount: data.result.count };
-        }
-        return rejectWithValue("Failed to fetch orders data");
-    } catch (error) {
-        return rejectWithValue("Error fetching bank data");
+// Fetch a specific order's last bill by ID
+export const fetchLastBillById = createAsyncThunk<
+  any, 
+  { billId: number },
+  { rejectValue: string }
+>("orders/fetchLastBillById", async ({ billId }, { rejectWithValue }) => {
+  try {
+    const response = await apiGet(`/api/orders/manage/last/bill/?bill=${billId}`);
+    if (response.success) {
+      return response.result;
     }
+    return rejectWithValue("Failed to fetch bill data");
+  } catch (error) {
+    return rejectWithValue("Error fetching bill data");
+  }
 });
 
-// export const fetchBankDataAsync = createAsyncThunk<
-// { data: BankData[]; totalCount: number },
-// { page: number; query: string },
-// { rejectValue: string }
-// >("form/fetchBankDataAsync", async ({ page, query }, { rejectWithValue }) => {
-// try {
-//   const data = await apiGet(`/api/payment/banks/?page=${page}&query=${query}`);
-//   if (data.success) {
-//     console.log("Bank Data:", data.result.results);
-//     return { data: data.result.results, totalCount: data.result.count };
-//   }
-//   return rejectWithValue("Failed to fetch bank data");
-// } catch (error) {
-//   return rejectWithValue("Error fetching bank data");
-// }
-// });
+// Fetch Orders without Filters (default display)
+export const fetchOrders = createAsyncThunk<
+  { data: Order[]; totalCount: number },
+  { page: number },
+  { rejectValue: string }
+>("orders/fetchOrders", async ({ page }, { rejectWithValue }) => {
+  try {
+    const data = await apiGet(`/api/orders/manage/?page=${page}`);
+    if (data.success) {
+      return { data: data.result.results, totalCount: data.result.count };
+    }
+    return rejectWithValue("Failed to fetch orders data");
+  } catch (error) {
+    return rejectWithValue("Error fetching orders data");
+  }
+});
 
+// Fetch Orders with Filters
+export const fetchOrdersWithFilters = createAsyncThunk<
+  { data: Order[]; totalCount: number },
+  {
+    page: number;
+    query?: string;
+    store?: number[];
+    order_status?: string;
+    delivery_type?: string;
+    start_date?: string;
+    end_date?: string;
+    code?: string;
+  },
+  { rejectValue: string }
+>("orders/fetchOrdersWithFilters", async (params, { rejectWithValue }) => {
+  try {
+    const queryParams = new URLSearchParams({
+      page: params.page.toString(),
+      ...(params.query && { query: params.query }),
+      ...(params.store && { store: params.store.join(",") }),
+      ...(params.order_status && { order_status: params.order_status }),
+      ...(params.delivery_type && { delivery_type: params.delivery_type }),
+      ...(params.start_date && { start_date: params.start_date }),
+      ...(params.end_date && { end_date: params.end_date }),
+      ...(params.code && { code: params.code }),
+    });
+
+    const data = await apiGet(`/api/orders/manage/filter/?${queryParams}`);
+    if (data.success) {
+      return { data: data.result.results, totalCount: data.result.count };
+    }
+
+    return rejectWithValue("Failed to fetch orders data");
+  } catch (error) {
+    return rejectWithValue("Error fetching orders data");
+  }
+});
 
 const orderSlice = createSlice({
   name: "orders",
@@ -104,6 +110,7 @@ const orderSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Fetch Orders
       .addCase(fetchOrders.pending, (state) => {
         state.status = "loading";
       })
@@ -112,8 +119,31 @@ const orderSlice = createSlice({
         state.orders = action.payload.data;
         state.totalCount = action.payload.totalCount;
       })
-      
       .addCase(fetchOrders.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      })
+      // Fetch Orders with Filters
+      .addCase(fetchOrdersWithFilters.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchOrdersWithFilters.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.orders = action.payload.data;
+        state.totalCount = action.payload.totalCount;
+      })
+      .addCase(fetchOrdersWithFilters.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      })
+      // Fetch Last Bill By ID
+      .addCase(fetchLastBillById.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchLastBillById.fulfilled, (state) => {
+        state.status = "succeeded";
+      })
+      .addCase(fetchLastBillById.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
       });
