@@ -101,12 +101,23 @@ const OrderDetailsList: React.FC = () => {
   const handlePrint = async (billId: number) => {
     const result = await dispatch(fetchLastBillById({ billId }));
     if (fetchLastBillById.fulfilled.match(result)) {
-      console.log("Fetched Bill Data:", result.payload.bill);
+      console.log("Fetched Bill Data:", result.payload);
+  
+     
+      const base64String = result.payload;  
+      download(base64String, 'Invoice.pdf');
     } else {
       console.error("Error fetching bill:", result.payload);
     }
   };
-
+  
+  // The provided download function
+  const download = (base64EncodedData, fileName) => {
+    const downloadLink = document.createElement('a');
+    downloadLink.href = `data:application/pdf;base64,${base64EncodedData}`;
+    downloadLink.download = fileName;
+    downloadLink.click();
+  };
 
   return (
     <div>

@@ -41,7 +41,7 @@ export const fetchLastBillById = createAsyncThunk<
   try {
     const response = await apiGet(`/api/orders/manage/last/bill/?bill=${billId}`);
     if (response.success) {
-      return response.result;
+      return response.result.bill;
     }
     return rejectWithValue("Failed to fetch bill data");
   } catch (error) {
