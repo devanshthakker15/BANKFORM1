@@ -66,6 +66,8 @@ export const fetchOrders = createAsyncThunk<
   }
 });
 
+
+
 // Fetch Orders with Filters
 export const fetchOrdersWithFilters = createAsyncThunk<
   { data: Order[]; totalCount: number },
@@ -86,7 +88,6 @@ export const fetchOrdersWithFilters = createAsyncThunk<
     const queryParams = new URLSearchParams({
       page: params.page.toString(),
       ...(params.query && { query: params.query }),
-      ...(params.store && { store: params.store.toString() }), 
       ...(params.order_status && { order_status: params.order_status }),
       ...(params.delivery_type && { delivery_type: params.delivery_type }),
       ...(params.start_date && { start_date: params.start_date }),
@@ -94,10 +95,13 @@ export const fetchOrdersWithFilters = createAsyncThunk<
       ...(params.code && { code: params.code }),
     });
 
-    const data = await apiGet(`/api/orders/manage/filter/?${queryParams}`);
+    if (params.store) {
+      queryParams.append("store[]", params.store.toString());
+    }
+    const data = await apiGet(`/api/orders/manage/filter/?${queryParams.toString()}`);
+    
     if (data.success) {
       return { data: data.result.results, totalCount: data.result.count };
-      console.log(data);
     }
 
     return rejectWithValue("Failed to fetch orders data");

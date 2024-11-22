@@ -91,7 +91,7 @@ export const apiDelete = async (url: string) => {
 // Error handler function
 const handleApiError = (error: any) => {
   if (error.response) {
-    console.error(`API Error - Status: ${error.response.status}`, error.response.data);
+    // console.error(`API Error - Status: ${error.response.status}`, error.response.data);
   } else {
     console.error("API call failed:", error.message);
   }

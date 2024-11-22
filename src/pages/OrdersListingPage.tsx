@@ -20,6 +20,7 @@ const OrderDetailsList: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("query") || "");
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
+  const [selectedStore, setSelectedStore] = useState<number | null>(null); 
   const formikValuesRef = useRef(null);
   const dispatch = useAppDispatch();
   const { orders, status, totalCount } = useSelector((state: RootState) => state.orders);
@@ -122,14 +123,19 @@ const OrderDetailsList: React.FC = () => {
     }
   };
 
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = event.target.value;
-    const selectedStore = storeOptions.find(store => store.value === selectedValue);
+  // const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  //   const selectedValue = event.target.value;
+  //   const selectedStore = storeOptions.find(store => store.value === selectedValue);
+  //   console.log("Store Selected", selectedValue);
        
-    if (selectedStore) {
-      console.log("Selected Store ID:", selectedStore.value);
-      console.log("Selected Store Label:", selectedStore.label);
-    }
+  //   if (selectedStore) {
+  //     console.log("Selected Store ID:", selectedStore.value);
+  //     console.log("Selected Store Label:", selectedStore.label);
+  //   }
+  // };
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = parseInt(event.target.value, 10);
+    setSelectedStore(selectedValue); // Update the selected store state
   };
 
   const handleFiltersChange = (values: any) => {
@@ -140,6 +146,7 @@ const OrderDetailsList: React.FC = () => {
       delivery_type: values.deliveryType !== "all" ? values.deliveryType : undefined,
       start_date: values.start_date,
       end_date: values.end_date,
+      store: selectedStore || undefined,
     };
 
     dispatch(fetchOrdersWithFilters(filters));
@@ -147,7 +154,7 @@ const OrderDetailsList: React.FC = () => {
 
   useEffect(() => {
     handleFiltersChange(initialFilters);
-  }, [debouncedQuery, currentPage]);
+  }, [debouncedQuery, currentPage, selectedStore]);
 
   return (
     <div>
@@ -178,7 +185,7 @@ const OrderDetailsList: React.FC = () => {
                         className="form-control"
                         max={values.end_date}
                         value={values.start_date}
-                        onChange={(e) => updateFilters("start_date", e.target.value)}
+                        onChange={(selectedDate) => updateFilters("start_date", selectedDate.target.value)}
                       />
                     </div>
                     <div className="col-md-3">
@@ -190,7 +197,7 @@ const OrderDetailsList: React.FC = () => {
                         min={values.start_date}
                         max={currentDate}
                         value={values.end_date}
-                        onChange={(e) => updateFilters("end_date", e.target.value)}
+                        onChange={(selectedDate) => updateFilters("end_date", selectedDate.target.value)}
                       />
                     </div>
                     <div className="col-md-2">
