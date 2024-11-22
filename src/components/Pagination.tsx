@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import Button from "./Button";
@@ -15,6 +15,14 @@ const Pagination: React.FC<PaginationProps> = ({
   onPageChange,
 }) => {
   const pageGroupSize = 5;
+
+  const handleScrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    handleScrollToTop();
+  }, [currentPage]);
 
   // Calculate dynamic start and end pages to keep currentPage in the center 
   const calculatePageRange = () => {

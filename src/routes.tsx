@@ -16,6 +16,7 @@ import PageNotFound from "./pages/PageNotFound";
 import OrderListingPage from "./pages/OrdersListingPage";
 import { hasPermission } from "./utils/commonFunction";
 import { PERMISSIONS } from "./utils/constants";
+import OrderDetailsPage from "./pages/OrderDetailsPage";
 
 // Map module aliases to components for each permission type
 const moduleComponentMap: { [key: string]: { [key: string]: React.ReactNode } } = {
@@ -40,8 +41,9 @@ const moduleComponentMap: { [key: string]: { [key: string]: React.ReactNode } } 
   },
   orders: {
     [PERMISSIONS.VIEW]: <OrderListingPage />,
+    // [PERMISSIONS.VIEW]: <OrderDetailsPage />,
     [PERMISSIONS.ADD]: <HomePage />,
-    [PERMISSIONS.UPDATE]: <HomePage />,
+    [PERMISSIONS.UPDATE]: <OrderDetailsPage />,
     [PERMISSIONS.DELETE]: <HomePage />,
   },
 };
@@ -63,7 +65,7 @@ export const generateRoutes = (permissions: any[]) => {
           </ProtectedRoute>
         ),
       });
-      console.log(`Route with permission generated for ${alias}`)
+      // console.log(`Route with permission generated for ${alias}`)
     }
     if (currentPerm.perm_add) {
       routesForModule.push({
@@ -74,18 +76,18 @@ export const generateRoutes = (permissions: any[]) => {
           </ProtectedRoute>
         ),
       });
-      console.log(`Route with permission generated for ${alias}`)
+      // console.log(`Route with permission generated for ${alias}`)
     }
     if (currentPerm.perm_edit) {
       routesForModule.push({
-        path: `/${alias}/edit/:id`,
+        path: `/${alias}/:id`,
         element: (
           <ProtectedRoute moduleName={alias} action={PERMISSIONS.UPDATE}>
             {moduleComponentMap[alias]?.[PERMISSIONS.UPDATE]}
           </ProtectedRoute>
         ),
       });
-      console.log(`Route with permission generated for ${alias}`)
+      // console.log(`Route with permission generated for ${alias}`)
     }
     return routesForModule;
   });
@@ -99,7 +101,8 @@ export const generateRoutes = (permissions: any[]) => {
           <Layout />
         </ProtectedRoute>
       ),
-      children: [{ path: "/", element: <HomePage /> }, ...dynamicRoutes],
+      children: [{ path: "/", element: <HomePage /> },
+        { path: "/orders/:id", element: <OrderDetailsPage /> }, ...dynamicRoutes],
     },
     { path: "*", element: <PageNotFound /> },
   ];

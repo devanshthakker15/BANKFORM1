@@ -12,6 +12,10 @@ const ManageProducts: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [show, setShow] = useState(false);
 
+  const ScrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -22,6 +26,7 @@ const ManageProducts: React.FC = () => {
       }
     };
     fetchProducts();
+    ScrollToTop();
   }, []);
 
   const sliceTitle = (title: string) => {

@@ -52,7 +52,7 @@ const BankDetailsList: React.FC = () => {
   };
 
   const handleEdit = (id: number) => {
-    navigate(`/banks/edit/${id}`);
+    navigate(`/banks/${id}`);
   };
 
   const handleDelete = (id: number) => {

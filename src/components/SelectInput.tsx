@@ -14,21 +14,19 @@ interface SelectInputProps {
   options: Option[];
   required?: boolean;
   onChange?: (value, action) => void; 
-  value?: Option; 
+  value?:  Option;
+  placeholder?: string 
 }
 
-const SelectInput: React.FC<SelectInputProps> = ({ label, name, options, required = false, onChange, value }) => {
+const SelectInput: React.FC<SelectInputProps> = ({ label, name, options, required = false, onChange, value, placeholder }) => {
   const [field, meta, helpers]: [
-    FieldInputProps<string>,
-    FieldMetaProps<string>,
-    FieldHelperProps<string>
+    FieldInputProps<string | Option>, 
+    FieldMetaProps<string | Option>,
+    FieldHelperProps<string | Option>
   ] = useField(name);
 
-
-
-  const selectedOption = options.find(
-    (option) => option.value === (value?.value || field.value)
-  );
+  // Handle initial value correctly
+  const initialValue = value || options.find(option => option.value === field.value);
 
   return (
     <div className="form-group">
@@ -39,9 +37,8 @@ const SelectInput: React.FC<SelectInputProps> = ({ label, name, options, require
         className={`react-select-container ${meta.touched && meta.error ? "is-invalid" : ""}`}
         classNamePrefix="react-select"
         name={name}
-        value={selectedOption}
+        value={initialValue} // Use the initialValue here
         options={options}
-        // value={}
         onChange={onChange}
         isClearable 
         placeholder="Select an option"
@@ -54,5 +51,3 @@ const SelectInput: React.FC<SelectInputProps> = ({ label, name, options, require
 };
 
 export default SelectInput;
-
-

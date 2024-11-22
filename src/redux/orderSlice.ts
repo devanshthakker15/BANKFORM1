@@ -4,9 +4,9 @@ import { apiGet } from "../utils/getApi";
 interface Order {
   id: number;
   invoice_code: string;
-  customer: { 
-    id: number; 
-    name: string; 
+  customer: {
+    id: number;
+    name: string;
   };
   customer_name?: string;
   bill_amount: number;
@@ -34,7 +34,7 @@ const initialState: OrderState = {
 
 // Fetch a specific order's last bill by ID
 export const fetchLastBillById = createAsyncThunk<
-  any, 
+  any,
   { billId: number },
   { rejectValue: string }
 >("orders/fetchLastBillById", async ({ billId }, { rejectWithValue }) => {
@@ -72,9 +72,10 @@ export const fetchOrdersWithFilters = createAsyncThunk<
   {
     page: number;
     query?: string;
-    store?: number[];
+    store?: number; // Changed to a single number for store ID
     order_status?: string;
     delivery_type?: string;
+    payment_type?: string;
     start_date?: string;
     end_date?: string;
     code?: string;
@@ -85,7 +86,7 @@ export const fetchOrdersWithFilters = createAsyncThunk<
     const queryParams = new URLSearchParams({
       page: params.page.toString(),
       ...(params.query && { query: params.query }),
-      ...(params.store && { store: params.store.join(",") }),
+      ...(params.store && { store: params.store.toString() }), 
       ...(params.order_status && { order_status: params.order_status }),
       ...(params.delivery_type && { delivery_type: params.delivery_type }),
       ...(params.start_date && { start_date: params.start_date }),
@@ -96,6 +97,7 @@ export const fetchOrdersWithFilters = createAsyncThunk<
     const data = await apiGet(`/api/orders/manage/filter/?${queryParams}`);
     if (data.success) {
       return { data: data.result.results, totalCount: data.result.count };
+      console.log(data);
     }
 
     return rejectWithValue("Failed to fetch orders data");
@@ -103,6 +105,7 @@ export const fetchOrdersWithFilters = createAsyncThunk<
     return rejectWithValue("Error fetching orders data");
   }
 });
+
 
 const orderSlice = createSlice({
   name: "orders",

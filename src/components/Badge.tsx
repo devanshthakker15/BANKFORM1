@@ -2,7 +2,6 @@ import React from "react";
 
 interface BadgeProps {
   badgeType?: string;
-  badgeSize?: string;
   badgeText: string;
   badgeColor?: string;
   badgeBackgroundColor?: string;
@@ -10,14 +9,13 @@ interface BadgeProps {
 
 const Badge: React.FC<BadgeProps> = ({
   badgeType,
-  badgeSize,
   badgeText,
   badgeColor,
   badgeBackgroundColor,
 }) => {
   return (
     <span
-      className={`badge bg-${badgeType} text-${badgeSize}`}
+      className={`badge bg-${badgeType}`}
       style={{
         backgroundColor: badgeBackgroundColor,
         color: badgeColor,

@@ -6,7 +6,9 @@ import locationReducer from "./locationSlice"
 import offcanvasReducer from "./offcanvasSlice"
 import employeeReducer from "./employeeSlice"
 import ordersReducer from "./orderSlice"
+import storeReducer from "./storeSlice"
 
+ 
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +18,8 @@ export const store = configureStore({
     offcanvas: offcanvasReducer,
     employee: employeeReducer,
     orders: ordersReducer,
+    store: storeReducer,
+
     
   },
 });
