@@ -106,6 +106,8 @@ const OrderDetailsList: React.FC = () => {
     
   };
 
+  
+
   const handlePrint = async (billId: number) => {
     const result = await dispatch(fetchLastBillById({ billId }));
     if (fetchLastBillById.fulfilled.match(result)) {
