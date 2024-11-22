@@ -103,6 +103,7 @@ const OrderDetailsList: React.FC = () => {
       ...Object.fromEntries(prev.entries()),
       page: page.toString(),
     }));
+    
   };
 
   const handlePrint = async (billId: number) => {
@@ -123,19 +124,11 @@ const OrderDetailsList: React.FC = () => {
     }
   };
 
-  // const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-  //   const selectedValue = event.target.value;
-  //   const selectedStore = storeOptions.find(store => store.value === selectedValue);
-  //   console.log("Store Selected", selectedValue);
-       
-  //   if (selectedStore) {
-  //     console.log("Selected Store ID:", selectedStore.value);
-  //     console.log("Selected Store Label:", selectedStore.label);
-  //   }
-  // };
+
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = parseInt(event.target.value, 10);
-    setSelectedStore(selectedValue); // Update the selected store state
+    const selectedValue = parseInt(event.target.value);
+    setSelectedStore(selectedValue); 
+    console.log("Store Selected", selectedStore);
   };
 
   const handleFiltersChange = (values: any) => {
@@ -338,7 +331,7 @@ const OrderDetailsList: React.FC = () => {
           <Modal.Body>
             <select
               className="form-select"
-              aria-label="Default select example"
+              aria-label="Store select"
               onChange={handleSelectChange}
             >
               <option value="">Select a store</option>

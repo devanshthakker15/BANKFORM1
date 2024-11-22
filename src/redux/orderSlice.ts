@@ -66,6 +66,22 @@ export const fetchOrders = createAsyncThunk<
   }
 });
 
+//Fetch Orders By Id
+export const fetchOrdersById = createAsyncThunk<
+  Order,
+  { id: number },
+  { rejectValue: string }
+>("orders/fetchOrdersById", async ({ id }, { rejectWithValue }) => {
+  try {
+    const response = await apiGet(`/api/orders/manage/${id}`);
+    if (response.success) {
+      return response.result as Order;
+    }
+    return rejectWithValue("Failed to fetch order details");
+  } catch (error) {
+    return rejectWithValue("Error fetching order details");
+  }
+});
 
 
 // Fetch Orders with Filters
@@ -111,6 +127,8 @@ export const fetchOrdersWithFilters = createAsyncThunk<
 });
 
 
+
+
 const orderSlice = createSlice({
   name: "orders",
   initialState,
@@ -151,6 +169,18 @@ const orderSlice = createSlice({
         state.status = "succeeded";
       })
       .addCase(fetchLastBillById.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      })
+      //Fetch Orders by id
+      .addCase(fetchOrdersById.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchOrdersById.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.orders = [action.payload]; 
+      })
+      .addCase(fetchOrdersById.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
       });

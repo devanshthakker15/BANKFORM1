@@ -9,15 +9,28 @@ interface Store {
   gstn: string;
 }
 
+// Define the state type
+interface StoreState {
+  stores: Store[];
+  loading: boolean;
+  error: string | null;
+  selectedStoreId: number | null; // Track the selected store
+}
+
+// Initial state
+const initialState: StoreState = {
+  stores: [],
+  loading: false,
+  error: null,
+  selectedStoreId: null, // Initially, no store is selected
+}
 
 // Async thunk to fetch active stores
 export const fetchActiveStores = createAsyncThunk(
   'store/fetchActiveStores',
   async (_, { rejectWithValue }) => {
     try {
-      // console.log("Fetching active stores..");
       const response = await apiGet('/api/store/manage/active/');
-      // console.log("Store API Response:", response);
       return response.result;
     } catch (error) {
       console.error("Error fetching stores:", error);
@@ -29,30 +42,29 @@ export const fetchActiveStores = createAsyncThunk(
 // Store slice
 const storeSlice = createSlice({
   name: 'store',
-  initialState: {
-    stores: [],
-    loading: false,
-    error: null,
+  initialState,
+  reducers: {
+    // Action to set the selected store
+    setSelectedStore: (state, action) => {
+      state.selectedStoreId = action.payload;
+    },
   },
-  reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchActiveStores.pending, (state) => {
         state.loading = true;
         state.error = null;
-        // console.log("Fetching stores: Pending...");
       })
       .addCase(fetchActiveStores.fulfilled, (state, action) => {
         state.loading = false;
         state.stores = action.payload;
-        // console.log("Fetching stores: Success. Data:", action.payload);
       })
       .addCase(fetchActiveStores.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Something went wrong';
-        // console.error("Fetching stores: Failed. Error:", action.payload);
+        // state.error = action.payload || 'Something went wrong';
       });
   },
 });
 
+export const { setSelectedStore } = storeSlice.actions;
 export default storeSlice.reducer;
