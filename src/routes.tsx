@@ -102,7 +102,8 @@ export const generateRoutes = (permissions: any[]) => {
         </ProtectedRoute>
       ),
       children: [{ path: "/", element: <HomePage /> },
-        { path: "/orders/:id", element: <OrderDetailsPage /> }, ...dynamicRoutes],
+        { path: "/orders/:id", element: <OrderDetailsPage /> }, 
+        ...dynamicRoutes],
     },
     { path: "*", element: <PageNotFound /> },
   ];

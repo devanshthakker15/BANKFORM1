@@ -2,19 +2,19 @@ import React, { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { fetchOrdersWithFilters, fetchLastBillById } from "../redux/orderSlice";
 import { RootState } from "../redux/store";
 import SelectInput from "../components/SelectInput";
-import "../App.css";
 import Loader from "../components/Loader";
 import Pagination from "../components/Pagination";
-import { formatDate } from "../utils/commonFunction";
-import { faPrint, faEye, faBars } from "@fortawesome/free-solid-svg-icons";
+import Badge from "../components/Badge";
 import Button from "../components/Button";
 import { Formik } from "formik";
 import { Modal } from "react-bootstrap";
-import Badge from "../components/Badge";
+import { fetchOrdersWithFilters, fetchLastBillById } from "../redux/orderSlice";
 import { fetchActiveStores } from "../redux/storeSlice";
+import { formatDate } from "../utils/commonFunction";
+import { faPrint, faEye, faBars } from "@fortawesome/free-solid-svg-icons";
+import "../App.css";
 
 const OrderDetailsList: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -106,7 +106,6 @@ const OrderDetailsList: React.FC = () => {
     
   };
 
-  
 
   const handlePrint = async (billId: number) => {
     const result = await dispatch(fetchLastBillById({ billId }));
@@ -117,7 +116,7 @@ const OrderDetailsList: React.FC = () => {
   };
 
   const printPDF = (base64EncodedData: string) => {
-    const pdfWindow = window.open("", "_blank");
+    const pdfWindow = window.open();
     if (pdfWindow) {
       pdfWindow.document.write(
         `<iframe width="100%" height="100%" src="data:application/pdf;base64,${base64EncodedData}" frameborder="0" allowfullscreen></iframe>`
@@ -131,6 +130,7 @@ const OrderDetailsList: React.FC = () => {
     const selectedValue = parseInt(event.target.value);
     setSelectedStore(selectedValue); 
     console.log("Store Selected", selectedStore);
+    setShowModal(false);
   };
 
   const handleFiltersChange = (values: any) => {
@@ -214,7 +214,12 @@ const OrderDetailsList: React.FC = () => {
                         value={paymentTypeOptions.find(
                           (option) => option.value === values.paymentType
                         )}
-                        onChange={(selected) => updateFilters("paymentType", selected?.value || "all")}
+                        onChange={(selected) => {
+                          updateFilters("paymentType", selected?.value || "all");
+                          if (selected?.value === "all") {
+                            updateFilters("deliveryType", "all"); 
+                          }
+                        }}
                       />
                     </div>
                     {values.paymentType === "pay later" && (
@@ -344,11 +349,6 @@ const OrderDetailsList: React.FC = () => {
               ))}
             </select>
           </Modal.Body>
-          <Modal.Footer>
-            <Button variant="primary" onClick={() => setShowModal(false)}>
-              Save
-            </Button>
-          </Modal.Footer>
         </Modal>
       </div>
     </div>

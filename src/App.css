@@ -103,6 +103,25 @@
   z-index: -1;
 }
 
+
+.details-container p {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+}
+
+.details-container .label {
+  font-weight: bold;
+  margin-right: 16px;
+  flex: 1;
+}
+
+.details-container .value {
+  flex: 2;
+  text-align: right;
+}
+
+
 @media (max-width: 768px) {
   .carousel-item {
     height: 250px; 

@@ -7,7 +7,7 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ title, children }) => {
   return (
-    <div className="card mb-4">
+    <div className="card mb-4"  style={{ borderTop: '5px solid #000000' }}>
       <div className="card-header">
         <h5>{title}</h5>
       </div>

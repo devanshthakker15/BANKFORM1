@@ -7,15 +7,29 @@ interface Order {
   customer: {
     id: number;
     name: string;
+    contact_number: string;
+    email: string;
+    company_name: string;
   };
+  employee:{
+    first_name: string,
+    last_name: string,
+    account_holder: string
+  }
   customer_name?: string;
   bill_amount: number;
   order_invoice_number: number;
   payable_amount: number;
-  payment_type: number;
+  payment_type: {
+    payment_type: string;
+  }
   status: string;
   created_at: string;
   products: any[];
+  delivery_type: string;
+  discount_value: number;
+  total_tax:number;
+  unit_price:number;
 }
 
 interface OrderState {
@@ -66,7 +80,7 @@ export const fetchOrders = createAsyncThunk<
   }
 });
 
-//Fetch Orders By Id
+// Fetch orders by ID
 export const fetchOrdersById = createAsyncThunk<
   Order,
   { id: number },
@@ -75,7 +89,9 @@ export const fetchOrdersById = createAsyncThunk<
   try {
     const response = await apiGet(`/api/orders/manage/${id}`);
     if (response.success) {
-      return response.result as Order;
+      const order = response.result;
+      console.log("Fetched order", order)
+      return order;
     }
     return rejectWithValue("Failed to fetch order details");
   } catch (error) {
@@ -90,7 +106,7 @@ export const fetchOrdersWithFilters = createAsyncThunk<
   {
     page: number;
     query?: string;
-    store?: number; // Changed to a single number for store ID
+    store?: number; 
     order_status?: string;
     delivery_type?: string;
     payment_type?: string;
@@ -182,7 +198,7 @@ const orderSlice = createSlice({
       })
       .addCase(fetchOrdersById.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.payload as string;
+        state.error = action.payload || "Error fetching order details";
       });
   },
 });

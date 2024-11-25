@@ -12,6 +12,7 @@ interface Store {
 // Define the state type
 interface StoreState {
   stores: Store[];
+  selectedStore: number | null; 
   loading: boolean;
   error: string | null;
   selectedStoreId: number | null; // Track the selected store
@@ -20,6 +21,7 @@ interface StoreState {
 // Initial state
 const initialState: StoreState = {
   stores: [],
+  selectedStore: null,
   loading: false,
   error: null,
   selectedStoreId: null, // Initially, no store is selected
@@ -45,8 +47,11 @@ const storeSlice = createSlice({
   initialState,
   reducers: {
     // Action to set the selected store
-    setSelectedStore: (state, action) => {
-      state.selectedStoreId = action.payload;
+    setSelectedStore(state, action) {
+      state.selectedStore = action.payload; // Update the selected store ID
+    },
+    setStores(state, action) {
+      state.stores = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -66,5 +71,5 @@ const storeSlice = createSlice({
   },
 });
 
-export const { setSelectedStore } = storeSlice.actions;
+export const { setSelectedStore, setStores } = storeSlice.actions;
 export default storeSlice.reducer;
