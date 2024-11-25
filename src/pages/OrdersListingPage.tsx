@@ -111,20 +111,42 @@ const OrderDetailsList: React.FC = () => {
     const result = await dispatch(fetchLastBillById({ billId }));
     if (fetchLastBillById.fulfilled.match(result)) {
       const base64String = result.payload;
-      printPDF(base64String);
+      showPrintPreview(base64String);
     }
   };
-
-  const printPDF = (base64EncodedData: string) => {
-    const pdfWindow = window.open();
-    if (pdfWindow) {
-      pdfWindow.document.write(
-        `<iframe width="100%" height="100%" src="data:application/pdf;base64,${base64EncodedData}" frameborder="0" allowfullscreen></iframe>`
-      );
-      pdfWindow.print();
-    }
+  
+  const showPrintPreview = (base64EncodedData: string) => {
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "absolute";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "none";
+    iframe.src = `data:application/pdf;base64,${base64EncodedData}`;
+    document.body.appendChild(iframe);
+    iframe.onload = () => {
+      iframe.contentWindow?.print();
+      setTimeout(() => document.body.removeChild(iframe), 1000);
+    };
   };
 
+
+  // const handlePrint = async (billId: number) => {
+  //   const result = await dispatch(fetchLastBillById({ billId }));
+  //   if (fetchLastBillById.fulfilled.match(result)) {
+  //     const base64String = result.payload;
+  //     printPDF(base64String);
+  //   }
+  // };
+
+  // const printPDF = (base64EncodedData: string) => {
+  //   const pdfWindow = window.open("", "_blank");
+  //   if (pdfWindow) {
+  //     pdfWindow.document.write(
+  //       `<iframe width="100%" height="100%" src="data:application/pdf;base64,${base64EncodedData}" frameborder="0" allowfullscreen></iframe>`
+  //     );
+  //     pdfWindow.print();
+  //   }
+  // };
 
   const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = parseInt(event.target.value);
@@ -291,7 +313,7 @@ const OrderDetailsList: React.FC = () => {
                   <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                   <td>{order.invoice_code}</td>
                   <td>{order.customer?.name || order.customer_name}</td>
-                  <td>₹ {order.payable_amount}</td>
+                  <td>₹ {order.payable_amount.toFixed(2)}</td>
                   <td>
                     <Badge
                       badgeText={order.status.toLocaleUpperCase()}

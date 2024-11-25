@@ -23,6 +23,13 @@ interface Order {
   payment_type: {
     payment_type: string;
   }
+  payments:{
+    payment_mode:{
+      payment_mode:string;
+    }
+    created_at: string;
+    amount: number;
+  }[]; 
   status: string;
   created_at: string;
   products: any[];
