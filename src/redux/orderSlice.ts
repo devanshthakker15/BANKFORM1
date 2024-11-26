@@ -11,32 +11,44 @@ interface Order {
     email: string;
     company_name: string;
   };
-  employee:{
-    first_name: string,
-    last_name: string,
-    account_holder: string
-  }
+  employee: {
+    first_name: string;
+    last_name: string;
+    account_holder: string;
+  };
   customer_name?: string;
   bill_amount: number;
   order_invoice_number: number;
   payable_amount: number;
   payment_type: {
     payment_type: string;
-  }
-  payments:{
-    payment_mode:{
-      payment_mode:string;
-    }
+  };
+  payments: {
+    payment_mode: {
+      payment_mode: string;
+    };
     created_at: string;
     amount: number;
-  }[]; 
+  }[];
   status: string;
   created_at: string;
-  products: any[];
+  products: {
+    id?: number; 
+    product?: {
+      product_code: string;
+      print_name: string;
+    };
+    quantity: number;
+    total_amount?: number;
+    discount_value?: number;
+    total_tax?: number;
+    unit_price?: number;
+    payable_amount?: number; 
+  }[];
   delivery_type: string;
   discount_value: number;
-  total_tax:number;
-  unit_price:number;
+  total_tax: number;
+  unit_price: number;
 }
 
 interface OrderState {

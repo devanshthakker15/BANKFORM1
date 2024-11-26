@@ -22,8 +22,12 @@ const OrderDetailsPage: React.FC = () => {
   };
 
   const [activeTab, setActiveTab] = useState<
-    "productDetails" | "paymentHistory" | "creditNote"
+    "productDetails" | "paymentHistory" | "creditNote" | "returnLayout"
   >("productDetails");
+
+  const [returnQuantities, setReturnQuantities] = useState<{
+    [key: number]: number;
+  }>({});
 
   const getOrderStatusColor = (status: string | undefined) => {
     switch (status?.toLowerCase()) {
@@ -41,15 +45,18 @@ const OrderDetailsPage: React.FC = () => {
   };
 
   const handlePrint = async (billId: number) => {
-    const result = await dispatch(fetchLastBillById({ billId }));
-    if (fetchLastBillById.fulfilled.match(result)) {
-      const base64String = result.payload;
+    try {
+      const base64String = await dispatch(
+        fetchLastBillById({ billId })
+      ).unwrap();
       printPDF(base64String);
+    } catch (error) {
+      console.error("Error fetching the bill:", error);
     }
   };
 
   const printPDF = (base64EncodedData: string) => {
-    const pdfWindow = window.open("", "_blank");
+    const pdfWindow = window.open("");
     if (pdfWindow) {
       pdfWindow.document.write(
         `<iframe width="100%" height="100%" src="data:application/pdf;base64,${base64EncodedData}" frameborder="0" allowfullscreen></iframe>`
@@ -58,6 +65,47 @@ const OrderDetailsPage: React.FC = () => {
     }
   };
 
+  const toggleReturnLayout = () => {
+    setActiveTab((prevTab) =>
+      prevTab === "productDetails" ? "returnLayout" : "productDetails"
+    );
+  };
+
+  // Calculate summary for returned items
+  const calculateReturnSummary = () => {
+    if (!order || !order.products)
+      return {
+        totalReturnedItems: 0,
+        totalRefundAmount: 0,
+        totalPayableRefund: 0,
+      };
+
+    let totalReturnedItems = 0;
+    let totalRefundAmount = 0;
+    let totalPayableRefund = 0;
+    order.products.forEach((product, index) => {
+      const returnQuantity = returnQuantities[index] || 0;
+      totalReturnedItems += returnQuantity;
+      totalRefundAmount += returnQuantity * product.unit_price;
+      totalPayableRefund += returnQuantity * product.unit_price;
+    });
+    return {
+      totalReturnedItems,
+      totalRefundAmount,
+      totalPayableRefund,
+    };
+  };
+
+  const handleReturnQuantityChange = (index: number, quantity: number) => {
+    setReturnQuantities((prev) => ({
+      ...prev,
+      [index]: quantity,
+    }));
+  };
+  const { totalReturnedItems, totalRefundAmount, totalPayableRefund } =
+    calculateReturnSummary();
+
+    
   useEffect(() => {
     if (id) {
       dispatch(fetchOrdersById({ id: Number(id) }));
@@ -128,7 +176,6 @@ const OrderDetailsPage: React.FC = () => {
               <p>
                 <strong>Payment Type:</strong>{" "}
                 {order.payment_type?.payment_type || "N/A"}
-                {/* {order.payments?.payment_mode?.payment_mode} */}
               </p>
             </div>
             <div className="col-md-5">
@@ -165,8 +212,9 @@ const OrderDetailsPage: React.FC = () => {
               icon={faUndo}
               variant="danger"
               style={{ width: "100px", margin: "4px" }}
+              onClick={toggleReturnLayout}
             >
-              Return
+              {activeTab === "returnLayout" ? "Exit" : "Return"}
             </Button>
           )}
         </Card>
@@ -192,14 +240,14 @@ const OrderDetailsPage: React.FC = () => {
                 >
                   Payment History
                 </span>
-                <span
-                  className={`tab ms-5 ${
-                    activeTab === "creditNote" ? "active" : ""
-                  }`}
-                  onClick={() => setActiveTab("creditNote")}
-                >
-                  Credit Note
-                </span>
+                {/* <span
+                className={`tab ms-5 ${
+                  activeTab === "creditNote" ? "active" : ""
+                }`}
+                onClick={() => setActiveTab("creditNote")}
+              >
+                Credit Note
+              </span> */}
               </>
             )}
           </div>
@@ -324,6 +372,7 @@ const OrderDetailsPage: React.FC = () => {
               )}
             </div>
           )}
+
           {activeTab === "paymentHistory" && (
             <div>
               <table className="table table-hover">
@@ -360,7 +409,119 @@ const OrderDetailsPage: React.FC = () => {
               </table>
             </div>
           )}
-          {activeTab === "creditNote" && <div>Credit Note Content</div>}
+
+          {/* {activeTab === "creditNote" && <div>Credit Note Content</div>} */}
+
+          {activeTab === "returnLayout" && (
+            <div>
+              <div
+                style={{
+                  maxHeight: "300px",
+                  overflowY: "auto",
+                  border: "1px solid #ddd",
+                  borderRadius: "5px",
+                }}
+              >
+                <table className="table table-hover mt-3">
+                  <thead style={{ backgroundColor: "#f8f9fa", color: "black" }}>
+                    <tr>
+                      <th>#</th>
+                      <th>Product Code</th>
+                      <th>Product Name</th>
+                      <th>Quantity</th>
+                      <th>MRP</th>
+                      <th>Discount</th>
+                      <th>Tax</th>
+                      <th>Unit Cost</th>
+                      <th>Net Amount</th>
+                      <th>Return Quantity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {order.products?.map((product, index) => {
+                      const returnQuantity = returnQuantities[index] || 0;
+                      const updatedQuantity = product.quantity - returnQuantity;
+
+                      return (
+                        <tr key={index}>
+                          <td>{index + 1}</td>
+                          <td>{product.product?.product_code || "N/A"}</td>
+                          <td>{product.product?.print_name || "N/A"}</td>
+                          <td>{updatedQuantity >= 0 ? updatedQuantity : 0}</td>
+                          <td>₹ {product.total_amount?.toFixed(2) || "N/A"}</td>
+                          <td>{product.discount_value || "-"}</td>
+                          <td>₹ {product.total_tax?.toFixed(2) || "N/A"}</td>
+                          <td>₹ {product.unit_price?.toFixed(2) || "N/A"}</td>
+                          <td>
+                            ₹ {product.payable_amount?.toFixed(2) || "N/A"}
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              min="0"
+                              max={product.quantity}
+                              value={returnQuantity}
+                              onChange={(e) =>
+                                handleReturnQuantityChange(
+                                  index,
+                                  Math.min(parseInt(e.target.value) || 0, product.quantity)
+                                )
+                              }
+                              style={{ width: "60px" }}
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              {/* Summary Section for Return Layout */}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginTop: "15px",
+                  padding: "10px",
+                  border: "1px solid #ddd",
+                  borderRadius: "5px",
+                  backgroundColor: "#f8f9fa",
+                }}
+              >
+                <div className="d-flex flex-column align-items-center">
+                  <span>{totalReturnedItems}</span>
+                  <span>
+                    <strong>Total Returned Items:</strong>
+                  </span>
+                </div>
+                <div className="d-flex flex-column align-items-center">
+                  <span>₹ {totalRefundAmount.toFixed(2)}</span>
+                  <span>
+                    <strong>Total Refund Amount:</strong>{" "}
+                  </span>
+                </div>
+                <div className="d-flex flex-column align-items-center">
+                  <span>₹ {totalPayableRefund.toFixed(2)}</span>
+                  <span>
+                    <strong>Payable Refund Amount:</strong>
+                  </span>
+                </div>
+                <div className="d-flex flex-column align-items-center">
+                  <span>
+                    <Button
+                      icon={faUndo}
+                      variant="danger"
+                      style={{ width: "100px", margin: "4px" }}
+                      onClick={() => console.log("Return Order")}
+                    >
+                      Return
+                    </Button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
         </Card>
       </div>
     </div>

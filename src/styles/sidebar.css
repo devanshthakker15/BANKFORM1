@@ -3,11 +3,12 @@
   transition: width 0.3s ease;
   width: 250px;
   height: 1830px;
+  /* height: "100%"; */
 }
 
 .main-sidebar.collapsed {
   width: 80px;
-  height: 1330px;
+  height: 1410px;
   /* height: 100vh; */
 }
 

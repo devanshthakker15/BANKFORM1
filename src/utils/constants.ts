@@ -39,9 +39,52 @@ export const PERMISSIONS = {
   DELETE: 'perm_delete'
 };
  
+export const statusOptions = [
+  { value: "all", label: "All" },
+  { value: "completed", label: "Completed" },
+  { value: "pending", label: "Pending" },
+  { value: "cancelled", label: "Cancelled" },
+];
+
+export const paymentTypeOptions = [
+  { value: "all", label: "All" },
+  { value: "pay now", label: "Pay Now" },
+  { value: "pay later", label: "Pay Later" },
+];
+
+export const deliveryTypeOptions = [
+  { value: "all", label: "All" },
+  { value: "delivery", label: "Delivery" },
+  { value: "pickup", label: "Pickup" },
+];
 
 
 
+export const printPDF = (base64EncodedData: string) => {
+  const pdfWindow = window.open("", "_blank");
+  if (pdfWindow) {
+    pdfWindow.document.write(
+      `<iframe width="100%" height="100%" src="data:application/pdf;base64,${base64EncodedData}" frameborder="0" allowfullscreen></iframe>`
+    );
+    pdfWindow.print();
+  }
+};
+
+
+export const getOrderStatusColor = (status: string) => {
+  switch (status.toLowerCase()) {
+    case "completed":
+      return "green";
+    case "pending":
+      return "yellow";
+    case "cancelled":
+      return "red";
+    case "pickup":
+      return "cyan";
+    default:
+      return "blue";
+  }
+};
 
 
 

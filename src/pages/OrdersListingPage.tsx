@@ -11,21 +11,36 @@ import Button from "../components/Button";
 import { Formik } from "formik";
 import { Modal } from "react-bootstrap";
 import { fetchOrdersWithFilters, fetchLastBillById } from "../redux/orderSlice";
-import { fetchActiveStores } from "../redux/storeSlice";
+import { fetchActiveStores, setSelectedStore } from "../redux/storeSlice";
 import { formatDate } from "../utils/commonFunction";
-import { faPrint, faEye, faBars } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPrint,
+  faEye,
+  faStore,
+} from "@fortawesome/free-solid-svg-icons";
 import "../App.css";
+import {
+  deliveryTypeOptions,
+  statusOptions,
+  paymentTypeOptions,
+  printPDF,
+  getOrderStatusColor,
+} from "../utils/constants";
 
 const OrderDetailsList: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState(searchParams.get("query") || "");
+  const [searchQuery, setSearchQuery] = useState(
+    searchParams.get("query") || ""
+  );
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
-  const [selectedStore, setSelectedStore] = useState<number | null>(null); 
-  const formikValuesRef = useRef(null);
+  const [showModal, setShowModal] = useState(false); 
+  // const formikValuesRef = useRef(null);
+
   const dispatch = useAppDispatch();
-  const { orders, status, totalCount } = useSelector((state: RootState) => state.orders);
-  const { stores } = useAppSelector((state) => state.store);
-  const [showModal, setShowModal] = useState(false);
+  const { orders, status, totalCount } = useSelector(
+    (state: RootState) => state.orders
+  );
+  const { stores, selectedStore } = useAppSelector((state) => state.store);
 
   const storeOptions = stores.map((store) => ({
     value: store.id,
@@ -36,19 +51,9 @@ const OrderDetailsList: React.FC = () => {
   const currentPage = parseInt(searchParams.get("page") || "1", 10);
   const totalPages = Math.ceil(totalCount / itemsPerPage);
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-    }, 1000);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [searchQuery]);
-
   const currentDate = new Date().toISOString().split("T")[0];
   const startDate = new Date();
-  startDate.setDate(startDate.getDate());
+  startDate.setDate(startDate.getDate()-25);
   const defaultStartDate = startDate.toISOString().split("T")[0];
   const defaultEndDate = currentDate;
 
@@ -61,117 +66,60 @@ const OrderDetailsList: React.FC = () => {
     query: debouncedQuery || "",
   };
 
-  const statusOptions = [
-    { value: "all", label: "All" },
-    { value: "completed", label: "Completed" },
-    { value: "pending", label: "Pending" },
-    { value: "cancelled", label: "Cancelled" },
-  ];
-
-  const paymentTypeOptions = [
-    { value: "all", label: "All" },
-    { value: "pay now", label: "Pay Now" },
-    { value: "pay later", label: "Pay Later" },
-  ];
-
-  const deliveryTypeOptions = [
-    { value: "all", label: "All" },
-    { value: "delivery", label: "Delivery" },
-    { value: "pickup", label: "Pickup" },
-  ];
-
-  const handleOpenModal = () => {
-    setShowModal(true);
-    dispatch(fetchActiveStores());
-  };
-
-  const getOrderStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "completed":
-        return "green";
-      case "pending":
-        return "yellow";
-      case "cancelled":
-        return "red";
-      default:
-        return "blue";
-    }
-  };
-
   const handlePageChange = (page: number) => {
     setSearchParams((prev) => ({
       ...Object.fromEntries(prev.entries()),
       page: page.toString(),
     }));
-    
   };
 
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedValue = parseInt(event.target.value, 10);
+    dispatch(setSelectedStore(selectedValue));
+    setShowModal(false);
+    setSearchParams({ page: "1" });
+  };
+
+  const handleFiltersChange = (values: any) => {
+    if (!selectedStore) return;
+    const filters = {
+      page: currentPage,
+      query: values.query || debouncedQuery,
+      order_status: values.status !== "all" ? values.status : undefined,
+      delivery_type:
+        values.deliveryType !== "all" ? values.deliveryType : undefined,
+      start_date: values.start_date,
+      end_date: values.end_date,
+      store: selectedStore,
+    };
+    dispatch(fetchOrdersWithFilters(filters));
+  };
+
+  const updateFilters = (field: string, value: any, values: any, setFieldValue: any) => {
+    setFieldValue(field, value);
+    handleFiltersChange({ ...values, [field]: value });
+  };
 
   const handlePrint = async (billId: number) => {
     const result = await dispatch(fetchLastBillById({ billId }));
     if (fetchLastBillById.fulfilled.match(result)) {
       const base64String = result.payload;
-      showPrintPreview(base64String);
+      printPDF(base64String);
     }
-  };
-  
-  const showPrintPreview = (base64EncodedData: string) => {
-    const iframe = document.createElement("iframe");
-    iframe.style.position = "absolute";
-    iframe.style.width = "0";
-    iframe.style.height = "0";
-    iframe.style.border = "none";
-    iframe.src = `data:application/pdf;base64,${base64EncodedData}`;
-    document.body.appendChild(iframe);
-    iframe.onload = () => {
-      iframe.contentWindow?.print();
-      setTimeout(() => document.body.removeChild(iframe), 1000);
-    };
-  };
-
-
-  // const handlePrint = async (billId: number) => {
-  //   const result = await dispatch(fetchLastBillById({ billId }));
-  //   if (fetchLastBillById.fulfilled.match(result)) {
-  //     const base64String = result.payload;
-  //     printPDF(base64String);
-  //   }
-  // };
-
-  // const printPDF = (base64EncodedData: string) => {
-  //   const pdfWindow = window.open("", "_blank");
-  //   if (pdfWindow) {
-  //     pdfWindow.document.write(
-  //       `<iframe width="100%" height="100%" src="data:application/pdf;base64,${base64EncodedData}" frameborder="0" allowfullscreen></iframe>`
-  //     );
-  //     pdfWindow.print();
-  //   }
-  // };
-
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedValue = parseInt(event.target.value);
-    setSelectedStore(selectedValue); 
-    console.log("Store Selected", selectedStore);
-    setShowModal(false);
-  };
-
-  const handleFiltersChange = (values: any) => {
-    const filters = {
-      page: currentPage,
-      query: values.query || debouncedQuery,
-      order_status: values.status !== "all" ? values.status : undefined,
-      delivery_type: values.deliveryType !== "all" ? values.deliveryType : undefined,
-      start_date: values.start_date,
-      end_date: values.end_date,
-      store: selectedStore || undefined,
-    };
-
-    dispatch(fetchOrdersWithFilters(filters));
   };
 
   useEffect(() => {
-    handleFiltersChange(initialFilters);
-  }, [debouncedQuery, currentPage, selectedStore]);
+    dispatch(fetchActiveStores());
+    if (!selectedStore) {
+    } else {
+      handleFiltersChange(initialFilters);
+    }
+    const handler = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+      handleFiltersChange(initialFilters);
+    }, 1000);
+    return () => clearTimeout(handler);
+  }, [searchQuery, currentPage, selectedStore, dispatch]);
 
   return (
     <div>
@@ -179,20 +127,16 @@ const OrderDetailsList: React.FC = () => {
       <div className="container mt-2">
         <Formik
           initialValues={initialFilters}
-          onSubmit={handleFiltersChange} 
+          onSubmit={handleFiltersChange}
           enableReinitialize
         >
           {({ values, setFieldValue }) => {
-            formikValuesRef.current = values;
-
-            const updateFilters = (field: string, value: any) => {
-              setFieldValue(field, value);
-              handleFiltersChange({ ...values, [field]: value });
-            };
+            // formikValuesRef.current = values;
 
             return (
               <div>
                 <form>
+                  {/* Filters Section */}
                   <div className="row mb-3">
                     <div className="col-md-3">
                       <label htmlFor="start_date">Start Date</label>
@@ -202,7 +146,9 @@ const OrderDetailsList: React.FC = () => {
                         className="form-control"
                         max={values.end_date}
                         value={values.start_date}
-                        onChange={(selectedDate) => updateFilters("start_date", selectedDate.target.value)}
+                        onChange={(selectedDate) =>
+                          updateFilters("start_date", selectedDate.target.value, values, setFieldValue)
+                        }
                       />
                     </div>
                     <div className="col-md-3">
@@ -214,7 +160,9 @@ const OrderDetailsList: React.FC = () => {
                         min={values.start_date}
                         max={currentDate}
                         value={values.end_date}
-                        onChange={(selectedDate) => updateFilters("end_date", selectedDate.target.value)}
+                        onChange={(selectedDate) =>
+                          updateFilters("end_date", selectedDate.target.value, values, setFieldValue)
+                        }
                       />
                     </div>
                     <div className="col-md-2">
@@ -225,7 +173,9 @@ const OrderDetailsList: React.FC = () => {
                         value={statusOptions.find(
                           (option) => option.value === values.status
                         )}
-                        onChange={(selected) => updateFilters("status", selected?.value || "all")}
+                        onChange={(selected) =>
+                          updateFilters("status", selected?.value || "all", values, setFieldValue)
+                        }
                       />
                     </div>
                     <div className="col-md-2">
@@ -237,9 +187,9 @@ const OrderDetailsList: React.FC = () => {
                           (option) => option.value === values.paymentType
                         )}
                         onChange={(selected) => {
-                          updateFilters("paymentType", selected?.value || "all");
+                          updateFilters("paymentType", selected?.value || "all", values, setFieldValue);
                           if (selected?.value === "all") {
-                            updateFilters("deliveryType", "all"); 
+                            updateFilters("deliveryType", "all", values, setFieldValue);
                           }
                         }}
                       />
@@ -253,7 +203,9 @@ const OrderDetailsList: React.FC = () => {
                           value={deliveryTypeOptions.find(
                             (option) => option.value === values.deliveryType
                           )}
-                          onChange={(selected) => updateFilters("deliveryType", selected?.value || "all")}
+                          onChange={(selected) =>
+                            updateFilters("deliveryType", selected?.value || "all", values, setFieldValue)
+                          }
                         />
                       </div>
                     )}
@@ -264,30 +216,34 @@ const OrderDetailsList: React.FC = () => {
                         placeholder="Search by Customer Name / Invoice Code / Payable Amount"
                         className="form-control"
                         value={values.query}
-                        onChange={(e) => updateFilters("query", e.target.value)}
+                        onChange={(e) => updateFilters("query", e.target.value, values, setFieldValue)}
                       />
                     </div>
                   </div>
                 </form>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "end",
-                    marginTop: "-80px",
-                    marginLeft: "-80px",
-                  }}
-                >
-                  <Button
-                    icon={faBars}
-                    variant="primary"
-                    style={{ width: "50px", margin: "4px" }}
-                    onClick={handleOpenModal}
-                  />
-                </div>
               </div>
             );
           }}
         </Formik>
+        {/* Change Store Button */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "end",
+            marginTop: "-80px",
+            marginLeft: "-90px",
+          }}
+        >
+          <Button
+            icon={faStore}
+            text=" Change Store"
+            variant="secondary"
+            onClick={() => setShowModal(true)}
+            style={{ marginBottom: "18px", width: "150px" }}
+          />
+        </div>
+
+        {/* Order Table */}
         <table className="table table-hover mt-3">
           <thead>
             <tr>
@@ -321,7 +277,6 @@ const OrderDetailsList: React.FC = () => {
                       badgeColor="black"
                     />
                   </td>
-
                   <td>{formatDate(order.created_at)}</td>
                   <td>
                     <Button
@@ -346,6 +301,8 @@ const OrderDetailsList: React.FC = () => {
             )}
           </tbody>
         </table>
+
+        {/* Pagination */}
         {totalPages > 1 && (
           <Pagination
             currentPage={currentPage}
@@ -353,8 +310,10 @@ const OrderDetailsList: React.FC = () => {
             onPageChange={handlePageChange}
           />
         )}
+
+        {/* Store Selection Modal */}
         <Modal show={showModal} onHide={() => setShowModal(false)}>
-          <Modal.Header closeButton>
+          <Modal.Header>
             <Modal.Title>Select Store</Modal.Title>
           </Modal.Header>
           <Modal.Body>
@@ -362,6 +321,7 @@ const OrderDetailsList: React.FC = () => {
               className="form-select"
               aria-label="Store select"
               onChange={handleSelectChange}
+              value={selectedStore || ""}
             >
               <option value="">Select a store</option>
               {storeOptions.map((option) => (
