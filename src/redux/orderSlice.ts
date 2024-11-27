@@ -35,6 +35,7 @@ interface Order {
   products: {
     id?: number; 
     product?: {
+      id: number;
       product_code: string;
       print_name: string;
     };

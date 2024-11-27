@@ -13,6 +13,7 @@ import { formatDate } from "../utils/commonFunction";
 import { printPDF } from "../utils/constants";
 import { Modal } from "react-bootstrap";
 import TextInput from "../components/TextInput";
+import { manageReturns } from "../redux/returnSlice";
 
 const OrderDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -97,9 +98,64 @@ const OrderDetailsPage: React.FC = () => {
   const { totalReturnedItems, totalRefundAmount, totalPayableRefund } =
     calculateReturnSummary();
 
+  // Handle the return action when the button is clicked
+  const handleReturnAction = async () => {
+    if (!order) return;
 
+    const returns = Object.entries(returnQuantities)
+      .filter(([_, quantity]) => quantity > 0)
+      .map(([index, quantity]) => {
+        const product = order.products[parseInt(index)];
+        return {
+          id: product.product.id,
+          quantity,
+          unit_price: product.unit_price,
+        };
+      });
 
-  
+    const returnData = { orderId: order.id, returns };
+
+    const result = await dispatch(manageReturns(returnData));
+    console.log(returnData);
+
+    if (manageReturns.fulfilled.match(result)) {
+      alert("Return processed successfully!");
+      setReturnQuantities({});
+    } else {
+      alert(`Error: ${result.payload}`);
+    }
+  };
+
+  const calculateProductSummary = () => {
+    let totalItems = 0;
+    let totalMRP = 0;
+    let totalDiscount = 0;
+    let totalTax = 0;
+
+    if (order.products && Array.isArray(order.products)) {
+      order.products.forEach((product) => {
+        totalItems += product.quantity || 0;
+        totalMRP += product.total_amount || 0;
+        totalDiscount += product.discount_value || 0;
+        totalTax += product.total_tax || 0;
+      });
+    }
+
+    const roundOff = Math.round(totalMRP) - totalMRP;
+    const netAmount = totalMRP + roundOff;
+
+    return {
+      totalItems,
+      totalMRP,
+      totalDiscount,
+      totalTax,
+      roundOff,
+      netAmount,
+    };
+  };
+
+  const { totalMRP, totalDiscount, totalTax, roundOff, netAmount } =
+    calculateProductSummary();
 
   useEffect(() => {
     if (id) {
@@ -124,70 +180,103 @@ const OrderDetailsPage: React.FC = () => {
       <div className="row">
         <div className="col-md-6">
           <Card title="Order Details">
-            <p>
-              <strong>Invoice Number:</strong> {order.invoice_code || "N/A"}
-            </p>
-            <p>
-              <strong>Status:</strong>{" "}
-              <Badge
-                badgeText={order.status?.toLocaleUpperCase() || "N/A"}
-                badgeBackgroundColor={getOrderStatusColor(order.status)}
-                badgeColor="black"
-              />
-            </p>
-            <p>
-              <strong>Created At:</strong>{" "}
-              {order.created_at ? formatDate(order.created_at) : "N/A"}
-            </p>
-            <p>
-              <strong>Biller Name:</strong>{" "}
-              {order.employee?.account_holder || "N/A"}
-            </p>
+            <div className="row">
+              <div className="col-md-3">
+                <strong>Invoice Number:</strong>
+              </div>
+              <div className="col-md-7">{order.invoice_code || "N/A"}</div>
+            </div>
+
+            <div className="row">
+              <div className="col-md-3">
+                <strong>Status:</strong>{" "}
+              </div>
+              <div className="col-md-7">
+                <Badge
+                  badgeText={order.status?.toLocaleUpperCase() || "N/A"}
+                  badgeBackgroundColor={getOrderStatusColor(order.status)}
+                  badgeColor={order.status === "pending" ? "black" : "white"}
+                />
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-3">
+                <strong>Created At:</strong>{" "}
+              </div>
+              <div className="col-md-7">
+                {order.created_at ? formatDate(order.created_at) : "N/A"}
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-3">
+                <strong>Biller Name:</strong>{" "}
+              </div>
+              <div className="col-md-7">
+                {order.employee?.account_holder || "N/A"}
+              </div>
+            </div>
           </Card>
         </div>
         <div className="col-md-6">
           <Card title="Customer Details">
-            <p>
-              <strong>Name:</strong> {order.customer?.name || "N/A"}
-            </p>
-            <p>
-              <strong>Mobile Number:</strong>{" "}
-              {order.customer?.contact_number || "N/A"}
-            </p>
-            <p>
-              <strong>Email:</strong> {order.customer?.email || "N/A"}
-            </p>
-            <p>
-              <strong>Company Name:</strong>{" "}
-              {order.customer?.company_name || "N/A"}
-            </p>
+            <div className="row">
+              <div className="col-md-3">
+                <strong>Name:</strong>
+              </div>
+              <div className="col-md-7">{order.customer?.name || "N/A"}</div>
+            </div>
+
+            <div className="row">
+              <div className="col-md-3">
+                <strong>Mobile Number:</strong>{" "}
+              </div>
+              <div className="col-md-7">
+                {order.customer?.contact_number || "N/A"}
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="col-md-3">
+                <strong>Email:</strong>
+              </div>
+              <div className="col-md-7"> {order.customer?.email || "N/A"}</div>
+            </div>
+
+            <div className="row">
+              <div className="col-md-3">
+                <strong>Company Name:</strong>{" "}
+              </div>
+              <div className="col-md-7">
+                {order.customer?.company_name || "N/A"}
+              </div>
+            </div>
           </Card>
         </div>
       </div>
       <div className="col-md-12">
         <Card title="Payment Details">
           <div className="row mt-1">
-            <div className="col-md-5">
-              <p>
-                <strong>Payment Type:</strong>{" "}
-                {order.payment_type?.payment_type || "N/A"}
-              </p>
+            <div className="col-md-3">
+              <strong>Payment Type:</strong>{" "}
             </div>
-            <div className="col-md-5">
-              <p>
-                <strong>Delivery Type:</strong>{" "}
-                {order.delivery_type ? (
-                  <Badge
-                    badgeText={order.delivery_type.toLocaleUpperCase()}
-                    badgeBackgroundColor={getOrderStatusColor(
-                      order.delivery_type
-                    )}
-                    badgeColor="black"
-                  />
-                ) : (
-                  "N/A"
-                )}
-              </p>
+            <div className="col-md-3">
+              {order.payment_type?.payment_type || "N/A"}
+            </div>
+            <div className="col-md-3">
+              <strong>Delivery Type:</strong>{" "}
+            </div>
+            <div className="col-md-3">
+              {order.delivery_type ? (
+                <Badge
+                  badgeText={order.delivery_type.toLocaleUpperCase()}
+                  badgeBackgroundColor={getOrderStatusColor(
+                    order.delivery_type
+                  )}
+                  badgeColor="black"
+                />
+              ) : (
+                "N/A"
+              )}
             </div>
           </div>
         </Card>
@@ -267,6 +356,7 @@ const OrderDetailsPage: React.FC = () => {
                       <th>Discount</th>
                       <th>Tax</th>
                       <th>Unit Cost</th>
+                      <th>Net Amount</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -277,10 +367,11 @@ const OrderDetailsPage: React.FC = () => {
                           <td>{product.product?.product_code || "N/A"}</td>
                           <td>{product.product?.print_name || "N/A"}</td>
                           <td>{product.quantity || "N/A"}</td>
-                          <td>₹ {product.total_amount?.toFixed(2) || "N/A"}</td>
+                          <td>₹ {product.unit_price?.toFixed(2) || "N/A"}</td>
                           <td>{product.discount_value || "-"}</td>
                           <td>₹ {product.total_tax?.toFixed(2) || "N/A"}</td>
                           <td>₹ {product.unit_price?.toFixed(2) || "N/A"}</td>
+                          <td>₹ {product.total_amount?.toFixed(2) || "N/A"}</td>
                         </tr>
                       ))
                     ) : (
@@ -314,52 +405,31 @@ const OrderDetailsPage: React.FC = () => {
                   </div>
                   <div className="d-flex flex-column align-items-center">
                     <span>
-                      <strong>
-                        ₹
-                        {order.products
-                          .reduce(
-                            (acc, product) => acc + product.total_amount,
-                            0
-                          )
-                          .toFixed(2)}
-                      </strong>
+                      <strong>₹ {totalMRP.toFixed(2)}</strong>
                     </span>
                     <span>MRP</span>
                   </div>
                   <div className="d-flex flex-column align-items-center">
                     <span>
-                      <strong>
-                        ₹
-                        {order.products
-                          .reduce(
-                            (acc, product) =>
-                              acc + (product.discount_value || 0),
-                            0
-                          )
-                          .toFixed(2)}
-                      </strong>
+                      <strong>₹ {totalDiscount.toFixed(2)}</strong>
                     </span>
                     <span>Total Discount</span>
                   </div>
                   <div className="d-flex flex-column align-items-center">
                     <span>
-                      <strong>
-                        ₹
-                        {order.products
-                          .reduce((acc, product) => acc + product.total_tax, 0)
-                          .toFixed(2)}
-                      </strong>
+                      <strong>₹ {totalTax.toFixed(2)}</strong>
                     </span>
                     <span>Tax Amount</span>
                   </div>
                   <div className="d-flex flex-column align-items-center">
                     <span>
-                      <strong>
-                        ₹
-                        {order.products
-                          .reduce((acc, product) => acc + product.unit_price, 0)
-                          .toFixed(2)}
-                      </strong>
+                      <strong>₹ {roundOff.toFixed(2)}</strong>
+                    </span>
+                    <span>Round Off</span>
+                  </div>
+                  <div className="d-flex flex-column align-items-center">
+                    <span>
+                      <strong>₹ {netAmount.toFixed(2)}</strong>
                     </span>
                     <span>Net Amount</span>
                   </div>
@@ -444,7 +514,7 @@ const OrderDetailsPage: React.FC = () => {
                           <td>{product.product?.product_code || "N/A"}</td>
                           <td>{product.product?.print_name || "N/A"}</td>
                           <td>{updatedQuantity >= 0 ? updatedQuantity : 0}</td>
-                          <td>₹ {product.total_amount?.toFixed(2) || "N/A"}</td>
+                          <td>₹ {product.unit_price?.toFixed(2) || "N/A"}</td>
                           <td>{product.discount_value || "-"}</td>
                           <td>₹ {product.total_tax?.toFixed(2) || "N/A"}</td>
                           <td>₹ {product.unit_price?.toFixed(2) || "N/A"}</td>
@@ -483,6 +553,9 @@ const OrderDetailsPage: React.FC = () => {
                   </tbody>
                 </table>
               </div>
+              <div className="col-md-12">
+                {/* <TextInput placeholder="Remarks" label="Remarks" name="Remarks"/> */}
+              </div>
               {/* Summary Section for Return Layout */}
               <div
                 style={{
@@ -520,7 +593,7 @@ const OrderDetailsPage: React.FC = () => {
                       icon={faUndo}
                       variant="danger"
                       style={{ width: "100px", margin: "4px" }}
-                      onClick={() => setShowModal(true)}
+                      onClick={handleReturnAction}
                     >
                       Return
                     </Button>
@@ -530,7 +603,7 @@ const OrderDetailsPage: React.FC = () => {
             </div>
           )}
         </Card>
-        <Modal show={showModal} onHide={() => setShowModal(false)} >
+        <Modal show={showModal} onHide={() => setShowModal(false)}>
           <Modal.Header>
             <Modal.Title>Return Item</Modal.Title>
           </Modal.Header>
@@ -539,7 +612,7 @@ const OrderDetailsPage: React.FC = () => {
               <h6>Return quantity</h6>
               <input type="text" placeholder="Enter return quantity" />
             </div>
-            <div className="mt-3"> 
+            <div className="mt-3">
               <h6>Remarks</h6>
               <input type="text" placeholder="Remarks" />
             </div>
