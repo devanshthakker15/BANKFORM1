@@ -60,14 +60,36 @@ export const deliveryTypeOptions = [
 
 
 
-export const printPDF = (base64EncodedData: string) => {
-  const pdfWindow = window.open("", "_blank");
-  if (pdfWindow) {
-    pdfWindow.document.write(
-      `<iframe width="100%" height="100%" src="data:application/pdf;base64,${base64EncodedData}" frameborder="0" allowfullscreen></iframe>`
-    );
-    pdfWindow.print();
+// Utility to convert Base64 string to ArrayBuffer
+const base64ToArrayBuffer = (data: string): Uint8Array => {
+  const bString = window.atob(data);
+  const bLength = bString.length;
+  const bytes = new Uint8Array(bLength);
+  for (let i = 0; i < bLength; i++) {
+    bytes[i] = bString.charCodeAt(i);
   }
+  return bytes;
+};
+
+// Utility to display and print the PDF
+  const makePDFWindow = (base64String: string): void => {
+  const content = base64ToArrayBuffer(base64String);
+  const blob = new Blob([content], { type: "application/pdf" });
+  const url = window.URL.createObjectURL(blob);
+
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none"; 
+  iframe.src = url;
+  document.body.appendChild(iframe);
+
+  iframe.onload = () => {
+    iframe.contentWindow?.print();
+  };
+};
+
+// Function to print the PDF
+export const printPDF = (base64EncodedData: string): void => {
+  makePDFWindow(base64EncodedData); 
 };
 
 

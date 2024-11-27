@@ -5,17 +5,21 @@ import Button from "../components/Button";
 import Loader from "../components/Loader";
 import Card from "../components/Card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPrint, faUndo } from "@fortawesome/free-solid-svg-icons";
+import { faExchange, faPrint, faUndo } from "@fortawesome/free-solid-svg-icons";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { fetchOrdersById, fetchLastBillById } from "../redux/orderSlice";
 import Badge from "../components/Badge";
 import { formatDate } from "../utils/commonFunction";
+import { printPDF } from "../utils/constants";
+import { Modal } from "react-bootstrap";
+import TextInput from "../components/TextInput";
 
 const OrderDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
   const { orders, status, error } = useAppSelector((state) => state.orders);
   const order = orders[0];
+  const [showModal, setShowModal] = useState(false);
 
   const ScrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -44,24 +48,12 @@ const OrderDetailsPage: React.FC = () => {
     }
   };
 
-  const handlePrint = async (billId: number) => {
-    try {
-      const base64String = await dispatch(
-        fetchLastBillById({ billId })
-      ).unwrap();
+  // Handler function for printing
+  const handlePrint = async (billId: number): Promise<void> => {
+    const result = await dispatch(fetchLastBillById({ billId }));
+    if (fetchLastBillById.fulfilled.match(result)) {
+      const base64String = result.payload;
       printPDF(base64String);
-    } catch (error) {
-      console.error("Error fetching the bill:", error);
-    }
-  };
-
-  const printPDF = (base64EncodedData: string) => {
-    const pdfWindow = window.open("");
-    if (pdfWindow) {
-      pdfWindow.document.write(
-        `<iframe width="100%" height="100%" src="data:application/pdf;base64,${base64EncodedData}" frameborder="0" allowfullscreen></iframe>`
-      );
-      pdfWindow.print();
     }
   };
 
@@ -105,7 +97,10 @@ const OrderDetailsPage: React.FC = () => {
   const { totalReturnedItems, totalRefundAmount, totalPayableRefund } =
     calculateReturnSummary();
 
-    
+
+
+  
+
   useEffect(() => {
     if (id) {
       dispatch(fetchOrdersById({ id: Number(id) }));
@@ -422,8 +417,8 @@ const OrderDetailsPage: React.FC = () => {
                   borderRadius: "5px",
                 }}
               >
-                <table className="table table-hover mt-3">
-                  <thead style={{ backgroundColor: "#f8f9fa", color: "black" }}>
+                <table className="table table-hover table-responsive mt-3">
+                  <thead className="thead-light">
                     <tr>
                       <th>#</th>
                       <th>Product Code</th>
@@ -435,6 +430,7 @@ const OrderDetailsPage: React.FC = () => {
                       <th>Unit Cost</th>
                       <th>Net Amount</th>
                       <th>Return Quantity</th>
+                      <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -464,11 +460,22 @@ const OrderDetailsPage: React.FC = () => {
                               onChange={(e) =>
                                 handleReturnQuantityChange(
                                   index,
-                                  Math.min(parseInt(e.target.value) || 0, product.quantity)
+                                  Math.min(
+                                    parseInt(e.target.value) || 0,
+                                    product.quantity
+                                  )
                                 )
                               }
                               style={{ width: "60px" }}
                             />
+                          </td>
+                          <td>
+                            <Button
+                              icon={faExchange}
+                              variant="secondary"
+                              style={{ width: "60px", margin: "4px" }}
+                              onClick={() => setShowModal(true)}
+                            ></Button>
                           </td>
                         </tr>
                       );
@@ -513,7 +520,7 @@ const OrderDetailsPage: React.FC = () => {
                       icon={faUndo}
                       variant="danger"
                       style={{ width: "100px", margin: "4px" }}
-                      onClick={() => console.log("Return Order")}
+                      onClick={() => setShowModal(true)}
                     >
                       Return
                     </Button>
@@ -523,6 +530,21 @@ const OrderDetailsPage: React.FC = () => {
             </div>
           )}
         </Card>
+        <Modal show={showModal} onHide={() => setShowModal(false)} >
+          <Modal.Header>
+            <Modal.Title>Return Item</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <div>
+              <h6>Return quantity</h6>
+              <input type="text" placeholder="Enter return quantity" />
+            </div>
+            <div className="mt-3"> 
+              <h6>Remarks</h6>
+              <input type="text" placeholder="Remarks" />
+            </div>
+          </Modal.Body>
+        </Modal>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
@@ -27,14 +27,13 @@ import {
   getOrderStatusColor,
 } from "../utils/constants";
 
-const OrderDetailsList: React.FC = () => {
+const OrderListPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(
     searchParams.get("query") || ""
   );
   const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
-  const [showModal, setShowModal] = useState(false); 
-  // const formikValuesRef = useRef(null);
+  const [showModal, setShowModal] = useState(false);
 
   const dispatch = useAppDispatch();
   const { orders, status, totalCount } = useSelector(
@@ -53,7 +52,7 @@ const OrderDetailsList: React.FC = () => {
 
   const currentDate = new Date().toISOString().split("T")[0];
   const startDate = new Date();
-  startDate.setDate(startDate.getDate()-25);
+  startDate.setDate(startDate.getDate() - 25);
   const defaultStartDate = startDate.toISOString().split("T")[0];
   const defaultEndDate = currentDate;
 
@@ -100,7 +99,7 @@ const OrderDetailsList: React.FC = () => {
     handleFiltersChange({ ...values, [field]: value });
   };
 
-  const handlePrint = async (billId: number) => {
+  const handlePrint = async (billId: number): Promise<void> => {
     const result = await dispatch(fetchLastBillById({ billId }));
     if (fetchLastBillById.fulfilled.match(result)) {
       const base64String = result.payload;
@@ -111,13 +110,16 @@ const OrderDetailsList: React.FC = () => {
   useEffect(() => {
     dispatch(fetchActiveStores());
     if (!selectedStore) {
+      setShowModal(true); // Show modal if no store is selected
     } else {
       handleFiltersChange(initialFilters);
     }
+
     const handler = setTimeout(() => {
       setDebouncedQuery(searchQuery);
       handleFiltersChange(initialFilters);
     }, 1000);
+
     return () => clearTimeout(handler);
   }, [searchQuery, currentPage, selectedStore, dispatch]);
 
@@ -130,101 +132,98 @@ const OrderDetailsList: React.FC = () => {
           onSubmit={handleFiltersChange}
           enableReinitialize
         >
-          {({ values, setFieldValue }) => {
-            // formikValuesRef.current = values;
-
-            return (
-              <div>
-                <form>
-                  {/* Filters Section */}
-                  <div className="row mb-3">
-                    <div className="col-md-3">
-                      <label htmlFor="start_date">Start Date</label>
-                      <input
-                        type="date"
-                        name="start_date"
-                        className="form-control"
-                        max={values.end_date}
-                        value={values.start_date}
-                        onChange={(selectedDate) =>
-                          updateFilters("start_date", selectedDate.target.value, values, setFieldValue)
+          {({ values, setFieldValue }) => (
+            <div>
+              <form>
+                {/* Filters Section */}
+                <div className="row mb-3">
+                  <div className="col-md-3">
+                    <label htmlFor="start_date">Start Date</label>
+                    <input
+                      type="date"
+                      name="start_date"
+                      className="form-control"
+                      max={values.end_date}
+                      value={values.start_date}
+                      onChange={(selectedDate) =>
+                        updateFilters("start_date", selectedDate.target.value, values, setFieldValue)
+                      }
+                    />
+                  </div>
+                  <div className="col-md-3">
+                    <label htmlFor="end_date">End Date</label>
+                    <input
+                      type="date"
+                      name="end_date"
+                      className="form-control"
+                      min={values.start_date}
+                      max={currentDate}
+                      value={values.end_date}
+                      onChange={(selectedDate) =>
+                        updateFilters("end_date", selectedDate.target.value, values, setFieldValue)
+                      }
+                    />
+                  </div>
+                  <div className="col-md-2">
+                    <SelectInput
+                      label="Order Status"
+                      name="status"
+                      options={statusOptions}
+                      value={statusOptions.find(
+                        (option) => option.value === values.status
+                      )}
+                      onChange={(selected) =>
+                        updateFilters("status", selected?.value || "all", values, setFieldValue)
+                      }
+                    />
+                  </div>
+                  <div className="col-md-2">
+                    <SelectInput
+                      label="Payment Type"
+                      name="paymentType"
+                      options={paymentTypeOptions}
+                      value={paymentTypeOptions.find(
+                        (option) => option.value === values.paymentType
+                      )}
+                      onChange={(selected) => {
+                        updateFilters("paymentType", selected?.value || "all", values, setFieldValue);
+                        if (selected?.value === "all") {
+                          updateFilters("deliveryType", "all", values, setFieldValue);
                         }
-                      />
-                    </div>
-                    <div className="col-md-3">
-                      <label htmlFor="end_date">End Date</label>
-                      <input
-                        type="date"
-                        name="end_date"
-                        className="form-control"
-                        min={values.start_date}
-                        max={currentDate}
-                        value={values.end_date}
-                        onChange={(selectedDate) =>
-                          updateFilters("end_date", selectedDate.target.value, values, setFieldValue)
-                        }
-                      />
-                    </div>
+                      }}
+                    />
+                  </div>
+                  {values.paymentType === "pay later" && (
                     <div className="col-md-2">
                       <SelectInput
-                        label="Order Status"
-                        name="status"
-                        options={statusOptions}
-                        value={statusOptions.find(
-                          (option) => option.value === values.status
+                        label="Delivery Type"
+                        name="deliveryType"
+                        options={deliveryTypeOptions}
+                        value={deliveryTypeOptions.find(
+                          (option) => option.value === values.deliveryType
                         )}
                         onChange={(selected) =>
-                          updateFilters("status", selected?.value || "all", values, setFieldValue)
+                          updateFilters("deliveryType", selected?.value || "all", values, setFieldValue)
                         }
                       />
                     </div>
-                    <div className="col-md-2">
-                      <SelectInput
-                        label="Payment Type"
-                        name="paymentType"
-                        options={paymentTypeOptions}
-                        value={paymentTypeOptions.find(
-                          (option) => option.value === values.paymentType
-                        )}
-                        onChange={(selected) => {
-                          updateFilters("paymentType", selected?.value || "all", values, setFieldValue);
-                          if (selected?.value === "all") {
-                            updateFilters("deliveryType", "all", values, setFieldValue);
-                          }
-                        }}
-                      />
-                    </div>
-                    {values.paymentType === "pay later" && (
-                      <div className="col-md-2">
-                        <SelectInput
-                          label="Delivery Type"
-                          name="deliveryType"
-                          options={deliveryTypeOptions}
-                          value={deliveryTypeOptions.find(
-                            (option) => option.value === values.deliveryType
-                          )}
-                          onChange={(selected) =>
-                            updateFilters("deliveryType", selected?.value || "all", values, setFieldValue)
-                          }
-                        />
-                      </div>
-                    )}
-                    <div className="col-md-10 mt-3 mb-2">
-                      <input
-                        type="text"
-                        name="query"
-                        placeholder="Search by Customer Name / Invoice Code / Payable Amount"
-                        className="form-control"
-                        value={values.query}
-                        onChange={(e) => updateFilters("query", e.target.value, values, setFieldValue)}
-                      />
-                    </div>
+                  )}
+                  <div className="col-md-10 mt-3 mb-2">
+                    <input
+                      type="text"
+                      name="query"
+                      placeholder="Search by Customer Name / Invoice Code / Payable Amount"
+                      className="form-control"
+                      value={values.query}
+                      onChange={(e) => updateFilters("query", e.target.value, values, setFieldValue)}
+                    />
                   </div>
-                </form>
-              </div>
-            );
-          }}
+                </div>
+              </form>
+            </div>
+          )}
         </Formik>
+
         {/* Change Store Button */}
         <div
           style={{
@@ -337,4 +336,4 @@ const OrderDetailsList: React.FC = () => {
   );
 };
 
-export default OrderDetailsList;
+export default OrderListPage;
